@@ -1,0 +1,111 @@
+Resources:
+  SubpingTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ${self:custom.stage}-subping-core
+      AttributeDefinitions:
+        - AttributeName: PK
+          AttributeType: S
+        - AttributeName: SK
+          AttributeType: S
+        - AttributeName: model
+          AttributeType: S  
+        - AttributeName: createdAt
+          AttributeType: S
+        - AttributeName: updatedAt
+          AttributeType: S
+
+      KeySchema:
+        - AttributeName: PK
+          KeyType: HASH
+        - AttributeName: SK
+          KeyType: RANGE
+
+      # Set the capacity based on the stage
+      ProvisionedThroughput:
+        ReadCapacityUnits: ${self:custom.tableThroughput}
+        WriteCapacityUnits: ${self:custom.tableThroughput}
+      
+      LocalSecondaryIndexes:
+        - IndexName: PK-updatedAt-Index
+          KeySchema:
+          - AttributeName: PK
+            KeyType: HASH
+          - AttributeName: updatedAt
+            KeyType: RANGE
+          Projection:
+            ProjectionType: KEYS_ONLY
+
+        - IndexName: PK-createdAt-Index
+          KeySchema:
+          - AttributeName: PK
+            KeyType: HASH
+          - AttributeName: createdAt
+            KeyType: RANGE
+          Projection:
+            ProjectionType: KEYS_ONLY
+
+      GlobalSecondaryIndexes:
+        - IndexName: SK-PK-Index
+          KeySchema:
+          - AttributeName: SK
+            KeyType: HASH
+          - AttributeName: PK
+            KeyType: RANGE
+          Projection:
+            ProjectionType: KEYS_ONLY
+          ProvisionedThroughput:
+            ReadCapacityUnits: ${self:custom.tableThroughput}
+            WriteCapacityUnits: ${self:custom.tableThroughput}
+
+        - IndexName: model-PK-Index
+          KeySchema:
+          - AttributeName: model
+            KeyType: HASH
+          - AttributeName: PK
+            KeyType: RANGE
+          Projection:
+            ProjectionType: KEYS_ONLY
+          ProvisionedThroughput:
+            ReadCapacityUnits: ${self:custom.tableThroughput}
+            WriteCapacityUnits: ${self:custom.tableThroughput}
+            
+  AuthsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ${self:custom.stage}-subping-auths
+      AttributeDefinitions:
+        - AttributeName: uniqueId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: uniqueId
+          KeyType: HASH
+
+      # Set the capacity based on the stage
+      ProvisionedThroughput:
+        ReadCapacityUnits: ${self:custom.tableThroughput}
+        WriteCapacityUnits: ${self:custom.tableThroughput}
+
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+
+  KeyTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ${self:custom.stage}-subping-keys
+      AttributeDefinitions:
+        - AttributeName: uniqueId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: uniqueId
+          KeyType: HASH
+
+      # Set the capacity based on the stage
+      ProvisionedThroughput:
+        ReadCapacityUnits: ${self:custom.tableThroughput}
+        WriteCapacityUnits: ${self:custom.tableThroughput}
+
+      # TimeToLiveSpecification:
+      #   AttributeName: ttl
+      #   Enabled: true
