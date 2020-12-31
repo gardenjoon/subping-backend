@@ -1,6 +1,4 @@
-import { TModels, TControllers } from "./types/types"
-import Controller from "./controller/"
-
+import Controller from "./controller"
 class SubpingDDB {
     private tableName: string;
 
@@ -8,8 +6,8 @@ class SubpingDDB {
         this.tableName = tableName
     }
 
-    getController(model: TModels): TControllers {
-        const controller = new Controller[model]();
+    getController(): Controller {
+        const controller = new Controller(this.tableName);
 
         return controller;
     }
