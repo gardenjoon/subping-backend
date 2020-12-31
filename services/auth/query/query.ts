@@ -18,7 +18,7 @@ export const makeUser = (PK: String, name: String, birthDay: String, CI: String,
                     TableName: process.env.subpingTable,
                     Item: {
                         PK: PK,
-                        SK: `user`,
+                        SK: name,
                         model: 'user',
                         name: name,
                         birthDay: birthDay,
@@ -32,7 +32,7 @@ export const makeUser = (PK: String, name: String, birthDay: String, CI: String,
                     TableName: process.env.subpingTable,
                     Item: {
                         PK: PK,
-                        SK: `ci`,
+                        SK: CI,
                         model: 'ci',
                         ci: CI,
                         createdAt: new Date().toISOString(),
@@ -45,7 +45,7 @@ export const makeUser = (PK: String, name: String, birthDay: String, CI: String,
                     TableName: process.env.subpingTable,
                     Item: {
                         PK: PK,
-                        SK: `phoneNumber`,
+                        SK: phoneNumber,
                         model: 'phoneNumber',
                         phoneNumber: phoneNumber,
                         carrier: carrier,
@@ -53,7 +53,7 @@ export const makeUser = (PK: String, name: String, birthDay: String, CI: String,
                         updatedAt: new Date().toISOString(),
                     }
                 }
-            }
+            },
         ]
     }
 }
@@ -120,3 +120,30 @@ export const deleteAttr = (PK: String, SK: String) => {
     }
 }
 
+export const makeAddress = (PK: String, addressName: String, postCode: String, address: String, detailedAddress: String) => {
+    return {
+        TableName: process.env.subpingTable,
+        Item: {
+            PK: PK,
+            SK: `address-${addressName}`,
+            model: 'address',
+            addressName: addressName,
+            postCode: postCode,
+            address: address,
+            detailedAddress: detailedAddress
+        }
+    }
+}
+
+export const getAddress = (PK: String) => {
+    return {
+        TableName: process.env.subpingTable,
+        KeyConditionExpression: "PK = :PK",
+        FilterExpression:
+            "model = :model",
+        ExpressionAttributeValues: {
+            ":PK": PK,
+            ":model": "address"
+        },
+    };
+}

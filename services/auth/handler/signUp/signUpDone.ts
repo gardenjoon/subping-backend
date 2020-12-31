@@ -16,6 +16,14 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
         const deviceId = header.deviceid;
         const userAuth = (await dynamodb.call("get", getAuth(deviceId))).Item;
         const userKey = (await dynamodb.call("get", getRSAKey(deviceId))).Item;
+
+        if (!userAuth) {
+            return failure({
+                success: false,
+                message: "AuthExpiredException"
+            })
+        }
+
         const email = userAuth.email
         const password = userAuth.password
         const carrier = body.carrier;
@@ -43,7 +51,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
                 MessageAction: "SUPPRESS"
             }, (err, data) => {
                 if (err) {
-                    throw new Error("cognitoException");
+                    throw new Error("CognitoException");
                 }
 
                 else {
@@ -54,7 +62,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
                         Permanent: true,
                     }, async (err, data) => {
                         if (err) {
-                            throw new Error("cognitoException");
+                            throw new Error("CognitoException");
                         }
 
                         else {
@@ -69,7 +77,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
         else {
             return failure({
                 success: false,
-                message: "parameterException"
+                message: "ParameterException"
             })
         }
 
@@ -82,7 +90,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
     catch (e) {
         return failure({
             success: false,
-            message: "signUpException"
+            message: "SignUpException"
         })
     }
 };

@@ -34,7 +34,7 @@ Resources:
           - AttributeName: updatedAt
             KeyType: RANGE
           Projection:
-            ProjectionType: KEYS_ONLY
+            ProjectionType: ALL
 
         - IndexName: PK-createdAt-Index
           KeySchema:
@@ -43,7 +43,7 @@ Resources:
           - AttributeName: createdAt
             KeyType: RANGE
           Projection:
-            ProjectionType: KEYS_ONLY
+            ProjectionType: ALL
 
       GlobalSecondaryIndexes:
         - IndexName: SK-PK-Index
@@ -53,7 +53,7 @@ Resources:
           - AttributeName: PK
             KeyType: RANGE
           Projection:
-            ProjectionType: KEYS_ONLY
+            ProjectionType: ALL
           ProvisionedThroughput:
             ReadCapacityUnits: ${self:custom.tableThroughput}
             WriteCapacityUnits: ${self:custom.tableThroughput}
@@ -65,7 +65,7 @@ Resources:
           - AttributeName: PK
             KeyType: RANGE
           Projection:
-            ProjectionType: KEYS_ONLY
+            ProjectionType: ALL
           ProvisionedThroughput:
             ReadCapacityUnits: ${self:custom.tableThroughput}
             WriteCapacityUnits: ${self:custom.tableThroughput}

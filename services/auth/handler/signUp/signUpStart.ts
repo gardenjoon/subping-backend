@@ -97,7 +97,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
                 console.log("[signUpStart] Cognito 있음, DB 있음")
                 return failure({
                     success: false,
-                    message: "userExistException"
+                    message: "UserExistException"
                 })
             }
         }
@@ -125,7 +125,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
         console.error(e)
         return failure({
             success: false,
-            message: "signUpStartExepction"
+            message: "SignUpStartExepction"
         })
     }
 };

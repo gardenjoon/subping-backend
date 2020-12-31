@@ -94,6 +94,15 @@ functions:
           method: post
           cors: true
     
+  onboardingStep:
+    handler: ./handler/onboarding/onboardingStep.handler
+    events:
+      - http:
+          path: onboardingStep
+          method: get
+          cors: true
+          authorizer: aws_iam
+    
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
