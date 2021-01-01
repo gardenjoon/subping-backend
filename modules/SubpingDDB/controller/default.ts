@@ -86,7 +86,7 @@ class DefaultController {
         throw new Error("delete 함수가 정의되지 않았습니다.")
     }
 
-    async update<T>(PK: string, SK: string, updated: T) {
+    async update(PK: string, SK: string, updated: Record<string, any>) {
         throw new Error("update 함수가 정의되지 않았습니다.")
     }
 }
