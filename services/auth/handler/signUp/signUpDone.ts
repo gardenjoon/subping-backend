@@ -6,7 +6,8 @@ import * as AWS from "aws-sdk";
 import RSA from "../../libs/RSA";
 import { success, failure } from "../../libs/response-lib";
 import * as dynamodb from "../../libs//dynamodb-lib";
-import { getAuth, getRSAKey, makeUser } from "../../query/query";
+import { makeUser } from "../../query/query";
+import SubpingDDB from "subpingddb";
 
 export const handler: APIGatewayProxyHandler = async (event, context) => {
     try {
@@ -14,8 +15,13 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
         const body = JSON.parse(event.body || "");
 
         const deviceId = header.deviceid;
-        const userAuth = (await dynamodb.call("get", getAuth(deviceId))).Item;
-        const userKey = (await dynamodb.call("get", getRSAKey(deviceId))).Item;
+        const subpingDDBAuth = new SubpingDDB(process.env.authTable);
+        const subpingDDBKey = new SubpingDDB(process.env.keyTable);
+        const authController = subpingDDBAuth.getController();
+        const keyController = subpingDDBKey.getController();
+
+        const userAuth = (await authController.read("uniqueId-Index", deviceId)).Items[0]
+        const userKey = (await keyController.read("uniqueId-Index", deviceId)).Items[0]
 
         if (!userAuth) {
             return failure({
@@ -66,8 +72,9 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
                         }
 
                         else {
+                            // SubpingDDB에서 어떻게 처리할지 고민해야 함.
                             await dynamodb.call("transactWrite", makeUser(email, name, birthDay, CI, phoneNumber, carrier))
-                            resolve()
+                            resolve(null)
                         }
                     })
                 }

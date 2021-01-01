@@ -2,13 +2,17 @@
 
 import { APIGatewayProxyHandler } from "aws-lambda";
 import * as AWS from "aws-sdk";
+import SubpingDDB from "subpingddb";
+import AuthModel from "subpingddb/model/authTable/auth";
 
 import { success, failure } from "../../libs/response-lib";
-import { deleteAttr, getUser, getUserAllAttr } from "../../query/query"
-import * as dynamodb from "../../libs//dynamodb-lib";
-import { makeAuth } from "../../query/query";
 
 export const handler: APIGatewayProxyHandler = async (event, context) => {
+    const subpingDDBCore = new SubpingDDB(process.env.subpingTable);
+    const coreController = subpingDDBCore.getController();
+    const subpingDDBAuth = new SubpingDDB(process.env.authTable);
+    const authController = subpingDDBAuth.getController();
+
     const _getUser = async (email) => {
         const cognitoProvider = new AWS.CognitoIdentityServiceProvider({
             region: "ap-northeast-2",
@@ -32,7 +36,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
             resolve(data)
         }))
 
-        const userDB = (await dynamodb.call("query", getUser(email))).Items[0]
+        const userDB = (await coreController.read("model-PK-Index", email, "user")).Items[0]
 
         return {
             cognito: userCognito,
@@ -62,10 +66,10 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
     }
 
     const _deleteDBUser = async (email) => {
-        const userAll = (await dynamodb.call("query", getUserAllAttr(email))).Items;
+        const userAll = (await coreController.read("PK-SK-Index", email)).Items
 
         for (const row of userAll) {
-            await dynamodb.call("delete", deleteAttr(email, row.SK))
+            await coreController.delete(email, row.SK);
         }
     }
 
@@ -112,7 +116,13 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
             // 코그니토 없고 DB 없는 경우
         }
 
-        await dynamodb.call("put", makeAuth(deviceId, email, password, ttl));
+        const authModel: AuthModel = {
+            uniqueId: deviceId,
+            email: email,
+            password: password,
+            ttl: ttl
+        }
+        await authController.create<AuthModel>(authModel);
         console.log("[signUpStart] Auth 생성 완료")
 
         return success({

@@ -1,20 +1,20 @@
 'use strict';
 
 import { APIGatewayProxyHandler } from "aws-lambda";
-import * as AWS from "aws-sdk";
+import SubpingDDB from "subpingddb";
 
 import { success, failure } from "../../libs/response-lib";
-import * as dynamodb from "../../libs/dynamodb-lib";
-import { getAddress } from "../../query/query";
 
 export const handler: APIGatewayProxyHandler = async (event, context) => {
     try {
         const header = event.headers;
         const PK = header.pk;
+        const subpingDDB = new SubpingDDB(process.env.subpingTable)
+        const controller = subpingDDB.getController();
 
-        const userAddress = (await dynamodb.call("query", getAddress(PK))).Items;
+        const userAddressCount = (await controller.read("model-PK-Index", "address", PK)).ScannedCount
 
-        if (userAddress.length === 0) {
+        if (userAddressCount === 0) {
             return failure({
                 success: false,
                 message: "UserAddressNotExistException"

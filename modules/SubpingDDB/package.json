@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "aws-sdk": "^2.819.0",
+    "ts-transformer-enumerate": "^0.5.1",
     "ts-transformer-keys": "^0.4.3"
   },
   "devDependencies": {

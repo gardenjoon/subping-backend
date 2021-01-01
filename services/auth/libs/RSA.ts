@@ -2,8 +2,11 @@ import { generateKeyPair, privateDecrypt } from "crypto";
 import JSEncrypt from "node-jsencrypt";
 
 const RSA = {
-    generateKeyPair: async function (keySize = 1024) {
-        let keys = {}
+    generateKeyPair: async function (keySize = 1024): Promise<{ privateKey: string, publicKey: string }> {
+        let keys = {
+            privateKey: "",
+            publicKey: ""
+        }
 
         await new Promise((resolve, reject) => generateKeyPair('rsa', {
             modulusLength: keySize,
@@ -24,7 +27,7 @@ const RSA = {
             keys["privateKey"] = privateKey
             keys["publicKey"] = publicKey
 
-            resolve()
+            resolve(null)
         }))
 
         return keys

@@ -1,34 +1,55 @@
 'use strict';
 
 import { APIGatewayProxyHandler } from "aws-lambda";
+import SubpingDDB from "subpingddb";
+import RsaModel from "subpingddb/model/keyTable/rsaKey";
 
 import { success, failure } from "../../libs/response-lib";
 import RSA from "../../libs/RSA";
-import * as dynamodb from "../../libs//dynamodb-lib";
-import { getRSAKey, putRSAKey } from "../../query/query";
 
 export const handler: APIGatewayProxyHandler = async (event, context) => {
-    const header = event.headers;
-    const deviceId = header.deviceid;
-    const existKey = await dynamodb.call("get", getRSAKey(deviceId));
+    try {
+        const header = event.headers;
+        const deviceId = header.deviceid;
 
-    let publicKey;
-    console.log("existKey", existKey)
+        const subpingDDB = new SubpingDDB(process.env.keyTable);
+        const controller = subpingDDB.getController();
 
-    if (existKey.Item) {
-        publicKey = existKey.Item.publicKey;
+        const existKey = (await controller.read("uniqueId-Index", deviceId)).Items[0];
+
+        let publicKey;
+        console.log("existKey", existKey)
+
+        if (existKey) {
+            publicKey = existKey.publicKey;
+        }
+
+        else {
+            const rsaKeys = await RSA.generateKeyPair();
+
+            const property: RsaModel = {
+                "uniqueId": deviceId,
+                "publicKey": rsaKeys.publicKey,
+                "privateKey": rsaKeys.privateKey
+            }
+
+            await controller.create<RsaModel>(property);
+
+            publicKey = rsaKeys.publicKey;
+        }
+
+        return success({
+            success: true,
+            message: "done",
+            publicKey: publicKey
+        })
+    }
+    catch (e) {
+        console.error(e);
+        failure({
+            success: false,
+            message: "SecureInitializeException"
+        })
     }
 
-    else {
-        const rsaKeys = await RSA.generateKeyPair();
-        await dynamodb.call("put", putRSAKey(deviceId, rsaKeys.publicKey, rsaKeys.privateKey));
-
-        publicKey = rsaKeys.publicKey;
-    }
-
-    return success({
-        success: true,
-        message: "done",
-        publicKey: publicKey
-    })
 };

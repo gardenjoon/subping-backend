@@ -9,7 +9,8 @@
   "dependencies": {
     "aws-sdk": "^2.800.0",
     "node-jsencrypt": "^1.0.0",
-    "source-map-support": "^0.5.10"
+    "source-map-support": "^0.5.10",
+    "subpingddb": "file:../../modules/SubpingDDB"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.17",

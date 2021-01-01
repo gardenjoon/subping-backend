@@ -1,17 +1,18 @@
 'use strict';
 
 import { APIGatewayProxyHandler } from "aws-lambda";
+import SubpingDDB from "subpingddb";
 
 import { success, failure } from "../../libs/response-lib";
-import * as dynamodb from "../../libs//dynamodb-lib";
-import { getUser } from "../../query/query";
 
 export const handler: APIGatewayProxyHandler = async (event, context) => {
     try {
         const body = JSON.parse(event.body || "");
         const email = body.email;
 
-        const userDB = (await dynamodb.call("query", getUser(email))).Items[0]
+        const subpingDDB = new SubpingDDB(process.env.subpingTable);
+        const controller = subpingDDB.getController();
+        const userDB = (await controller.read("model-PK-Index", "user", email)).Items[0];
 
         if (userDB) {
             return success({
