@@ -1,12 +1,12 @@
-import SubpingDDB from "subpingddb"
-import AddressModel from "subpingddb/model/subpingTable/address"
+import SubpingDDB from "subpingddb";
+import AddressModel from "subpingddb/model/subpingTable/address";
+import DefaultAddressModel from "subpingddb/model/subpingTable/defaultAddress";
 import { APIGatewayProxyHandler } from 'aws-lambda';
 
 import { success, failure } from "../../libs/response-lib";
 
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
-        console.log(event.body);
         const header = event.headers;
         const PK = header.pk;
         const body = JSON.parse(event.body || "");
@@ -14,6 +14,10 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         console.log(PK, body);
 
         const { addressName, postCode, address, detailedAddress, isDefault } = body;
+
+        // 테스트 코드
+        // const PK = "jsw9088@gmail.com"
+        // const { addressName, postCode, address, detailedAddress, isDefault } = { addressName: "test2", postCode: "test", address: "test", detailedAddress: "test", isDefault: true };
 
         if (!(addressName && postCode && address && detailedAddress && isDefault)) {
             return failure({
@@ -24,7 +28,6 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
 
         const subpingDDB = new SubpingDDB(process.env.subpingTable);
         const controller = subpingDDB.getController();
-
         const existAddress: AddressModel[] = (await controller.read("model-PK-Index", "address", PK)).Items;
 
         // 유저의 주소가 5개 이상일 때 
@@ -43,27 +46,41 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
                     message: "UserAddressNameDuplicatedException"
                 })
             }
-
-            // 기본 주소가 이미 있고, 추가하는 주소가 기본 주소일 떄 기본주소 변경
-            if (isDefault && address.isDefault) {
-                await controller.update(address.PK, address.SK, { isDefault: false });
-            }
         }
 
         const addressModel: AddressModel = {
             PK: PK,
-            SK: addressName,
+            SK: `address#${addressName}`,
             model: "address",
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
             addressName: addressName,
             postCode: postCode,
             address: address,
             detailedAddress: detailedAddress,
-            isDefault: isDefault,
         };
 
         await controller.create<AddressModel>(addressModel);
+
+        // 기본 주소일때 기본주소 업데이트
+        if (isDefault) {
+            const defaultAddress = (await controller.read("model-PK-Index", "defaultAddress", PK)).Items[0];
+
+            if (!defaultAddress) {
+                const property: DefaultAddressModel = {
+                    PK: PK,
+                    SK: "defaultAddress",
+                    model: "defaultAddress",
+                    defaultAddress: `address#${addressName}`
+                }
+
+                await controller.create<DefaultAddressModel>(property);
+            }
+
+            else {
+                await controller.update(defaultAddress.PK, defaultAddress.SK, {
+                    defaultAddress: `address#${addressName}`
+                })
+            }
+        }
 
         return success({
             success: true,
@@ -72,7 +89,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
     }
 
     catch (e) {
-        console.error(e);
+        console.log(e);
         return failure({
             success: false,
             message: "MakeAddressException"

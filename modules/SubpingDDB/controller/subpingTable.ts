@@ -32,21 +32,26 @@ class SubpingTableController extends DefaultController {
 
     private generateReadParams(readIndex: TCombinedAllReadIndex, PK: string, SK?: string, filter?: Record<string, string>, SKBeginsWith?: boolean) {
         const params = super.generateReadParamsDefault(this.PKSKMapper, readIndex, PK, SK, filter, SKBeginsWith);
-        console.log(params)
         return params
     }
 
     private generateUpdateParams(PK: string, SK: string, updated: Record<string, string>) {
-        let updateExpression: string = "SET";
+        const currentDate = new Date().toISOString();
+
+        let updateExpression: string = "SET updatedAt = :updatedAt,";
         const expressionAttributeValues: any = {};
 
         const updatedKeys = Object.keys(updated);
-        updatedKeys.forEach((value, key) => {
-            updateExpression += ` ${key} = :${key}, `;
-            expressionAttributeValues[`:${key}`] = value;
+        expressionAttributeValues[":updatedAt"] = currentDate;
+
+        updatedKeys.forEach((key) => {
+            updateExpression += ` ${key} = :${key},`;
+            expressionAttributeValues[`:${key}`] = updated[key];
         });
 
-        return {
+        updateExpression = updateExpression.substr(0, updateExpression.length - 1);
+
+        const params = {
             TableName: this.tableName,
             Key: {
                 PK: PK,
@@ -56,6 +61,8 @@ class SubpingTableController extends DefaultController {
             ExpressionAttributeValues: expressionAttributeValues,
             ReturnValues: "ALL_NEW"
         }
+
+        return params
     }
 
     async read(readIndex: TCombinedAllReadIndex, PK: string, SK?: string, SKBeginsWith: boolean = false): Promise<any> {

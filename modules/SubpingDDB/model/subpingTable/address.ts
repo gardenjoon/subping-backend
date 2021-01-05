@@ -5,7 +5,6 @@ interface AddressModel extends DefaultModel {
     postCode: string;
     address: string;
     detailedAddress: string;
-    isDefault: Boolean;
 }
 
 export default AddressModel;

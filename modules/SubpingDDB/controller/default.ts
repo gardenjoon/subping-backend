@@ -66,9 +66,15 @@ class DefaultController {
     }
 
     async create<T>(property: T) {
+        const currentDate = new Date().toISOString();
+
         const params = {
             TableName: this.tableName,
-            Item: property
+            Item: {
+                ...property,
+                createdAt: currentDate,
+                updatedAt: currentDate
+            }
         };
 
         await dynamoDBLib.call("put", params);
