@@ -114,4 +114,4 @@ class SubpingTableController extends DefaultController {
     }
 }
 
-export default SubpingTableController
+export default SubpingTableController;

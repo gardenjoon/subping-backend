@@ -1,0 +1,85 @@
+# Welcome to Serverless!
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+# Happy Coding!
+
+service: service
+# app and org for use with dashboard.serverless.com
+#app: your-app-name
+#org: your-org-name
+
+# You can pin your service to only deploy with a specific Serverless version
+# Check out our docs for more details
+# frameworkVersion: "=X.X.X"
+
+plugins:
+  - serverless-webpack
+  - serverless-offline
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  webpack:
+    webpackConfig: ./webpack.config.js
+    includeModules: true
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: ap-northeast-2
+  stage: dev
+  environment:
+    subpingTable: ${self:custom.stage}-subping-core
+    authTable: ${self:custom.stage}-subping-auths
+    keyTable: ${self:custom.stage}-subping-keys
+
+package:
+  individually: true
+
+iamRoleStatements:
+  - Effect: "Allow"
+    Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+        - dynamodb:BatchWriteItem
+
+    Resource:
+      Fn::Join:
+        - "Fn::GetAtt": [ AuthsTable, Arn ]
+        - "Fn::GetAtt": [ SubpingTable, Arn ]
+        - "Fn::GetAtt": [ KeyTable, Arn ]
+
+functions:
+  currentHotChart:
+    handler: ./handler/chart/currentHotChart.handler
+    events:
+      - http:
+          path: currentHotChart
+          method: post
+          cors: true
+          authorizer: aws_iam
+  
+  recommendServices:
+    handler: ./handler/recommend/recommendServices.handler
+    events:
+      - http:
+          path: recommendServices
+          method: post
+          cors: true
+          authorizer: aws_iam
+
+  makeService:
+    handler: ./handler/service/makeService.handler
+  
