@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import SubpingDDB from "subpingddb";
 import AddressModel from "subpingddb/model/subpingTable/address";
 import DefaultAddressModel from "subpingddb/model/subpingTable/defaultAddress";
@@ -10,6 +11,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const header = event.headers;
         const PK = header.pk;
         const body = JSON.parse(event.body || "");
+        const uuid = uuidv4();
 
         console.log(PK, body);
 
@@ -50,8 +52,10 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
 
         const addressModel: AddressModel = {
             PK: PK,
-            SK: `address#${addressName}`,
+            SK: `address#${uuid}`,
             model: "address",
+            createdAt: null,
+            updatedAt: null,
             addressName: addressName,
             postCode: postCode,
             address: address,
@@ -69,7 +73,9 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
                     PK: PK,
                     SK: "defaultAddress",
                     model: "defaultAddress",
-                    defaultAddress: `address#${addressName}`
+                    createdAt: null,
+                    updatedAt: null,
+                    defaultAddress: `address#${uuid}`
                 }
 
                 await controller.create<DefaultAddressModel>(property);
@@ -77,7 +83,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
 
             else {
                 await controller.update(defaultAddress.PK, defaultAddress.SK, {
-                    defaultAddress: `address#${addressName}`
+                    defaultAddress: `address#${uuid}`
                 })
             }
         }

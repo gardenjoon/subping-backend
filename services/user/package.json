@@ -10,7 +10,8 @@
     "aws-sdk": "^2.800.0",
     "node-jsencrypt": "^1.0.0",
     "source-map-support": "^0.5.19",
-    "subpingddb": "file:../../modules/SubpingDDB"
+    "subpingddb": "file:../../modules/SubpingDDB",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "@serverless/typescript": "^2.12.0",

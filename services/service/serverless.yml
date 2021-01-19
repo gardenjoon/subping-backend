@@ -82,4 +82,7 @@ functions:
 
   makeService:
     handler: ./handler/service/makeService.handler
+
+  makeReview:
+    handler: ./handler/review/makeReview.handler
   

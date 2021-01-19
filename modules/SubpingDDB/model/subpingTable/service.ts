@@ -3,11 +3,10 @@ import DefaultModel from "./default"
 interface ServiceModel extends DefaultModel {
     serviceCode: string;
     serviceName: string;
-    serviceSqaureLogoUrl: string;
+    serviceLogoUrl: string;
     servicSummary: string;
     serviceTags: string[];
-    serviceRating: number;
-    serviceMinPrice: number;
+    serviceCategory: String;
 }
 
 
