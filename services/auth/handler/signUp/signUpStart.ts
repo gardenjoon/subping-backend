@@ -36,7 +36,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
             resolve(data)
         }))
 
-        const userDB = (await coreController.read("model-PK-Index", email, "user")).Items[0]
+        const userDB = (await coreController.read("model-PK-Index", "user", email)).Items[0]
 
         return {
             cognito: userCognito,
