@@ -80,9 +80,18 @@ functions:
           cors: true
           authorizer: aws_iam
 
-  makeService:
-    handler: ./handler/service/makeService.handler
+  getServices:
+    handler: ./handler/service/getServices.handler
+    events:
+      - http:
+          path: getServices
+          method: post
+          cors: true
+          authorizer: aws_iam
 
-  makeReview:
-    handler: ./handler/review/makeReview.handler
+  # makeService:
+  #   handler: ./handler/service/makeService.handler
+
+  # makeReview:
+  #   handler: ./handler/review/makeReview.handler
   
