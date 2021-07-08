@@ -28,7 +28,10 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
             
             return success({
                 success: true,
-                message: serviceRank
+                message: {
+                    time: time,
+                    serviceRank: serviceRank
+                }
             })
         }
     }
