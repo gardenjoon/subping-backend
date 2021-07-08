@@ -3,10 +3,12 @@ import ServiceModel from "subpingddb/model/subpingTable/service";
 import ServiceRankModel from "subpingddb/model/subpingTable/serviceRank";
 import HotChartTimeModel from "subpingddb/model/subpingTable/hotChartTime";
 import ServiceEventModel from "subpingddb/model/subpingTable/serviceEvent";
+import "moment-timezone";
 
 import { APIGatewayProxyHandler } from 'aws-lambda';
 
 import { success, failure } from "../../libs/response-lib";
+import * as moment from "moment-timezone";
 
 export const handler:APIGatewayProxyHandler  = async (event, _context) => {
     try {
@@ -21,7 +23,7 @@ export const handler:APIGatewayProxyHandler  = async (event, _context) => {
             return (b.dailyReviews + b.dailySubscribers + b.dailyWatchers) - (a.dailyReviews + a.dailySubscribers + a.dailyWatchers);
         });
         
-        let time = new Date().getHours()-9;
+        let time = moment.tz("Asia/Seoul").hour();
         
         if (6 <= time && time < 12) {
             time = 6;
