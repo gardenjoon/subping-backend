@@ -6,7 +6,7 @@ interface ServiceModel extends DefaultModel {
     serviceSquareLogoUrl: string;
     serviceSummary: string;
     serviceTags: string[];
-    serviceCategory: String;
+    serviceCategory: string;
 }
 
 export default ServiceModel
