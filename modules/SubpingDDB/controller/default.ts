@@ -95,6 +95,34 @@ class DefaultController {
     async update(PK: string, SK: string, updated: Record<string, any>) {
         throw new Error("update 함수가 정의되지 않았습니다.")
     }
+
+    async transactionCreate(property: any[]) {
+        const createParam: any = [];
+
+        property.forEach(element => {
+            const currentDate = new Date().toISOString();
+
+            const params = {
+                TableName: this.tableName,
+                Item: {
+                    ...element,
+                    createdAt: currentDate,
+                    updatedAt: currentDate
+                }
+            };
+
+            createParam.push(
+                {
+                    "Put": params
+                }
+            )
+        })
+
+        await dynamoDBLib.call("transactWrite", createParam, (err, data) => {
+            console.log("err" , err);
+            console.log("data", data);
+        });
+    }
 }
 
 export default DefaultController

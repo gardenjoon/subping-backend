@@ -10,7 +10,8 @@
     "aws-sdk": "^2.800.0",
     "node-jsencrypt": "^1.0.0",
     "source-map-support": "^0.5.19",
-    "subpingddb": "file:../../modules/SubpingDDB"
+    "subpingddb": "file:../../modules/SubpingDDB",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "@serverless/typescript": "^2.12.0",
@@ -18,7 +19,7 @@
     "@types/node": "^14.14.6",
     "fork-ts-checker-webpack-plugin": "^6.0.0",
     "serverless-offline": "^6.8.0",
-    "serverless-webpack": "^5.2.0",
+    "serverless-webpack": "^5.5.1",
     "ts-loader": "^8.0.10",
     "ts-node": "^9.0.0",
     "typescript": "^4.0.5",

@@ -1,6 +1,6 @@
 import * as AWS from "aws-sdk";
 
-type TActions = "put" | "query" | "update" | "delete"
+type TActions = "put" | "query" | "update" | "delete" | "transactWrite"
 
 export function call(action: TActions, params: any, callback?: (err: any, data: any) => void) {
   const dynamoDb = new AWS.DynamoDB.DocumentClient({
@@ -8,5 +8,13 @@ export function call(action: TActions, params: any, callback?: (err: any, data: 
     region: 'ap-northeast-2'
   });
 
-  return dynamoDb[action](params, callback).promise();
+  if (action === "transactWrite") {
+    return dynamoDb.transactWrite({
+      TransactItems: params
+    }, callback).promise(); 
+  }
+
+  else {
+    return dynamoDb[action](params, callback).promise();
+  }
 }

@@ -70,6 +70,11 @@ functions:
           method: post
           cors: true
           authorizer: aws_iam
+          
+  cronMakeRank:
+    handler: ./handler/chart/cronMakeRank.handler
+    events:
+      - schedule: cron(0 6 * * ? *)
   
   recommendServices:
     handler: ./handler/recommend/recommendServices.handler
