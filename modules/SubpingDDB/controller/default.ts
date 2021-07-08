@@ -119,8 +119,9 @@ class DefaultController {
         })
 
         await dynamoDBLib.call("transactWrite", createParam, (err, data) => {
-            console.log("err" , err);
-            console.log("data", data);
+            if(err) {
+                console.log("[SubpingDDB] transacWriteError : ", err);
+            }
         });
     }
 }
