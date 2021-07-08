@@ -21,7 +21,7 @@ export const handler:APIGatewayProxyHandler  = async (event, _context) => {
             return (b.dailyReviews + b.dailySubscribers + b.dailyWatchers) - (a.dailyReviews + a.dailySubscribers + a.dailyWatchers);
         });
         
-        let time = new Date().getHours();
+        let time = new Date().getHours()-9;
         
         if (6 <= time && time < 12) {
             time = 6;
