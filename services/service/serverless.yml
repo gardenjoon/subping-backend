@@ -74,7 +74,7 @@ functions:
   cronMakeRank:
     handler: ./handler/chart/cronMakeRank.handler
     events:
-      - schedule: cron(0 6 * * ? *)
+      - schedule: cron(0 6,12,18,24 * * ? *)
   
   recommendServices:
     handler: ./handler/recommend/recommendServices.handler
