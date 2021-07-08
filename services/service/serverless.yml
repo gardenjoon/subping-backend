@@ -74,7 +74,7 @@ functions:
   cronMakeRank:
     handler: ./handler/chart/cronMakeRank.handler
     events:
-      - schedule: cron(0 6 * * ? *)
+      - schedule: cron(0 21,3,9,15 * * ? *)
   
   recommendServices:
     handler: ./handler/recommend/recommendServices.handler
@@ -94,6 +94,15 @@ functions:
           cors: true
           authorizer: aws_iam
 
+  getCategories:
+    handler: ./handler/service/getCategories.handler
+    events:
+      - http:
+          path: getCategories
+          method: get
+          cors: true
+          authorizer: aws_iam
+  
   # makeService:
   #   handler: ./handler/service/makeService.handler
 
