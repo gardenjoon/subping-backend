@@ -11,10 +11,11 @@ import { success, failure } from "../../libs/response-lib";
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     const checkAvailable = async (controller, category, serviceName) => {
         const categoryModel:CategoryModel[] = (await controller.read("SK-PK-Index", `category#${category}`)).Items;
-        const serviceModel: ServiceModel[] = (await controller.read("SK-PK-Index", `service#${category}`, null, {
+        const serviceModel: ServiceModel[] = (await controller.readWithFilter("SK-PK-Index", `service#${category}`, null, {
             serviceName: serviceName
         })).Items;
-        
+
+
         if(categoryModel && serviceModel.length === 0) {
             return true;
         }
