@@ -38,8 +38,8 @@ export const handler:APIGatewayProxyHandler  = async (event, _context) => {
         else {
             time = 24;
         }
-        serviceEvent.forEach(async (element, index) => {
-            const service: ServiceModel = (await controller.read("model-PK-Index", "service", element.PK)).Items[0]
+        for (const [index, element] of serviceEvent.entries()) {
+            const service: ServiceModel = (await controller.read("model-PK-Index", "service", element.PK)).Items[0];
             const ttlHour = 24;
             const ttl = (Math.round(Date.now() / 1000) + ttlHour * 60 * 60).toString();
             const serviceRankModel: ServiceRankModel = {
@@ -52,11 +52,10 @@ export const handler:APIGatewayProxyHandler  = async (event, _context) => {
                 rank: index + 1,
                 time: `${time}`,
                 ttl: ttl
-            }
-            console.log(time)
+            };
 
             await controller.create<ServiceRankModel>(serviceRankModel);
-        });
+        };
 
         const HotChartTimeModel: HotChartTimeModel = {
             PK: "hotChartTime",
@@ -65,14 +64,13 @@ export const handler:APIGatewayProxyHandler  = async (event, _context) => {
             updatedAt: null,
             model: "hotChartTime",
             time: time
-        }
-
+        };
         await controller.create<HotChartTimeModel>(HotChartTimeModel);
 
         return success({
             success: true,
             message: 'All MakeRating is successfully updated'
-        })
+        });
     }
 
     catch (e) {
@@ -80,9 +78,6 @@ export const handler:APIGatewayProxyHandler  = async (event, _context) => {
       return failure({
           success: false,
           message: "cronMakeRatingException"
-      })
-    }
-}
-
-
-
+      });
+    };
+};
