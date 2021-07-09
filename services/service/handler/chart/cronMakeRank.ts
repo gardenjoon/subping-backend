@@ -3,12 +3,11 @@ import ServiceModel from "subpingddb/model/subpingTable/service";
 import ServiceRankModel from "subpingddb/model/subpingTable/serviceRank";
 import HotChartTimeModel from "subpingddb/model/subpingTable/hotChartTime";
 import ServiceEventModel from "subpingddb/model/subpingTable/serviceEvent";
-import "moment-timezone";
+import * as moment from "moment-timezone";
 
 import { APIGatewayProxyHandler } from 'aws-lambda';
 
 import { success, failure } from "../../libs/response-lib";
-import * as moment from "moment-timezone";
 
 export const handler:APIGatewayProxyHandler  = async (event, _context) => {
     try {
@@ -39,7 +38,6 @@ export const handler:APIGatewayProxyHandler  = async (event, _context) => {
         else {
             time = 24;
         }
-
         serviceEvent.forEach(async (element, index) => {
             const service: ServiceModel = (await controller.read("model-PK-Index", "service", element.PK)).Items[0]
             const ttlHour = 24;
@@ -55,6 +53,7 @@ export const handler:APIGatewayProxyHandler  = async (event, _context) => {
                 time: `${time}`,
                 ttl: ttl
             }
+            console.log(time)
 
             await controller.create<ServiceRankModel>(serviceRankModel);
         });
