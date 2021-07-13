@@ -54,6 +54,12 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
             await new Promise((resolve, reject) => cognitoProvider.adminCreateUser({
                 UserPoolId: "ap-northeast-2_VzCrSsELb",
                 Username: email,
+                UserAttributes: [
+                    {
+                        "Name": "name",
+                        "Value": name
+                    }
+                ],
                 MessageAction: "SUPPRESS"
             }, (err, data) => {
                 if (err) {
