@@ -14,12 +14,13 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
 
         const categoryModel: CategoryModel = {
             PK: `category#${servicePK}`,
-            SK: `category#생활`,
+            SK: `category#사회`,
             createdAt: null,
             updatedAt: null,
             model: "category",
-            category: "생활",
-            categorySummary: "생활용품에 관한 카테고리입니다.",
+            category: "사회",
+            categoryCode : `category#${servicePK}`,
+            categorySummary: "정치, 뉴스, 연예에 관한 카테고리입니다",
         }
         await controller.create<CategoryModel>(categoryModel);
 
