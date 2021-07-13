@@ -84,7 +84,7 @@ class DefaultController {
         throw new Error("read 함수가 정의되지 않았습니다.")
     }
 
-    async readWithFilter(readIndex: TCombinedAllReadIndex, PK: string, SK?: string, filter?: Record<string, string>, SKBeginsWith: boolean = false) {
+    async readWithFilter(readIndex: TCombinedAllReadIndex, PK: string, SK?: string, filter?: Record<string, any>, SKBeginsWith: boolean = false) {
         throw new Error("readWithFilter 함수가 정의되지 않았습니다.")
     }
 

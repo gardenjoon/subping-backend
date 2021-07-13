@@ -76,7 +76,7 @@ class SubpingTableController extends DefaultController {
         return result;
     }
 
-    async readWithFilter(readIndex: TCombinedAllReadIndex, PK: string, SK?: string, filter?: Record<string, string>, SKBeginsWith: boolean = false): Promise<any> {
+    async readWithFilter(readIndex: TCombinedAllReadIndex, PK: string, SK?: string, filter?: Record<string, any>, SKBeginsWith: boolean = false): Promise<any> {
         if (readIndex === "uniqueId-Index") {
             throw new Error("해당 Table에서 사용할 수 없는 Index입니다.")
         }
