@@ -6,13 +6,10 @@ export class ReviewImage {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @ManyToOne(type => Review, review => review.id, {
+    @ManyToOne(type => Review, review => review.images, {
         cascade: true
     })
-    @JoinColumn({
-        name: "reviewId"
-    })
-    reviewId: string;
+    review: string;
 
     @Column({
         length: 1000,

@@ -8,23 +8,15 @@ export class Review {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @PrimaryColumn()
-    @ManyToOne(type => User, user => user.email, {
+    @ManyToOne(type => User, user => user.reviews, {
         cascade: true
     })
-    @JoinColumn({
-        name: "userEmail"
-    })
-    userEmail: string;
+    user: string;
 
-    @PrimaryColumn()
-    @ManyToOne(type => Product, product => product.id, {
+    @ManyToOne(type => Product, product => product.reviews, {
         cascade: true
     })
-    @JoinColumn({
-        name: "productId"
-    })
-    productId: string;
+    product: string;
 
     @Column({
         nullable: false
@@ -52,6 +44,6 @@ export class Review {
     })
     updatedAt: Date;
 
-    @OneToMany(type => ReviewImage, reviewImage => reviewImage.id)
+    @OneToMany(type => ReviewImage, reviewImage => reviewImage.review)
     images: ReviewImage[]
 }

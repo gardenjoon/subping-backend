@@ -6,11 +6,8 @@ type RankTime = "06:00" | "12:00" | "18:00" | "24:00";
 @Entity()
 export class ServiceRank {
     @PrimaryColumn()
-    @OneToOne(type => Service, service => service.id)
-    @JoinColumn({
-        name: "serviceId"
-    })
-    serviceId: string;
+    @OneToOne(type => Service)
+    service: string;
     
     @PrimaryColumn({
         type: "date"

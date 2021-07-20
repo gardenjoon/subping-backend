@@ -3,6 +3,7 @@ import { UserAddress } from "./UserAddress";
 import { Alarm } from "./Alarm";
 import { Seller } from "./Seller";
 import { ServiceCategory } from "./ServiceCategory";
+import { Product } from "./Product";
 
 type ServiceType = "delivery" | "online"
 
@@ -11,12 +12,11 @@ export class Service {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @ManyToOne(type => Seller, seller => seller.email, {
+    @ManyToOne(type => Seller, seller => seller.services, {
         nullable: false,
         cascade: true
     })
-    @JoinColumn({name: "sellerEmail"})
-    sellerEmail: string;
+    seller: string;
 
     @Column({
         nullable: false
@@ -49,6 +49,9 @@ export class Service {
     })
     updatedAt: Date
 
-    @OneToMany(type => ServiceCategory, serviceCategory => serviceCategory.categoryName)
+    @OneToMany(type => ServiceCategory, serviceCategory => serviceCategory.service)
     serviceCategories: ServiceCategory[]
+
+    @OneToMany(type => Product, product => product.service)
+    products: Product[]
 }

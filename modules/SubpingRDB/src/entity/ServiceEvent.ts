@@ -6,13 +6,10 @@ type RankTime = "06:00" | "12:00" | "18:00" | "24:00";
 @Entity()
 export class ServiceEvent {
     @PrimaryColumn()
-    @OneToOne(type => Service, service => service.id, {
+    @OneToOne(type => Service, {
         cascade: true
     })
-    @JoinColumn({
-        name: "serviceId"
-    })
-    serviceId: string;
+    service: string;
     
     @PrimaryColumn({
         type: "date"

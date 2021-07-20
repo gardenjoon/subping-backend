@@ -8,14 +8,10 @@ export class Product {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @PrimaryColumn()
-    @ManyToOne(type => Service, service => service.id, {
+    @ManyToOne(type => Service, service => service.products, {
         cascade: true
     })
-    @JoinColumn({
-        name: "serviceId"
-    })
-    serviceId: string;
+    service: string;
 
     @Column({
         nullable: false
@@ -54,6 +50,6 @@ export class Product {
     })
     updatedAt: Date;
 
-    @OneToMany(type => Review, review => review.id)
+    @OneToMany(type => Review, review => review.product)
     reviews: Review[]
 }

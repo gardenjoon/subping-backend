@@ -1,6 +1,7 @@
 import {Entity, Column, CreateDateColumn, UpdateDateColumn, PrimaryColumn, OneToMany} from "typeorm";
 import { UserAddress } from "./UserAddress";
 import { Alarm } from "./Alarm";
+import { Review } from "./Review";
 
 type GenterType = "F" | "M";
 
@@ -58,9 +59,12 @@ export class User {
     })
     updatedAt: Date
 
-    @OneToMany(type => Alarm, alarm => alarm.userEmail)
+    @OneToMany(type => Alarm, alarm => alarm.user)
     alarms: Alarm[];
 
-    @OneToMany(type => UserAddress, userAddress => userAddress.userEmail)
+    @OneToMany(type => UserAddress, userAddress => userAddress.user)
     addresses: UserAddress[];
+
+    @OneToMany(type => Review, review => review.user)
+    reviews: Review[];
 }

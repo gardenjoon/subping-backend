@@ -23,12 +23,6 @@ export class Seller {
     })
     updatedAt: Date
 
-    @OneToMany(type => Alarm, alarm => alarm.userEmail)
-    alarms: Alarm[];
-
-    @OneToMany(type => UserAddress, userAddress => userAddress.userEmail)
-    addresses: UserAddress[];
-
-    @OneToMany(type => Service, service => service.sellerEmail)
+    @OneToMany(type => Service, service => service.seller)
     services: Service[];
 }

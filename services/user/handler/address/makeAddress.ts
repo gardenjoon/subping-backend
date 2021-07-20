@@ -1,7 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import SubpingDDB from "subpingddb";
 import AddressModel from "subpingddb/model/subpingTable/address";
-import DefaultAddressModel from "subpingddb/model/subpingTable/defaultAddress";
 import { APIGatewayProxyHandler } from 'aws-lambda';
 
 import { success, failure } from "../../libs/response-lib";
@@ -50,6 +49,16 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
             }
         }
 
+        if(isDefault) {
+            for(const address of existAddress) {
+                if(address.isDefault) {
+                    await controller.update(address.PK, address.SK, {
+                        isDefault: false
+                    })
+                }
+            }
+        }
+
         const addressModel: AddressModel = {
             PK: PK,
             SK: `address#${uuid}`,
@@ -60,33 +69,10 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
             postCode: postCode,
             address: address,
             detailedAddress: detailedAddress,
+            isDefault: !!!isDefault
         };
 
         await controller.create<AddressModel>(addressModel);
-
-        // 기본 주소일때 기본주소 업데이트
-        if (isDefault) {
-            const defaultAddress = (await controller.read("model-PK-Index", "defaultAddress", PK)).Items[0];
-
-            if (!defaultAddress) {
-                const property: DefaultAddressModel = {
-                    PK: PK,
-                    SK: "defaultAddress",
-                    model: "defaultAddress",
-                    createdAt: null,
-                    updatedAt: null,
-                    defaultAddress: `address#${uuid}`
-                }
-
-                await controller.create<DefaultAddressModel>(property);
-            }
-
-            else {
-                await controller.update(defaultAddress.PK, defaultAddress.SK, {
-                    defaultAddress: `address#${uuid}`
-                })
-            }
-        }
 
         return success({
             success: true,

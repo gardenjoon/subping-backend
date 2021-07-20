@@ -27,6 +27,6 @@ export class Category {
     })
     updatedAt: Date;
 
-    @OneToMany(type => ServiceCategory, serviceCategory => serviceCategory.categoryName)
+    @OneToMany(type => ServiceCategory, serviceCategory => serviceCategory.category)
     serviceCategories: ServiceCategory[]
 }

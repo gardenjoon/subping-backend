@@ -1,26 +1,21 @@
-import {Entity, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, PrimaryColumn} from "typeorm";
+import {Entity, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, PrimaryColumn, PrimaryGeneratedColumn} from "typeorm";
 import { Category } from "./Category";
 import { Service } from "./Service";
 
 @Entity()
 export class ServiceCategory {
-    @PrimaryColumn()
-    @ManyToOne(type => Service, service => service.id, {
-        cascade: true
-    })
-    @JoinColumn({
-        name: "serviceId"
-    })
-    serviceId: string;
+    @PrimaryGeneratedColumn("uuid")
+    id: string;
 
-    @PrimaryColumn()
-    @ManyToOne(type => Category, category => category.name, {
+    @ManyToOne(type => Service, service => service.serviceCategories, {
         cascade: true
     })
-    @JoinColumn({
-        name: "categoryName"
+    service: string;
+
+    @ManyToOne(type => Category, category => category.serviceCategories, {
+        cascade: true
     })
-    categoryName: string;
+    category: string;
 
     @CreateDateColumn({
         nullable: false

@@ -8,12 +8,11 @@ export class Alarm {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @ManyToOne(type => User, user => user.email, {
+    @ManyToOne(type => User, user => user.alarms, {
         nullable: false,
         cascade: true
     })
-    @JoinColumn({ name: "userEmail"})
-    userEmail: string;
+    user: string;
 
     @Column({
         nullable: false
