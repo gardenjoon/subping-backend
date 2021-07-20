@@ -1,0 +1,49 @@
+import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn} from "typeorm";
+import { User } from "./User";
+
+type AlarmType = "delivery" | "payment" | "expiration" | "info" | "important";
+ 
+@Entity()
+export class Alarm {
+    @PrimaryGeneratedColumn("uuid")
+    id: string;
+
+    @ManyToOne(type => User, user => user.email, {
+        nullable: false,
+        cascade: true
+    })
+    @JoinColumn({ name: "userEmail"})
+    userEmail: string;
+
+    @Column({
+        nullable: false
+    })
+    type: AlarmType;
+
+    @Column({
+        nullable: false
+    })
+    title: string;
+
+    @Column({
+        type: "text",
+        nullable: false
+    })
+    content: string;
+
+    @Column({
+        nullable: false,
+        default: false
+    })
+    read: boolean;
+
+    @CreateDateColumn({
+        nullable: false
+    })
+    createdAt: Date;
+
+    @UpdateDateColumn({
+        nullable: false
+    })
+    updatedAt: Date;
+}
