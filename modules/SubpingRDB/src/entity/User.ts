@@ -43,6 +43,11 @@ export class User {
         nullable: false
     })
     ci: string;
+
+    @Column({
+        nullable: false
+    })
+    carrier: string;
     
     @Column({
         nullable: false
