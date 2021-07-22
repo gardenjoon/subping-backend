@@ -1,7 +1,18 @@
 import "reflect-metadata";
-import * as path from 'path';
 import {createConnection, getConnectionOptions} from "typeorm";
+
+import { Alarm } from "./entity/Alarm";
+import { Category } from "./entity/Category";
+import { Product } from "./entity/Product";
+import { Review } from "./entity/Review";
+import { ReviewImage } from "./entity/ReviewImage";
+import { Seller } from "./entity/Seller";
+import { Service } from "./entity/Service";
+import { ServiceCategory } from "./entity/ServiceCategory";
+import { ServiceEvent } from "./entity/ServiceEvent";
+import { ServiceRank } from "./entity/ServiceRank";
 import { User } from "./entity/User";
+import { UserAddress } from "./entity/UserAddress";
 
 type StageType = "prod" | "dev";
 
@@ -21,15 +32,19 @@ class SubpingRDB {
     }    
 }
 
-const test = async () => {
-    const subpingRDB = new SubpingRDB()
-    const connection = await subpingRDB.createConnection("dev");
-    console.log(connection);
-    
-    const userRepository = connection.getRepository(User);
-    console.log(userRepository);
+export const Entity = {
+    User: User,
+    Alarm: Alarm,
+    Category: Category,
+    Product: Product,
+    Review: Review,
+    ReviewImage: ReviewImage,
+    Seller: Seller,
+    Service: Service,
+    ServiceCategory: ServiceCategory,
+    ServiceEvent: ServiceEvent,
+    ServiceRank: ServiceRank,
+    UserAddress: UserAddress
 }
-
-test();
 
 export default SubpingRDB;
