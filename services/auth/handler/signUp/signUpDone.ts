@@ -2,8 +2,8 @@
 
 import { APIGatewayProxyHandler } from "aws-lambda";
 import * as AWS from "aws-sdk";
-import SubpingDDB from "@SubpingDDB";
-import SubpingRDB, { Entity } from "@SubpingRDB";
+import SubpingDDB from "subpingddb";
+import SubpingRDB, { Entity } from "subpingrdb";
 
 import RSA from "../../libs/RSA";
 import { success, failure } from "../../libs/response-lib";

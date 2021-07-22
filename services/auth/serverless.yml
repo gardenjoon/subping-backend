@@ -103,9 +103,6 @@ functions:
           method: post
           cors: true
   
-  onBoardingStep:
-    handler: ./handler/onboarding/onboardingStep.handler
-
     
 
 #    The following are a few example events you can configure

@@ -2,9 +2,9 @@
 
 import { APIGatewayProxyHandler } from "aws-lambda";
 import * as AWS from "aws-sdk";
-import SubpingDDB from "@SubpingDDB";
-import SubpingRDB, { Entity } from "@SubpingRDB";
-import AuthModel from "@SubpingDDB/model/authTable/auth";
+import SubpingDDB from "subpingddb";
+import SubpingRDB, { Entity } from "subpingrdb";
+import AuthModel from "subpingddb/model/authTable/auth";
 
 import { success, failure } from "../../libs/response-lib";
 

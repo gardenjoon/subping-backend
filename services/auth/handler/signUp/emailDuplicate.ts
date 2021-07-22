@@ -2,71 +2,75 @@
 
 import * as AWS from "aws-sdk";
 import { APIGatewayProxyHandler } from "aws-lambda";
-import SubpingRDB, {Entity} from "@SubpingRDB";
+import SubpingRDB from "subpingrdb";
 
 import { success, failure } from "../../libs/response-lib";
 
 export const handler: APIGatewayProxyHandler = async (event, context) => {
     const subpingRDB = new SubpingRDB();
     const rdbConnection = await subpingRDB.createConnection("dev");
+    console.log(rdbConnection)
 
-    const _getUser = async (email: string) => {
-        const cognitoProvider = new AWS.CognitoIdentityServiceProvider({
-            region: "ap-northeast-2",
-        });
-
-        const userCognito = await new Promise((resolve, reject) => cognitoProvider.adminGetUser({
-            UserPoolId: "ap-northeast-2_VzCrSsELb",
-            Username: email
-        }, (err, data) => {
-            if (err) {
-                switch (err.code) {
-                    case "UserNotFoundException":
-                        resolve(null)
-                        break
-                    default:
-                        console.log(err)
-                        throw new Error("cognitoException");
-                }
-            }
-
-            resolve(data)
-        }))
-
-        const userRepository = rdbConnection.getRepository(Entity.User);
-        const userDB = await userRepository.findOne({
-            email: email
-        })
-
-        return {
-            cognito: userCognito,
-            db: userDB
-        };
-    }
-
-    try {
-        const body = JSON.parse(event.body || "");
-        const email = body.email;
+    return success({
         
-        const user = await _getUser(email);
+    });
+    // const _getUser = async (email: string) => {
+    //     const cognitoProvider = new AWS.CognitoIdentityServiceProvider({
+    //         region: "ap-northeast-2",
+    //     });
 
-        if (user.db && user.cognito) {
-            return success({
-                success: false,
-                message: "EmailExistException"
-            })
-        }
+    //     const userCognito = await new Promise((resolve, reject) => cognitoProvider.adminGetUser({
+    //         UserPoolId: "ap-northeast-2_VzCrSsELb",
+    //         Username: email
+    //     }, (err, data) => {
+    //         if (err) {
+    //             switch (err.code) {
+    //                 case "UserNotFoundException":
+    //                     resolve(null)
+    //                     break
+    //                 default:
+    //                     console.log(err)
+    //                     throw new Error("cognitoException");
+    //             }
+    //         }
 
-        return success({
-            success: true,
-            message: "done"
-        })
-    }
+    //         resolve(data)
+    //     }))
 
-    catch (e) {
-        return failure({
-            success: false,
-            message: "EmailDuplicateException"
-        })
-    }
+    //     const userRepository = rdbConnection.getRepository(Entity.User);
+    //     const userDB = await userRepository.findOne({
+    //         email: email
+    //     })
+
+    //     return {
+    //         cognito: userCognito,
+    //         db: userDB
+    //     };
+    // }
+
+    // try {
+    //     const body = JSON.parse(event.body || "");
+    //     const email = body.email;
+        
+    //     const user = await _getUser(email);
+
+    //     if (user.db && user.cognito) {
+    //         return success({
+    //             success: false,
+    //             message: "EmailExistException"
+    //         })
+    //     }
+
+    //     return success({
+    //         success: true,
+    //         message: "done"
+    //     })
+    // }
+
+    // catch (e) {
+    //     return failure({
+    //         success: false,
+    //         message: "EmailDuplicateException"
+    //     })
+    // }
 };
