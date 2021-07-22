@@ -1,26 +1,25 @@
-import SubpingDDB from "subpingddb";
+import SubpingRDB from "subpingrdb";
 import { APIGatewayProxyHandler } from 'aws-lambda';
 
-import ServiceModel from "subpingddb/model/subpingTable/service"
-import CategoryModel from "../../../../modules/SubpingDDB/model/subpingTable/category";
 import { success, failure } from "../../libs/response-lib";
 
-interface Category {
-    [key:string]: Array<ServiceModel>
-}
 
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
-        let response: CategoryModel[] = [];
+        const subpingRDB = new SubpingRDB();
+        const connection = await subpingRDB.createConnection("dev");
+        console.log(connection);
         
-        const subpingDDB = new SubpingDDB(process.env.subpingTable);
-        const controller = subpingDDB.getController();
+        // let response: CategoryModel[] = [];
         
-        response = (await controller.read("model-PK-Index", "category")).Items;
+        // const subpingDDB = new SubpingDDB(process.env.subpingTable);
+        // const controller = subpingDDB.getController();
+        
+        // response = (await controller.read("model-PK-Index", "category")).Items;
 
         return success({
             success: true,
-            message: response  
+            message: "done"  
         })
     }
 

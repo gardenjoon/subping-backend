@@ -70,3 +70,24 @@ functions:
           method: post
           cors: true
           authorizer: aws_iam
+  
+  getAlarm:
+    handler: ./handler/alarm/getAlarm.handler
+    events:
+      - http:
+          path: getAlarm
+          method: get
+          cors: true
+          authorizer: aws_iam
+  
+  readAlarm:
+    handler: ./handler/alarm/readAlarm.handler
+    events:
+      - http:
+          path: readAlarm
+          method: get
+          cors: true
+          authorizer: aws_iam
+  
+  makeAlarm:
+    handler: ./handler/alarm/makeAlarm.handler
