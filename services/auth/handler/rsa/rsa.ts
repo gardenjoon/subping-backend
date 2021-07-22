@@ -1,8 +1,8 @@
 'use strict';
 
 import { APIGatewayProxyHandler } from "aws-lambda";
-import SubpingDDB from "subpingddb";
-import RsaModel from "subpingddb/model/keyTable/rsaKey";
+import SubpingDDB from "@SubpingDDB";
+import RsaModel from "@SubpingDDB/model/keyTable/rsaKey";
 
 import { success, failure } from "../../libs/response-lib";
 import RSA from "../../libs/RSA";

@@ -23,12 +23,21 @@ service: auth
 plugins:
   - serverless-webpack
   - serverless-offline
-
+  
 custom:
   stage: ${opt:stage, self:provider.stage}
   webpack:
     webpackConfig: ./webpack.config.js
-    includeModules: true
+    includeModules:
+      forceExclude:
+        - aws-sdk
+    packager: 'npm'
+
+  serverless-layers:
+    dependenciesPath: ./package.json
+    layersDeploymentBucket: subping-dev-layer-deployment
+    compatibleRuntimes: ["nodejs12.x"]
+    packageManager: npm
 
 provider:
   name: aws
@@ -69,7 +78,7 @@ functions:
           path: rsa
           method: get
           cors: true
-          
+  
   emailDuplicate:
     handler: ./handler/signUp/emailDuplicate.handler
     events:
@@ -77,7 +86,7 @@ functions:
           path: emailDuplicate
           method: post
           cors: true
-
+  
   signUpStart:
     handler: ./handler/signUp/signUpStart.handler
     events:
@@ -93,15 +102,10 @@ functions:
           path: signUpDone
           method: post
           cors: true
-    
-  onboardingStep:
+  
+  onBoardingStep:
     handler: ./handler/onboarding/onboardingStep.handler
-    events:
-      - http:
-          path: onboardingStep
-          method: get
-          cors: true
-          authorizer: aws_iam
+
     
 
 #    The following are a few example events you can configure

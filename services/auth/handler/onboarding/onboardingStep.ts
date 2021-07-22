@@ -1,7 +1,7 @@
 'use strict';
 
 import { APIGatewayProxyHandler } from "aws-lambda";
-import SubpingDDB from "subpingddb";
+import SubpingDDB from "@SubpingDDB";
 
 import { success, failure } from "../../libs/response-lib";
 

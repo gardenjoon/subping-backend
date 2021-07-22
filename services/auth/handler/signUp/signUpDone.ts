@@ -2,12 +2,11 @@
 
 import { APIGatewayProxyHandler } from "aws-lambda";
 import * as AWS from "aws-sdk";
+import SubpingDDB from "@SubpingDDB";
+import SubpingRDB, { Entity } from "@SubpingRDB";
 
 import RSA from "../../libs/RSA";
 import { success, failure } from "../../libs/response-lib";
-import * as dynamodb from "../../libs//dynamodb-lib";
-import { makeUser } from "../../query/query";
-import SubpingDDB from "subpingddb";
 
 export const handler: APIGatewayProxyHandler = async (event, context) => {
     try {
@@ -19,6 +18,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
         const subpingDDBKey = new SubpingDDB(process.env.keyTable);
         const authController = subpingDDBAuth.getController();
         const keyController = subpingDDBKey.getController();
+        const subpingRDB = new SubpingRDB()
 
         const userAuth = (await authController.read("uniqueId-Index", deviceId)).Items[0]
         const userKey = (await keyController.read("uniqueId-Index", deviceId)).Items[0]
@@ -37,6 +37,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
         const phoneNumber = body.phoneNumber;
         const birthDay = body.birthDay;
         const CI = body.ci;
+        const gender = body.gender;
 
         console.log(`[signUpDone] 회원가입 요청 시작\ndeviceId: '${deviceId}'\nemail: '${email}'`)
 
@@ -78,8 +79,19 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
                         }
 
                         else {
-                            // SubpingDDB에서 어떻게 처리할지 고민해야 함.
-                            await dynamodb.call("transactWrite", makeUser(email, name, birthDay, CI, phoneNumber, carrier))
+                            const rdbConnection = await subpingRDB.createConnection("dev");
+                            const userRepository = rdbConnection.getRepository(Entity.User);
+                            const user = new Entity.User();
+
+                            user.email = email;
+                            user.name = name;
+                            user.carrier = carrier;
+                            user.birthday = new Date(birthDay);
+                            user.gender = gender;
+                            user.ci = CI;
+                            user.phoneNumber = phoneNumber;
+
+                            await userRepository.save(user);
                             resolve(null)
                         }
                     })

@@ -2,6 +2,7 @@ const path = require('path');
 const slsw = require('serverless-webpack');
 const nodeExternals = require('webpack-node-externals');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = {
   context: __dirname,
@@ -9,6 +10,10 @@ module.exports = {
   entry: slsw.lib.entries,
   devtool: slsw.lib.webpack.isLocal ? 'cheap-module-eval-source-map' : 'source-map',
   resolve: {
+    alias: {
+      "@SubpingRDB": path.resolve(__dirname, "libs/SubpingRDB/src"),
+      "@SubpingDDB": path.resolve(__dirname, "libs/SubpingDDB")
+    },
     extensions: ['.mjs', '.json', '.ts'],
     symlinks: false,
     cacheWithContext: false,

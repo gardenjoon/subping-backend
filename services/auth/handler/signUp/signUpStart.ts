@@ -2,16 +2,17 @@
 
 import { APIGatewayProxyHandler } from "aws-lambda";
 import * as AWS from "aws-sdk";
-import SubpingDDB from "subpingddb";
-import AuthModel from "subpingddb/model/authTable/auth";
+import SubpingDDB from "@SubpingDDB";
+import SubpingRDB, { Entity } from "@SubpingRDB";
+import AuthModel from "@SubpingDDB/model/authTable/auth";
 
 import { success, failure } from "../../libs/response-lib";
 
 export const handler: APIGatewayProxyHandler = async (event, context) => {
-    const subpingDDBCore = new SubpingDDB(process.env.subpingTable);
-    const coreController = subpingDDBCore.getController();
     const subpingDDBAuth = new SubpingDDB(process.env.authTable);
     const authController = subpingDDBAuth.getController();
+    const subpingRDB = new SubpingRDB();
+    const rdbConnection = await subpingRDB.createConnection("dev");
 
     const _getUser = async (email) => {
         const cognitoProvider = new AWS.CognitoIdentityServiceProvider({
@@ -36,7 +37,10 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
             resolve(data)
         }))
 
-        const userDB = (await coreController.read("model-PK-Index", "user", email)).Items[0]
+        const userRepository = rdbConnection.getRepository(Entity.User);
+        const userDB = await userRepository.findOne({
+            email: email
+        })
 
         return {
             cognito: userCognito,
@@ -66,11 +70,12 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
     }
 
     const _deleteDBUser = async (email) => {
-        const userAll = (await coreController.read("PK-SK-Index", email)).Items
+        const userRepository = rdbConnection.getRepository(Entity.User);
+        const deleteUser = await userRepository.delete({
+            email: email
+        });
 
-        for (const row of userAll) {
-            await coreController.delete(email, row.SK);
-        }
+        console.log(`[signUpStart] DB 이상유저 제거\n${deleteUser}`)
     }
 
     try {

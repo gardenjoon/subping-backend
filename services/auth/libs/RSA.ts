@@ -1,4 +1,4 @@
-import { generateKeyPair, privateDecrypt } from "crypto";
+import { generateKeyPair } from "crypto";
 import JSEncrypt from "node-jsencrypt";
 
 const RSA = {

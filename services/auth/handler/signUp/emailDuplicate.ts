@@ -2,13 +2,13 @@
 
 import * as AWS from "aws-sdk";
 import { APIGatewayProxyHandler } from "aws-lambda";
-import SubpingDDB from "subpingddb";
+import SubpingRDB, {Entity} from "@SubpingRDB";
 
 import { success, failure } from "../../libs/response-lib";
 
 export const handler: APIGatewayProxyHandler = async (event, context) => {
-    const subpingDDBCore = new SubpingDDB(process.env.subpingTable);
-    const coreController = subpingDDBCore.getController();
+    const subpingRDB = new SubpingRDB();
+    const rdbConnection = await subpingRDB.createConnection("dev");
 
     const _getUser = async (email: string) => {
         const cognitoProvider = new AWS.CognitoIdentityServiceProvider({
@@ -33,7 +33,10 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
             resolve(data)
         }))
 
-        const userDB = (await coreController.read("model-PK-Index", "user", email)).Items[0]
+        const userRepository = rdbConnection.getRepository(Entity.User);
+        const userDB = await userRepository.findOne({
+            email: email
+        })
 
         return {
             cognito: userCognito,
