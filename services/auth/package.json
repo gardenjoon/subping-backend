@@ -13,7 +13,6 @@
     "ts-transformer-enumerate": "^0.5.1",
     "ts-transformer-keys": "^0.4.3",
     "aws-sdk": "^2.948.0",
-    "subpingddb": "file:../../modules/SubpingDDB",
     "subpingrdb": "file:../../modules/SubpingRDB"
   },
   "devDependencies": {

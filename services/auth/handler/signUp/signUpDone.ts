@@ -2,8 +2,8 @@
 
 import { APIGatewayProxyHandler } from "aws-lambda";
 import * as AWS from "aws-sdk";
-import SubpingDDB from "subpingddb";
 import SubpingRDB, { Entity } from "subpingrdb";
+import SubpingDDB from "../../libs/SubpingDDB";
 
 import RSA from "../../libs/RSA";
 import { success, failure } from "../../libs/response-lib";
@@ -64,6 +64,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
                 MessageAction: "SUPPRESS"
             }, (err, data) => {
                 if (err) {
+                    console.log(err)
                     throw new Error("CognitoException");
                 }
 
@@ -75,6 +76,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
                         Permanent: true,
                     }, async (err, data) => {
                         if (err) {
+                            console.log(err)
                             throw new Error("CognitoException");
                         }
 
@@ -113,6 +115,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
     }
 
     catch (e) {
+        console.log(e) 
         return failure({
             success: false,
             message: "SignUpException"
