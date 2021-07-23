@@ -95,7 +95,7 @@ functions:
           authorizer: aws_iam
 
   getCategories:
-    handler: ./handler/service/getCategories.handler
+    handler: ./handler/category/getCategories.handler
     events:
       - http:
           path: getCategories
