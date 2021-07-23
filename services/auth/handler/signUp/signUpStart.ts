@@ -12,7 +12,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
     const subpingDDBAuth = new SubpingDDB(process.env.authTable);
     const authController = subpingDDBAuth.getController();
     const subpingRDB = new SubpingRDB();
-    const rdbConnection = await subpingRDB.createConnection("dev");
+    const rdbConnection = await subpingRDB.getConnection("dev");
 
     const _getUser = async (email) => {
         const cognitoProvider = new AWS.CognitoIdentityServiceProvider({
@@ -81,7 +81,8 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
     try {
         const header = event.headers;
         const body = JSON.parse(event.body || "");
-
+        console.log(body);
+        
         const deviceId = header.deviceid;
         const email = body.email;
         const password = body.password;

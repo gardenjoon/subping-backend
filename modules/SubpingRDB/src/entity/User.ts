@@ -7,7 +7,9 @@ type GenterType = "F" | "M";
 
 @Entity()
 export class User {
-    @PrimaryColumn()
+    @PrimaryColumn({
+        length: 100
+    })
     email: string;
 
     @Column({
@@ -17,7 +19,8 @@ export class User {
 
     @Column({
         unique: true,
-        nullable: true
+        nullable: true,
+        length: 100
     })
     nickName: string;
 

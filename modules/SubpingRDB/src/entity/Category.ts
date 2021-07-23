@@ -3,7 +3,9 @@ import { ServiceCategory } from "./ServiceCategory";
 
 @Entity()
 export class Category {
-    @PrimaryColumn()
+    @PrimaryColumn({
+        length: 100
+    })
     name: string;
 
     @Column({

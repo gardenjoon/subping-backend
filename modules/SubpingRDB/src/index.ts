@@ -44,16 +44,10 @@ class SubpingRDB {
             if(!conn.isConnected) {
                 conn = await conn.connect();
             }
-
-            return conn;
         }
 
         else {
             conn = await this._createConnection(stage);
-        }
-
-        if(stage === "dev") {
-            await conn.synchronize();
         }
         
         return conn;
@@ -66,7 +60,10 @@ class SubpingRDB {
             secretArn: "arn:aws:secretsmanager:ap-northeast-2:068162191174:secret:dev/admin/subping-xQSws2",
             resourceArn: "arn:aws:rds:ap-northeast-2:068162191174:cluster:subping-dev",
             region: "ap-northeast-2",
-            entities: Object.values(Entity)
+            entities: Object.values(Entity),
+            extra: {
+                "charset": "utf8mb4_unicode_ci"
+            }
         })
     }
 }

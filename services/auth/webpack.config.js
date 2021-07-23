@@ -10,10 +10,6 @@ module.exports = {
   entry: slsw.lib.entries,
   devtool: slsw.lib.webpack.isLocal ? 'cheap-module-eval-source-map' : 'source-map',
   resolve: {
-    alias: {
-      "@SubpingRDB": path.resolve(__dirname, "libs/SubpingRDB/src"),
-      "@SubpingDDB": path.resolve(__dirname, "libs/SubpingDDB")
-    },
     extensions: ['.mjs', '.json', '.ts'],
     symlinks: false,
     cacheWithContext: false,
@@ -24,7 +20,7 @@ module.exports = {
     filename: '[name].js',
   },
   target: 'node',
-  externals: [nodeExternals()],
+  externals: [nodeExternals(), { "aws-sdk": "commonjs aws-sdk" }],
   module: {
     rules: [
       // all files with a `.ts` or `.tsx` extension will be handled by `ts-loader`

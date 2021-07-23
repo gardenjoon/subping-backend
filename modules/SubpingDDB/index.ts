@@ -1,6 +1,7 @@
 import SubpingTableController from "./controller/subpingTable"
 import KeyTableController from "./controller/keyTable"
 import AuthTableController from "./controller/authTable"
+
 class SubpingDDB {
     private tableName: string;
 

@@ -5,7 +5,9 @@ import { Service } from "./Service";
 
 @Entity()
 export class Seller {
-    @PrimaryColumn()
+    @PrimaryColumn({
+        length: 100
+    })
     email: string;
 
     @Column({

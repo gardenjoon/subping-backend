@@ -1,9 +1,9 @@
-import * as AWS from "aws-sdk";
+import { DynamoDB } from "aws-sdk";
 
 type TActions = "put" | "query" | "update" | "delete" | "transactWrite"
 
 export function call(action: TActions, params: any, callback?: (err: any, data: any) => void) {
-  const dynamoDb = new AWS.DynamoDB.DocumentClient({
+  const dynamoDb = new DynamoDB.DocumentClient({
     convertEmptyValues: true,
     region: 'ap-northeast-2'
   });

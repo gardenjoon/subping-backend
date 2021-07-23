@@ -79,7 +79,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
                         }
 
                         else {
-                            const rdbConnection = await subpingRDB.createConnection("dev");
+                            const rdbConnection = await subpingRDB.getConnection("dev");
                             const userRepository = rdbConnection.getRepository(Entity.User);
                             const user = new Entity.User();
 

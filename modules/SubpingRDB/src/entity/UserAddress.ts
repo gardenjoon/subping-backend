@@ -8,7 +8,7 @@ export class UserAddress {
 
     @ManyToOne(type => User, user => user.addresses, {
         nullable: false,
-        cascade: true
+        cascade: true,
     })
     user: string;
     
