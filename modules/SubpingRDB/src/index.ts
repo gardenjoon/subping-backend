@@ -14,6 +14,10 @@ import { ServiceRank } from "./entity/ServiceRank";
 import { User } from "./entity/User";
 import { UserAddress } from "./entity/UserAddress";
 
+import { UserRepository } from "./repository/User";
+import { CategoryRepository } from "./repository/Category";
+import { ServiceRepository } from "./repository/Service";
+
 type StageType = "prod" | "dev";
 
 export const Entity = {
@@ -29,6 +33,12 @@ export const Entity = {
     ServiceEvent: ServiceEvent,
     ServiceRank: ServiceRank,
     UserAddress: UserAddress
+}
+
+export const Repository = {
+    UserRepository : UserRepository,
+    CategoryRepository: CategoryRepository,
+    ServiceRepository: ServiceRepository,
 }
 
 class SubpingRDB {

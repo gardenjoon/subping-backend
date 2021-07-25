@@ -2,23 +2,24 @@ import SubpingRDB, { Repository } from "subpingrdb";
 
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import { success, failure } from "../../libs/response-lib";
+import { v4 as uuidv4 } from 'uuid';
+
 
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
-    try {
+    const test = async() => {
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
-        const repository = connection.getCustomRepository(Repository.CategoryRepository)
-
-        const categoryModel = new Repository.CategoryRepository();
-        categoryModel.name = "사회"
-        categoryModel.summary = "정치, 뉴스, 연예에 관한 카테고리입니다"
-        categoryModel.categoryLogoUrl = null
-
-        await repository.save(categoryModel)
-
+        const UserRepository = connection.getCustomRepository(Repository.UserRepository)
+        
+        console.log(await UserRepository.findByName("정승우"));
+        
+        console.log("madesuccess");
+    }
+    try {
+        await test()
         return success({
             success: true,
-            message: "makeCategorySuccess"
+            message: "Success"
         })
         
     }
@@ -27,7 +28,8 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         console.log(e);
         return failure({
             success: false,
-            message: "makeCategoryException"
+            message: "MakeServiceException"
         })
     }
 }
+

@@ -105,8 +105,12 @@ functions:
   
   makeCategory:
     handler: ./handler/category/makeCategory.handler
-  # makeService:
-  #   handler: ./handler/service/makeService.handler
+
+  prac:
+    handler: ./handler/prac/prac.handler
+
+  makeService:
+    handler: ./handler/service/makeService.handler
 
   # makeReview:
   #   handler: ./handler/review/makeReview.handler
