@@ -7,6 +7,10 @@ import { success, failure } from "../../libs/response-lib";
 
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
+        const subpingDDB = new SubpingDDB(process.env.subpingTable);
+        const controller = subpingDDB.getController();
+        const DDBservice = (await controller.read("model-PK-Index", "service")).Items
+
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
         

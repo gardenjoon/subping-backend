@@ -1,4 +1,4 @@
-import {EntityRepository, Repository} from "typeorm";
+import { EntityRepository, Repository } from "typeorm";
 import { Service } from "../entity/Service";
 
 @EntityRepository(Service)
@@ -24,6 +24,4 @@ export class ServiceRepository extends Repository<Service> {
             .where("Service.name = :name", { name })
             .getMany()
     }
-
-    
 }

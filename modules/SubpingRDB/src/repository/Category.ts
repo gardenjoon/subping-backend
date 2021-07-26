@@ -19,13 +19,13 @@ export class CategoryRepository extends Repository<Category> {
         await this.delete({ name : name });
     }
 
-    findByCateogory(name: string) {
+    findByCategory(name: string) {
         return this.createQueryBuilder("name")
             .where("Category.name = :name", { name })
             .getMany()
     }
 
-    async findServiceByCategory(name: string) {
+    async findServicesWithCategory(name: string) {
         return await this.createQueryBuilder("category")
         .select("category.name", "category")
         .addSelect("service.*")

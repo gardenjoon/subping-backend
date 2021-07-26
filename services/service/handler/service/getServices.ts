@@ -2,6 +2,7 @@ import SubpingRDB, { Repository, Entity } from "subpingrdb";
 import ServiceModel from "subpingddb/model/subpingTable/service"
 import { APIGatewayProxyHandler } from 'aws-lambda';
 
+import { APIGatewayProxyHandler } from 'aws-lambda';
 import { success, failure } from "../../libs/response-lib";
 
 
