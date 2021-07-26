@@ -17,8 +17,9 @@ import { UserAddress } from "./entity/UserAddress";
 import { UserRepository } from "./repository/User";
 import { CategoryRepository } from "./repository/Category";
 import { ServiceRepository } from "./repository/Service";
+import { SellerRepository } from "./repository/Seller";
+import { ServiceCategoryRepository } from "./repository/ServiceCategory";
 import { ServiceEventRepository } from "./repository/ServiceEvent";
-
 
 type StageType = "prod" | "dev";
 
@@ -41,7 +42,9 @@ export const Repository = {
     User : UserRepository,
     Category: CategoryRepository,
     Service: ServiceRepository,
-    ServiceEvent: ServiceEventRepository
+    ServiceEvent: ServiceEventRepository,
+    Seller: SellerRepository,
+    ServiceCategory: ServiceCategoryRepository,
 }
 
 
@@ -81,5 +84,4 @@ class SubpingRDB {
         })
     }
 }
-
 export default SubpingRDB;

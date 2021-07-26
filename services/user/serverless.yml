@@ -91,3 +91,6 @@ functions:
   
   makeAlarm:
     handler: ./handler/alarm/makeAlarm.handler
+
+  makeSeller:
+    handler: ./handler/seller/makeSeller.handler
