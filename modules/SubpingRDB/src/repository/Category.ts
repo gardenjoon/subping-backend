@@ -1,7 +1,5 @@
 import {EntityRepository, Repository} from "typeorm";
 import { Category } from "../entity/Category";
-import { Service } from "../entity/Service";
-import { ServiceCategory } from "../entity/ServiceCategory";
 
 @EntityRepository(Category)
 export class CategoryRepository extends Repository<Category> {
