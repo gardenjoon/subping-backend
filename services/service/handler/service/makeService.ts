@@ -1,4 +1,4 @@
-import SubpingRDB, { Repository } from "subpingrdb";
+import SubpingRDB, { Repository, Entity } from "subpingrdb";
 
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import { success, failure } from "../../libs/response-lib";
@@ -8,23 +8,24 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
-        const repository = connection.getCustomRepository(Repository.ServiceRepository)
         
-        const serviceModel = new Repository.ServiceRepository();
+        const serviceModel = new Entity.Service();
+        const serviceEventModel = new Entity.ServiceEvent();
+        
         serviceModel.seller = "wonjoon@joiple.co"
-        serviceModel.name = element.serviceName
-        
-        if(element.serviceName == ("왓챠"||"넷플릭스")){
-            serviceModel.type = "online"
-        }
-        else {
-            serviceModel.type = "delivery"
-        }
-
+        serviceModel.name = "test";
+        serviceModel.type = "online"
         serviceModel.serviceLogoUrl = "https://subping-assets.s3.ap-northeast-2.amazonaws.com/serviceLogo/watcha.png"
-        serviceModel.summary = element.serviceSummary
+        serviceModel.summary = "test";
         
-        await repository.save(serviceModel)
+        serviceEventModel.service = serviceModel.id;
+
+        const queryRunner = connection.createQueryRunner();
+
+        queryRunner.startTransaction();
+        await queryRunner.manager.getCustomRepository(Repository.Service).save(serviceModel);
+        await queryRunner.manager.getCustomRepository(Repository.ServiceEvent).save(serviceEventModel);
+        queryRunner.commitTransaction();
 
         return success({
             success: true,

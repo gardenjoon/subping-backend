@@ -19,9 +19,11 @@ export class ServiceRepository extends Repository<Service> {
         await this.delete({ name : name });
     }
 
-    findByName(name: string) {
-        return this.createQueryBuilder("name")
+    async findByName(name: string) {
+        return await this.createQueryBuilder("name")
             .where("Service.name = :name", { name })
             .getMany()
     }
+
+    
 }

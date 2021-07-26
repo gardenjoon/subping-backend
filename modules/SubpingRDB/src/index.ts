@@ -17,6 +17,8 @@ import { UserAddress } from "./entity/UserAddress";
 import { UserRepository } from "./repository/User";
 import { CategoryRepository } from "./repository/Category";
 import { ServiceRepository } from "./repository/Service";
+import { ServiceEventRepository } from "./repository/ServiceEvent";
+
 
 type StageType = "prod" | "dev";
 
@@ -32,14 +34,16 @@ export const Entity = {
     ServiceCategory: ServiceCategory,
     ServiceEvent: ServiceEvent,
     ServiceRank: ServiceRank,
-    UserAddress: UserAddress
+    UserAddress: UserAddress,
 }
 
 export const Repository = {
-    UserRepository : UserRepository,
-    CategoryRepository: CategoryRepository,
-    ServiceRepository: ServiceRepository,
+    User : UserRepository,
+    Category: CategoryRepository,
+    Service: ServiceRepository,
+    ServiceEvent: ServiceEventRepository
 }
+
 
 class SubpingRDB {
     async getConnection(stage: StageType) {
