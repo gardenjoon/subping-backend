@@ -17,13 +17,17 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         serviceModel.type = "online"
         serviceModel.serviceLogoUrl = "https://subping-assets.s3.ap-northeast-2.amazonaws.com/serviceLogo/watcha.png"
         serviceModel.summary = "test";
-        
-        serviceEventModel.service = serviceModel.id;
+
+        serviceEventModel.date = new Date();
+        serviceEventModel.time = "18:00";
 
         const queryRunner = connection.createQueryRunner();
 
         queryRunner.startTransaction();
         await queryRunner.manager.getCustomRepository(Repository.Service).save(serviceModel);
+
+        serviceEventModel.service = serviceModel.id;
+
         await queryRunner.manager.getCustomRepository(Repository.ServiceEvent).save(serviceEventModel);
         queryRunner.commitTransaction();
 
