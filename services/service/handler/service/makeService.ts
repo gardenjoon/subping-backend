@@ -1,5 +1,5 @@
 import SubpingRDB, { Repository, Entity } from "subpingrdb";
-import moment from "moment-timezone";
+import  * as moment from "moment-timezone";
 
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import { success, failure } from "../../libs/response-lib";
@@ -7,10 +7,6 @@ import { success, failure } from "../../libs/response-lib";
 
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
-        const subpingDDB = new SubpingDDB(process.env.subpingTable);
-        const controller = subpingDDB.getController();
-        const DDBservice = (await controller.read("model-PK-Index", "service")).Items
-
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
         
@@ -46,12 +42,13 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
             standardHour = "24:00";
         }
 
-        serviceEventModel.date = currentTime;
+        serviceEventModel.date = currentTime.toDate();
         serviceEventModel.time = standardHour;
 
         const queryRunner = connection.createQueryRunner();
 
         queryRunner.startTransaction();
+
         await queryRunner.manager.getCustomRepository(Repository.Service).save(serviceModel);
 
         serviceEventModel.service = serviceModel.id;
@@ -62,7 +59,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
             serviceCategoryModel.service = serviceModel.id;
             serviceCategoryModel.category = category;
 
-            await queryRunner.manager.getCustomRepository(Repository.)
+            await queryRunner.manager.getCustomRepository(Repository.ServiceCategory).save(serviceCategoryModel);
         }
 
         queryRunner.commitTransaction();
