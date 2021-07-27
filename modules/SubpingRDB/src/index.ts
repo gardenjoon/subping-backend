@@ -20,6 +20,7 @@ import { ServiceRepository } from "./repository/Service";
 import { SellerRepository } from "./repository/Seller";
 import { ServiceCategoryRepository } from "./repository/ServiceCategory";
 import { ServiceEventRepository } from "./repository/ServiceEvent";
+import { AlarmRepository } from "./repository/Alarm";
 
 type StageType = "prod" | "dev";
 
@@ -45,6 +46,7 @@ export const Repository = {
     ServiceEvent: ServiceEventRepository,
     Seller: SellerRepository,
     ServiceCategory: ServiceCategoryRepository,
+    Alarm: AlarmRepository
 }
 
 
