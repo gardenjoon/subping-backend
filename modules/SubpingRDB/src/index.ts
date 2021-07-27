@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import { createConnection, getConnectionOptions, getConnectionManager, Connection } from "typeorm";
+import { createConnection, getConnectionManager, Connection } from "typeorm";
 
 import { Alarm } from "./entity/Alarm";
 import { Category } from "./entity/Category";
@@ -13,6 +13,7 @@ import { ServiceEvent } from "./entity/ServiceEvent";
 import { ServiceRank } from "./entity/ServiceRank";
 import { User } from "./entity/User";
 import { UserAddress } from "./entity/UserAddress";
+import { Tag } from "./entity/Tag";
 
 import { UserRepository } from "./repository/User";
 import { CategoryRepository } from "./repository/Category";
@@ -21,6 +22,7 @@ import { SellerRepository } from "./repository/Seller";
 import { ServiceCategoryRepository } from "./repository/ServiceCategory";
 import { ServiceEventRepository } from "./repository/ServiceEvent";
 import { AlarmRepository } from "./repository/Alarm";
+import { TagRepository } from "./repository/Tag";
 
 type StageType = "prod" | "dev";
 
@@ -37,6 +39,8 @@ export const Entity = {
     ServiceEvent: ServiceEvent,
     ServiceRank: ServiceRank,
     UserAddress: UserAddress,
+    Tag: Tag,
+
 }
 
 export const Repository = {
@@ -46,7 +50,8 @@ export const Repository = {
     ServiceEvent: ServiceEventRepository,
     Seller: SellerRepository,
     ServiceCategory: ServiceCategoryRepository,
-    Alarm: AlarmRepository
+    Alarm: AlarmRepository,
+    Tag: TagRepository
 }
 
 
