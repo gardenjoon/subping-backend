@@ -1,9 +1,10 @@
-import {Entity, Column, CreateDateColumn, UpdateDateColumn, PrimaryColumn, OneToMany, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToOne} from "typeorm";
+import { Entity, Column, CreateDateColumn, UpdateDateColumn, PrimaryColumn, OneToMany, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
 import { Seller } from "./Seller";
 import { ServiceCategory } from "./ServiceCategory";
 import { Product } from "./Product";
 import { ServiceEvent } from "./ServiceEvent";
 import { ServiceRank } from "./ServiceRank";
+import { ServiceTag } from "./ServiceTag";
 
 type ServiceType = "delivery" | "online"
 
@@ -60,4 +61,7 @@ export class Service {
 
     @OneToMany(type => ServiceEvent, serviceRank => serviceRank.service)
     serviceRank: ServiceRank[];
+
+    @OneToMany(type => ServiceTag, serviceTag => serviceTag.service)
+    serviceTags: ServiceTag[];
 }
