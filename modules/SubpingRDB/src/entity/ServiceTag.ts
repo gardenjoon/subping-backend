@@ -1,19 +1,16 @@
-import {Entity, CreateDateColumn, UpdateDateColumn, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
+import {Entity, CreateDateColumn, UpdateDateColumn, ManyToOne, PrimaryGeneratedColumn, PrimaryColumn} from "typeorm";
 import { Service } from "./Service";
-import { Tag } from "./Tag";
 
 @Entity()
 export class ServiceTag {
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
-
     @ManyToOne(type => Service, service => service.serviceTags, {
-        cascade: true
+        cascade: true,
+        primary: true
     })
     service: string;
 
-    @ManyToOne(type => Tag, tag => tag.serviceTags, {
-        cascade: true
+    @PrimaryColumn({
+        length: 100
     })
     tag: string;
 

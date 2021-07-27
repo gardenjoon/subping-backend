@@ -13,7 +13,7 @@ import { ServiceEvent } from "./entity/ServiceEvent";
 import { ServiceRank } from "./entity/ServiceRank";
 import { User } from "./entity/User";
 import { UserAddress } from "./entity/UserAddress";
-import { Tag } from "./entity/Tag";
+import { ServiceTag } from "./entity/ServiceTag";
 
 import { UserRepository } from "./repository/User";
 import { CategoryRepository } from "./repository/Category";
@@ -22,7 +22,6 @@ import { SellerRepository } from "./repository/Seller";
 import { ServiceCategoryRepository } from "./repository/ServiceCategory";
 import { ServiceEventRepository } from "./repository/ServiceEvent";
 import { AlarmRepository } from "./repository/Alarm";
-import { TagRepository } from "./repository/Tag";
 
 type StageType = "prod" | "dev";
 
@@ -38,9 +37,8 @@ export const Entity = {
     ServiceCategory: ServiceCategory,
     ServiceEvent: ServiceEvent,
     ServiceRank: ServiceRank,
+    ServiceTag: ServiceTag,
     UserAddress: UserAddress,
-    Tag: Tag,
-
 }
 
 export const Repository = {
@@ -51,7 +49,6 @@ export const Repository = {
     Seller: SellerRepository,
     ServiceCategory: ServiceCategoryRepository,
     Alarm: AlarmRepository,
-    Tag: TagRepository
 }
 
 

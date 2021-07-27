@@ -4,16 +4,15 @@ import { Service } from "./Service";
 
 @Entity()
 export class ServiceCategory {
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
-
     @ManyToOne(type => Service, service => service.serviceCategories, {
-        cascade: true
+        cascade: true,
+        primary: true
     })
     service: string;
 
     @ManyToOne(type => Category, category => category.serviceCategories, {
-        cascade: true
+        cascade: true,
+        primary: true
     })
     category: string;
 
