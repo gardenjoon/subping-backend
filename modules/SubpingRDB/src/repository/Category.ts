@@ -24,14 +24,4 @@ export class CategoryRepository extends Repository<Category> {
             .where("Category.name = :name", { name })
             .getMany()
     }
-
-    async findServicesWithCategory(name: string) {
-        return await this.createQueryBuilder("category")
-        .select("category.name", "category")
-        .addSelect("service.*")
-        .innerJoin("category.serviceCategories", "serviceCategory")
-        .where(`category.name = "${name}"`)
-        .innerJoin("serviceCategory.service", "service")
-        .getRawMany()
-    }
 }

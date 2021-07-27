@@ -1,5 +1,6 @@
 import { EntityRepository, Repository } from "typeorm";
 import { Service } from "../entity/Service";
+import { ServiceCategoryRepository } from "./ServiceCategory";
 
 @EntityRepository(Service)
 export class ServiceRepository extends Repository<Service> {
@@ -24,14 +25,17 @@ export class ServiceRepository extends Repository<Service> {
             .where("Service.name = :name", { name })
             .getMany()
     }
-    
-    async findServiceWithCategory(name: string) {
-        return await this.createQueryBuilder("service")
-        .select("category.name", "category")
-        .addSelect("service.*")
-        .innerJoin("category.serviceCategories", "serviceCategory")
-        .where(`category.name = "${name}"`)
-        .innerJoin("serviceCategories.service", "service")
-        .getRawMany()
+
+    async getServicesWithCategory(category: string) {
+        const serviceCategoryRepository = this.manager.getCustomRepository(ServiceCategoryRepository);
+
+        const services = await serviceCategoryRepository.createQueryBuilder("serviceCategory")
+            .select("service.*")
+            .addSelect("tag.tag", "tag")
+            .innerJoin("serviceCategory.service", "service")
+            .innerJoin("service.serviceTags", "tag")
+            .getRawMany()
+        
+        
     }
 }

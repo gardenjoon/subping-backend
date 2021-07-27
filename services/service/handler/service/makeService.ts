@@ -10,17 +10,19 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
         
-        const categories = ['미디어'];
+        const categories = ['사회'];
+        const tags = ["tag#1", "tag#2"];
 
         const serviceModel = new Entity.Service();
         const serviceEventModel = new Entity.ServiceEvent();
         const serviceCategoryModel = new Entity.ServiceCategory();
-        
+        const serviceTagModel = new Entity.ServiceTag();
+
         serviceModel.seller = "wonjoon@joiple.co"
-        serviceModel.name = "test";
+        serviceModel.name = "test2";
         serviceModel.type = "online"
         serviceModel.serviceLogoUrl = "https://subping-assets.s3.ap-northeast-2.amazonaws.com/serviceLogo/watcha.png"
-        serviceModel.summary = "test";
+        serviceModel.summary = "test2";
 
         const currentTime = moment.tz("Asia/Seoul");
         const hour = currentTime.hour();
@@ -46,23 +48,39 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         serviceEventModel.time = standardHour;
 
         const queryRunner = connection.createQueryRunner();
-
-        queryRunner.startTransaction();
-
-        await queryRunner.manager.getCustomRepository(Repository.Service).save(serviceModel);
-
-        serviceEventModel.service = serviceModel.id;
-
-        await queryRunner.manager.getCustomRepository(Repository.ServiceEvent).save(serviceEventModel);
         
-        for(const category of categories) {
-            serviceCategoryModel.service = serviceModel.id;
-            serviceCategoryModel.category = category;
+        try {
+            await queryRunner.startTransaction();
 
-            await queryRunner.manager.getCustomRepository(Repository.ServiceCategory).save(serviceCategoryModel);
+            await queryRunner.manager.save(serviceModel);
+            
+            serviceEventModel.service = serviceModel.id;
+    
+            await queryRunner.manager.save(serviceEventModel);
+            
+            for(const category of categories) {
+                serviceCategoryModel.service = serviceModel.id;
+                serviceCategoryModel.category = category;
+    
+                await queryRunner.manager.save(serviceCategoryModel);
+            }
+
+            for(const tag of tags) {
+                serviceTagModel.service = serviceModel.id;
+                serviceTagModel.tag = tag;
+
+                await queryRunner.manager.save(serviceTagModel);
+            }
+    
+            await queryRunner.commitTransaction();
         }
-
-        queryRunner.commitTransaction();
+        catch(e) {
+            console.log(e);
+            await queryRunner.rollbackTransaction();
+        }
+        finally {
+            await queryRunner.release();
+        }
 
         return success({
             success: true,

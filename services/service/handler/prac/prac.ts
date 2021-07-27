@@ -9,12 +9,11 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
     const test = async() => {
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
-        const UserRepository = connection.getCustomRepository(Repository.UserRepository)
-        
-        console.log(await UserRepository.findByName("정승우"));
-        
-        console.log("madesuccess");
+        const categoryRepository = connection.getCustomRepository(Repository.Service)
+        const res = await categoryRepository.getServicesWithCategory("사회");
+        console.log(res);        
     }
+
     try {
         await test()
         return success({
