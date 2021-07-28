@@ -1,5 +1,6 @@
 import { EntityRepository, Repository } from "typeorm";
 import { Service } from "../entity/Service";
+import { ServiceCategory } from "../entity/ServiceCategory";
 import { ServiceCategoryRepository } from "./ServiceCategory";
 
 @EntityRepository(Service)
@@ -29,13 +30,26 @@ export class ServiceRepository extends Repository<Service> {
     async getServicesWithCategory(category: string) {
         const serviceCategoryRepository = this.manager.getCustomRepository(ServiceCategoryRepository);
 
-        const services = await serviceCategoryRepository.createQueryBuilder("serviceCategory")
+        const getAllServiceSQL = serviceCategoryRepository.createQueryBuilder("serviceCategory")
             .select("service.*")
-            .addSelect("tag.tag", "tag")
+            .addSelect("GROUP_CONCAT(DISTINCT serviceCategory.categoryName)", "category")
+            .addSelect("GROUP_CONCAT(DISTINCT serviceTag.tag)", "tag")
             .innerJoin("serviceCategory.service", "service")
-            .innerJoin("service.serviceTags", "tag")
-            .getRawMany()
+            .innerJoin("service.serviceTags", "serviceTag", "service.id = serviceTag.serviceId")
+            .groupBy("service.id")
+            .getSql();
         
+        const servicesOfCategory = await this.manager.createQueryBuilder()
+            .select("s.*")
+            .from("(" + getAllServiceSQL + ")", "s")
+            .where(`s.category LIKE "%${category}%"`)
+            .getRawMany();
+
+        servicesOfCategory.map(service => {
+            service.tag = service.tag.split(",");
+            service.category = service.category.split(",");
+        })
         
+        return servicesOfCategory;
     }
 }

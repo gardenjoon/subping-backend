@@ -1,8 +1,6 @@
 import SubpingRDB, { Repository, Entity } from "subpingrdb";
-import ServiceModel from "subpingddb/model/subpingTable/service"
 import { APIGatewayProxyHandler } from 'aws-lambda';
 
-import { APIGatewayProxyHandler } from 'aws-lambda';
 import { success, failure } from "../../libs/response-lib";
 
 
@@ -15,10 +13,10 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
 
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
-        const categoryRepository = connection.getCustomRepository(Repository.Category);
+        const serviceRepository = connection.getCustomRepository(Repository.Service);
 
         if(requestedCategory) {
-            response = await categoryRepository.findServiceByCategory(requestedCategory)
+            response = await serviceRepository.getServicesWithCategory(requestedCategory)
 
             return success({
                 success: true,
