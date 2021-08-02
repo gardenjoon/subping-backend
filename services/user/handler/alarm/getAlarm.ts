@@ -1,6 +1,5 @@
-import AlarmModel from "subpingddb/model/subpingTable/alarm"
 import { APIGatewayProxyHandler } from 'aws-lambda';
-import SubpingDDB from "subpingddb";
+import SubpingRDB, { Repository } from "subpingrdb";
 
 import { success, failure } from "../../libs/response-lib";
 
@@ -8,23 +7,24 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
         const header = event.headers;
         const PK = header.email;
-        const subpingDDB = new SubpingDDB(process.env.subpingTable);
-        const controller = subpingDDB.getController();
-        
-        console.log(PK);
+        const subpingRDB = new SubpingRDB()
+        const connection = await subpingRDB.getConnection("dev");
         
         let unReadCount = 0;
 
-        const alarms: AlarmModel[] = (await controller.read("model-PK-Index", "alarm", PK)).Items;
-        
-        alarms.forEach(item => {
-            if(!item.read) unReadCount += 1;
-        })
+        const alarmRepository = connection.getCustomRepository(Repository.Alarm);
+        const userAlarms = await alarmRepository.findUserAlarms(PK);
+
+        userAlarms.map(item => {
+            if(!item.read) {
+                unReadCount += 1;
+            }
+        });
 
         return success({
             success: true,
             message: {
-                "alarms": alarms,
+                "alarms": userAlarms,
                 "unReadCount": unReadCount
             }
         });
