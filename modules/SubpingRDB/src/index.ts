@@ -20,8 +20,9 @@ import { CategoryRepository } from "./repository/Category";
 import { ServiceRepository } from "./repository/Service";
 import { SellerRepository } from "./repository/Seller";
 import { ServiceCategoryRepository } from "./repository/ServiceCategory";
-import { ServiceEventRepository } from "./repository/ServiceEvent";
 import { AlarmRepository } from "./repository/Alarm";
+import { ServiceEventRepository } from "./repository/ServiceEvent";
+import { ServiceRankRepository } from "./repository/ServiceRank";
 
 type StageType = "prod" | "dev";
 
@@ -45,9 +46,10 @@ export const Repository = {
     User : UserRepository,
     Category: CategoryRepository,
     Service: ServiceRepository,
-    ServiceEvent: ServiceEventRepository,
     Seller: SellerRepository,
     ServiceCategory: ServiceCategoryRepository,
+    ServiceEvent: ServiceEventRepository,
+    ServiceRank: ServiceRankRepository,
     Alarm: AlarmRepository,
 }
 

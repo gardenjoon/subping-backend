@@ -52,4 +52,12 @@ export class ServiceRepository extends Repository<Service> {
         
         return servicesOfCategory;
     }
+    async getServicesWithRank(){
+        return await this.createQueryBuilder("service")
+            .select("serviceRank.*")
+            .addSelect("service.*")
+            .where("service.id = serviceRank.service")
+            .innerJoin("service.serviceRank", "serviceRank")
+            .getRawMany()
+    }
 }

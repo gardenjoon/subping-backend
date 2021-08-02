@@ -59,7 +59,7 @@ export class Service {
     @OneToMany(type => ServiceEvent, serviceEvent => serviceEvent.service)
     serviceEvent: ServiceEvent[];
 
-    @OneToMany(type => ServiceEvent, serviceRank => serviceRank.service)
+    @OneToMany(type => ServiceRank, serviceRank => serviceRank.service)
     serviceRank: ServiceRank[];
 
     @OneToMany(type => ServiceTag, serviceTag => serviceTag.service)

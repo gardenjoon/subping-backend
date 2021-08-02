@@ -1,6 +1,5 @@
+import SubpingRDB, { Repository } from "subpingrdb";
 import SubpingDDB from "subpingddb";
-import ServiceRankModel from "subpingddb/model/subpingTable/serviceRank";
-import HotChartTimeModel from "subpingddb/model/subpingTable/hotChartTime";
 
 import { APIGatewayProxyHandler } from 'aws-lambda';
 
@@ -8,12 +7,15 @@ import { success, failure } from "../../libs/response-lib";
 
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
+        const subpingRDB = new SubpingRDB();
+        const connection = await subpingRDB.getConnection("dev");
+
         const subpingDDB = new SubpingDDB(process.env.subpingTable);
         const controller = subpingDDB.getController();
-        const hotChartTime: HotChartTimeModel = (await controller.read("PK-SK-Index", "hotChartTime")).Items[0]
-        const time = hotChartTime.time;
-        const serviceRank = (await controller.read("SK-PK-Index", `rank#${time}`)).Items;
-        
+        const hotChartTime = (await controller.read("PK-SK-Index", "hotChartTime")).Items[0]
+        const rankRepository = connection.getCustomRepository(Repository.ServiceRank)
+        const serviceRank = await rankRepository.findAllServiceRank(hotChartTime.date, hotChartTime.time);
+
         if(serviceRank.length === 0) {
             return failure({
                 success: false,
@@ -22,14 +24,11 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         }
 
         else {
-            serviceRank.sort((a: ServiceRankModel, b: ServiceRankModel) => {
-                return a.rank - b.rank
-            });
-            
             return success({
                 success: true,
                 message: {
-                    time: time,
+                    date: hotChartTime.date,
+                    time: hotChartTime.time,
                     serviceRank: serviceRank
                 }
             })
