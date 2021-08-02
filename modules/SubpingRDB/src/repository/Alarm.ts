@@ -6,11 +6,13 @@ export class AlarmRepository extends Repository<Alarm> {
     async saveAlarm(Alarm: Alarm): Promise<void> {
         await this.save(Alarm);
     }
-    async updateAlarmRead(id: string , read: boolean): Promise<void> {
-        await this.update(id, { read : read})
+
+    async updateAlarmRead(id: string, read: boolean): Promise<void> {
+        await this.update(id, { read: read })
     }
+
     async deleteAlarm(user: string): Promise<void> {
-        await this.delete({ user : user });
+        await this.delete({ user: user });
     }
 
     async findUserAlarms(email: string) {
@@ -25,5 +27,4 @@ export class AlarmRepository extends Repository<Alarm> {
             read: false
         })
     }
-
 }
