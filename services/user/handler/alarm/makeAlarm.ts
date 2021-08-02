@@ -1,36 +1,25 @@
-import AlarmModel from "subpingddb/model/subpingTable/alarm"
-import { APIGatewayProxyHandler } from 'aws-lambda';
-import { v4 as uuidv4 } from 'uuid';
-import SubpingDDB from "subpingddb";
+import SubpingRDB, { Repository, Entity } from "subpingrdb"
 
+import { APIGatewayProxyHandler } from 'aws-lambda';
 import { success, failure } from "../../libs/response-lib";
 
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
-        const ttlHour = 2400;
-        const ttl = (Math.round(Date.now() / 1000) + ttlHour * 60 * 60);
-
-        const alarm: AlarmModel = {
-            PK: "dlwjdwls6504@gmail.com",
-            SK: `alarm#${uuidv4()}`,
-            createdAt: null,
-            updatedAt: null,
-            model: "alarm",
-            title: "이정진 전용",
-            content: "정진님 오늗도 5정진 했어!\n-다일-",
-            read: false,
-            type: "important",
-            clickTo: "/home",
-            ttl: ttl
-        }
-
-        const subpingDDB = new SubpingDDB(process.env.subpingTable);
-        const controller = subpingDDB.getController();
-        await controller.create<AlarmModel>(alarm);
+        const subpingRDB = new SubpingRDB();
+        const connection = await subpingRDB.getConnection("dev");
+        const alarmRepository = connection.getCustomRepository(Repository.Alarm)
         
+        const alarmModel = new Entity.Alarm();
+        alarmModel.user = "dlwjdwls6504@gmail.com"
+        alarmModel.type = "info"
+        alarmModel.title = "이정진 전용"
+        alarmModel.content = "정진님 오늗도 1정진 했어!\n-다일-"
+        alarmModel.read = true
+        await alarmRepository.saveAlarm(alarmModel)
+
         return success({
             success: true,
-            message: "done"
+            message: "MakeAlarmSuccess"
         });
     }
 
@@ -38,7 +27,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         console.log(e);
         return failure({
             success: false,
-            message: "GetAlarmException"
+            message: "MakeAlarmException"
         })
     }
 }

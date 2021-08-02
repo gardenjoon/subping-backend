@@ -1,28 +1,26 @@
-import AlarmModel from "subpingddb/model/subpingTable/alarm"
-import { APIGatewayProxyHandler } from 'aws-lambda';
-import SubpingDDB from "subpingddb";
+import SubpingRDB, { Repository } from "subpingrdb"
 
+import { APIGatewayProxyHandler } from 'aws-lambda';
 import { success, failure } from "../../libs/response-lib";
 
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
-        const header = event.headers;
-        const PK = header.email;
+        // const header = event.headers;
+        // const PK = header.email;
 
-        const subpingDDB = new SubpingDDB(process.env.subpingTable);
-        const controller = subpingDDB.getController();
-        const unReadAlarms: AlarmModel[] = 
-            (await controller.readWithFilter("model-PK-Index", PK, null, {read: false})).Items;
+        const subpingRDB = new SubpingRDB();
+        const connection = await subpingRDB.getConnection("dev");
+        const alarmRepository = connection.getCustomRepository(Repository.Alarm);
 
-        for(const unReadAlarm of unReadAlarms) {
-            await controller.update(unReadAlarm.PK, unReadAlarm.SK, {
-                read: true
-            });
+        const unReadAlarms = await alarmRepository.findUserAlarms("dlwjdwls6504@gmail.com")//PK 입력
+
+        for (const unReadAlarm of unReadAlarms){
+            await alarmRepository.updateAlarmRead(unReadAlarm.id, true)
         }
 
         return success({
             success: true,
-            message: "done"
+            message: "ReadAlarmSuccess"
         });
     }
 
