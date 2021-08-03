@@ -1,5 +1,5 @@
 import SubpingRDB, { Entity, Repository } from "subpingrdb";
-import SubpingDDB from "subpingddb"
+import SubpingDDB from "../../libs/subpingddb"
 import HotChartTimeModel from "subpingddb/model/subpingTable/hotChartTime";
 
 import * as moment from "moment-timezone";

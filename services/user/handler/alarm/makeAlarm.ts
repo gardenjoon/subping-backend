@@ -14,7 +14,8 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         alarmModel.type = "info"
         alarmModel.title = "이정진 전용"
         alarmModel.content = "정진님 오늗도 1정진 했어!\n-다일-"
-        alarmModel.read = true
+        alarmModel.read = false
+
         await alarmRepository.saveAlarm(alarmModel)
 
         return success({

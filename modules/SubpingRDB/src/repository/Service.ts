@@ -52,6 +52,7 @@ export class ServiceRepository extends Repository<Service> {
         
         return servicesOfCategory;
     }
+    
     async getServicesWithRank(){
         return await this.createQueryBuilder("service")
             .select("serviceRank.*")

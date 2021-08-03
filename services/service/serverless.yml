@@ -76,15 +76,6 @@ functions:
     events:
       - schedule: cron(0 21,3,9,15 * * ? *)
   
-  recommendServices:
-    handler: ./handler/recommend/recommendServices.handler
-    events:
-      - http:
-          path: recommendServices
-          method: post
-          cors: true
-          authorizer: aws_iam
-
   getServices:
     handler: ./handler/service/getServices.handler
     events:

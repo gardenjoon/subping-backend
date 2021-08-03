@@ -1,5 +1,5 @@
 import SubpingRDB, { Repository } from "subpingrdb";
-import SubpingDDB from "subpingddb";
+import SubpingDDB from "../../libs/subpingddb";
 
 import { APIGatewayProxyHandler } from 'aws-lambda';
 
@@ -13,6 +13,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const subpingDDB = new SubpingDDB(process.env.subpingTable);
         const controller = subpingDDB.getController();
         const hotChartTime = (await controller.read("PK-SK-Index", "hotChartTime")).Items[0]
+
         const rankRepository = connection.getCustomRepository(Repository.ServiceRank)
         const serviceRank = await rankRepository.findAllServiceRank(hotChartTime.date, hotChartTime.time);
 
