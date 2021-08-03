@@ -27,6 +27,68 @@ export class ServiceRepository extends Repository<Service> {
             .getMany()
     }
 
+    async getServices(options?:{
+            category?: boolean,
+            tag?: boolean,
+            rank?: boolean,
+            standardDate?: string,
+            standardTime?: string
+        }) {
+        
+        const { category, tag, rank, standardDate, standardTime } = options;
+        
+        let query = this.createQueryBuilder("service")
+
+        query = query.select("service.*");
+
+        if(category) {
+            query = query
+                .addSelect("GROUP_CONCAT(DISTINCT serviceCategory.categoryName)", "category")
+                .innerJoin("service.serviceCategories", "serviceCategory")
+        }
+
+        if(tag) {
+            query = query
+                .addSelect("GROUP_CONCAT(DISTINCT serviceTag.tag)", "tag")
+                .innerJoin("service.serviceTags", "serviceTag")
+        }
+
+        if(rank) {
+            if(standardTime && standardDate) {
+                query = query
+                    .addSelect("serviceRank.rank", "rank")
+                    .innerJoin("service.serviceRank", "serviceRank", 
+                        `serviceRank.date = "${standardDate}" 
+                        AND serviceRank.time = "${standardTime}"`)
+                    .orderBy("serviceRank.rank");
+            }
+
+            else {
+                throw new Error("[SubpingRDB] getServices Rank가 정의되었지만 기준시간이 없습니다.")
+            }
+        }
+
+        if(category || tag || rank) {
+            query = query.groupBy("service.id")
+        }
+
+        const result = await query.getRawMany();
+
+        if(category || tag) {
+            result.map(service => {
+                if(category) {
+                    service.category = service.category.split(",");
+                }
+
+                if(tag) {
+                    service.tag = service.tag.split(",");
+                }
+            })
+        }
+
+        return result;
+    }
+
     async getServicesWithCategory(category: string) {
         const serviceCategoryRepository = this.manager.getCustomRepository(ServiceCategoryRepository);
 
@@ -51,14 +113,5 @@ export class ServiceRepository extends Repository<Service> {
         })
         
         return servicesOfCategory;
-    }
-    
-    async getServicesWithRank(){
-        return await this.createQueryBuilder("service")
-            .select("serviceRank.*")
-            .addSelect("service.*")
-            .where("service.id = serviceRank.service")
-            .innerJoin("service.serviceRank", "serviceRank")
-            .getRawMany()
     }
 }

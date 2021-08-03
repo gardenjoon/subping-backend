@@ -106,6 +106,8 @@ functions:
   makeServiceCategory:
     handler: ./handler/service/makeServiceCategory.handler
 
+  search:
+    handler: ./handler/search/search.handler
   # makeReview:
   #   handler: ./handler/review/makeReview.handler
   
