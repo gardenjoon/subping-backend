@@ -36,6 +36,12 @@ export class Service {
     serviceLogoUrl: string;
 
     @Column({
+        length: 1000,
+        nullable: true
+    })
+    serviceExplaneUrl: string;
+
+    @Column({
         type: "text"
     })
     summary: string;
