@@ -14,8 +14,13 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const controller = subpingDDB.getController();
         const hotChartTime = (await controller.read("PK-SK-Index", "hotChartTime")).Items[0]
 
-        const rankRepository = connection.getCustomRepository(Repository.ServiceRank)
-        const serviceRank = await rankRepository.findAllServiceRank(hotChartTime.date, hotChartTime.time);
+        const rankRepository = connection.getCustomRepository(Repository.Service)
+        const serviceRank = await rankRepository.getServices({
+            rank: true,
+            tag: true,
+            standardDate: hotChartTime.date,
+            standardTime: hotChartTime.time
+        });
 
         if(serviceRank.length === 0) {
             return failure({
