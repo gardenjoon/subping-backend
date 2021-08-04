@@ -1,13 +1,17 @@
 {
    "host": "subping-dev.cluster-cqlkkbiwraof.ap-northeast-2.rds.amazonaws.com",
    "port": 3306,
-   "synchronize": true,
    "logging": false,
+   "type": "aurora-data-api",
+   "secretArn": "arn:aws:secretsmanager:ap-northeast-2:068162191174:secret:dev/admin/subping-xQSws2",
+   "resourceArn": "arn:aws:rds:ap-northeast-2:068162191174:cluster:subping-dev",
+   "region": "ap-northeast-2",
+   "database": "subping",
    "entities": [
       "dist/src/entity/**/*.ts"
    ],
    "migrations": [
-      "dist/src/migration/**/*.ts"
+      "dist/src/migration/**/*.js"
    ],
    "subscribers": [
       "dist/src/subscriber/**/*.ts"
