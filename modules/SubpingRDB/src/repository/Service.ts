@@ -114,4 +114,20 @@ export class ServiceRepository extends Repository<Service> {
         
         return servicesOfCategory;
     }
+
+    async getServiceWithId(id: string) {
+        const service = await this.createQueryBuilder("service")
+            .select("service.*")
+            .addSelect("GROUP_CONCAT(DISTINCT serviceCategory.categoryName)", "category")
+            .where(`service.id = "${id}"`)
+            .innerJoin("service.serviceCategories", "serviceCategory")
+            .addSelect("GROUP_CONCAT(DISTINCT serviceTag.tag)", "tag")
+            .innerJoin("service.serviceTags", "serviceTag")
+            .groupBy("service.id")
+            .getRawOne();
+        
+        service.tag = service.tag.split(",");
+
+        return service;
+    }
 }

@@ -85,6 +85,9 @@ functions:
           cors: true
           authorizer: aws_iam
 
+  getService:
+    handler: ./handler/service/getService.handler
+
   getCategories:
     handler: ./handler/category/getCategories.handler
     events:
@@ -93,7 +96,7 @@ functions:
           method: get
           cors: true
           authorizer: aws_iam
-  
+      
   makeCategory:
     handler: ./handler/category/makeCategory.handler
 
