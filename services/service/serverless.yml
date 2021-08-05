@@ -111,6 +111,9 @@ functions:
 
   search:
     handler: ./handler/search/search.handler
+  
+  backup:
+    handler: ./handler/backup/backup.handler
   # makeReview:
   #   handler: ./handler/review/makeReview.handler
   
