@@ -114,6 +114,21 @@ functions:
   
   backup:
     handler: ./handler/backup/backup.handler
+
+    getImages:
+    handler: ./handler/image/getImages.handler
+    events:
+      - http:
+          path: getImages
+          method: post
+          cors: true
+          authorizer: aws_iam
+
+  saveImage:
+    handler: ./handler/image/saveImage.handler
+
+  deleteImage:
+    handler: ./handler/image/deleteImage.handler
   # makeReview:
   #   handler: ./handler/review/makeReview.handler
   
