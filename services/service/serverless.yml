@@ -100,15 +100,15 @@ functions:
   makeCategory:
     handler: ./handler/category/makeCategory.handler
 
-  prac:
-    handler: ./handler/prac/prac.handler
-
   makeService:
     handler: ./handler/service/makeService.handler
 
   makeServiceCategory:
     handler: ./handler/service/makeServiceCategory.handler
 
+  makeProduct:
+    handler: ./handler/product/product.handler
+  
   search:
     handler: ./handler/search/search.handler
   

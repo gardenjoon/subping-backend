@@ -2,6 +2,7 @@ import {Entity, Column, CreateDateColumn, UpdateDateColumn, PrimaryColumn, OneTo
 import { UserAddress } from "./UserAddress";
 import { Alarm } from "./Alarm";
 import { Review } from "./Review";
+import { Subscribe } from "./Subscribe";
 
 type GenterType = "F" | "M";
 
@@ -75,4 +76,7 @@ export class User {
 
     @OneToMany(type => Review, review => review.user)
     reviews: Review[];
+
+    @OneToMany(type => Subscribe, userSubscribe => userSubscribe.user)
+    subscribes: Subscribe[];
 }

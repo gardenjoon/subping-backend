@@ -2,6 +2,7 @@ import {Entity, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColum
 import { Category } from "./Category";
 import { Review } from "./Review";
 import { Service } from "./Service";
+import { Subscribe } from "./Subscribe";
 
 @Entity()
 export class Product {
@@ -52,4 +53,7 @@ export class Product {
 
     @OneToMany(type => Review, review => review.product)
     reviews: Review[]
+
+    @OneToMany(type => Subscribe, subscribe => subscribe.product)
+    subscribes: Subscribe[];
 }

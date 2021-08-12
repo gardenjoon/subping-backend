@@ -94,3 +94,12 @@ functions:
 
   makeSeller:
     handler: ./handler/seller/makeSeller.handler
+
+  makeSubscribe:
+    handler: ./handler/subscribe/makeSubscribe.handler
+
+  getSubscribe:
+    handler: ./handler/subscribe/getSubscribe.handler 
+  
+  updateSubscribe:
+    handler: ./handler/subscribe/updateSubscribe.handler

@@ -186,6 +186,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
             subscribeModel.period = backupData[element][0];
             subscribeModel.subscribeDate = backupData[element][1];
             subscribeModel.product = backupData[element][2];
+            subscribeModel.expiredDate = null;
             await subscribeRP.saveSubscribe(subscribeModel);
         }
         console.log("makeSubscribeComplete")
