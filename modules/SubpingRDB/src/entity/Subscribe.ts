@@ -2,6 +2,8 @@ import { Entity, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, PrimaryG
 import { Product } from "./Product";
 import { User } from "./User";
 
+type Period = "1W" | "2W" | "1M";
+
 @Entity()
 export class Subscribe {
     @PrimaryGeneratedColumn("uuid")
@@ -17,9 +19,9 @@ export class Subscribe {
     })
     product: string;
 
-    @Column({ type: "smallint", nullable: false })
+    @Column({ length: 50, nullable: false })
     // 주기는 Day 기준입니다.
-    period: Number;
+    period: Period;
 
     @Column({ type: "date", nullable: false })
     subscribeDate: string;

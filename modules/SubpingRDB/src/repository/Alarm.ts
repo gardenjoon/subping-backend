@@ -16,9 +16,11 @@ export class AlarmRepository extends Repository<Alarm> {
     }
 
     async findUserAlarms(email: string) {
-        return await this.find({
-            user: email
-        })
+        return await this.createQueryBuilder("alarm")
+            .select("alarm.*")
+            .where(`alarm.userEmail = "${email}"`)
+            .orderBy("alarm.updatedAt", "DESC")
+            .getRawMany()
     }
 
     async findUserUnreadAlarms(email: string) {
