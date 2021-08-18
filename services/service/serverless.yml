@@ -87,6 +87,12 @@ functions:
 
   getService:
     handler: ./handler/service/getService.handler
+    events:
+      - http:
+          path: getService
+          method: post
+          cors: true
+          authorizer: aws_iam
 
   getCategories:
     handler: ./handler/category/getCategories.handler

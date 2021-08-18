@@ -127,6 +127,7 @@ export class ServiceRepository extends Repository<Service> {
             .getRawOne();
         
         service.tag = service.tag.split(",");
+        service.category = service.category.split(",");
 
         return service;
     }
