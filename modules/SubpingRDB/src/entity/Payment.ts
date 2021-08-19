@@ -6,7 +6,9 @@ export class Payment {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @ManyToOne(type => Subscribe, subscribe => subscribe.payments)
+    @ManyToOne(type => Subscribe, subscribe => subscribe.payments, {
+        cascade: true
+    })
     subscribe: string;
 
     @Column({nullable: false, type: "date"})

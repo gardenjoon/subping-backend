@@ -3,6 +3,7 @@ import { UserAddress } from "./UserAddress";
 import { Alarm } from "./Alarm";
 import { Review } from "./Review";
 import { Subscribe } from "./Subscribe";
+import { UserLike } from "./UserLike";
 
 type GenterType = "F" | "M";
 
@@ -79,4 +80,7 @@ export class User {
 
     @OneToMany(type => Subscribe, userSubscribe => userSubscribe.user)
     subscribes: Subscribe[];
+    
+    @OneToMany(type => UserLike, userLike => userLike.user)
+    userLikes: UserLike[];
 }

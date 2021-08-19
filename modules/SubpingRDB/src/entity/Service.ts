@@ -5,6 +5,7 @@ import { Product } from "./Product";
 import { ServiceEvent } from "./ServiceEvent";
 import { ServiceRank } from "./ServiceRank";
 import { ServiceTag } from "./ServiceTag";
+import { UserLike } from "./UserLike";
 
 type ServiceType = "delivery" | "online"
 
@@ -70,4 +71,7 @@ export class Service {
 
     @OneToMany(type => ServiceTag, serviceTag => serviceTag.service)
     serviceTags: ServiceTag[];
+
+    @OneToMany(type => UserLike, userLike => userLike.service)
+    userLikes: UserLike[];
 }
