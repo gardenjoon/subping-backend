@@ -41,10 +41,10 @@ export const handler:APIGatewayProxyHandler  = async (event, _context) => {
         const standardHour = makeHour(standardTime.hours());
         const standardDate = standardTime.toDate();
         
-        const eventRepository = connection.getCustomRepository(Repository.ServiceEvent)
+        const eventRepository = connection.getCustomRepository(Repository.ServiceEvent);
 
         // service와 serviceEvent를 조인하고 정보를 읽어 rating을 생성
-        const rankRepository = connection.getCustomRepository(Repository.ServiceRank)
+        const rankRepository = connection.getCustomRepository(Repository.ServiceRank);
 
         const eventModelForRank = await eventRepository.getServiceEvents(standardDate, standardHour);
         for (const [index, element] of eventModelForRank.entries()) {
@@ -53,7 +53,7 @@ export const handler:APIGatewayProxyHandler  = async (event, _context) => {
             serviceRankModel.date = currentDate;
             serviceRankModel.time = currentHour;
             serviceRankModel.rank = index+1;
-            await rankRepository.saveServiceRank(serviceRankModel)
+            await rankRepository.saveServiceRank(serviceRankModel);
         }
 
         // 매 standardHour마다 serviceEvent 생성
@@ -68,7 +68,7 @@ export const handler:APIGatewayProxyHandler  = async (event, _context) => {
             serviceEventModel.subscribe = 0;
             serviceEventModel.review = 0;
             serviceEventModel.view = 0;
-            await eventRepository.saveServiceEvent(serviceEventModel)
+            await eventRepository.saveServiceEvent(serviceEventModel);
         }
 
         //핫차트 기준시간 모델 생성

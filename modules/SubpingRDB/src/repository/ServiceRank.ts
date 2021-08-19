@@ -1,14 +1,16 @@
 import { EntityRepository, Repository } from "typeorm";
 import { ServiceRank } from "../entity/ServiceRank";
+import * as moment from "moment-timezone";
 
 @EntityRepository(ServiceRank)
 export class ServiceRankRepository extends Repository<ServiceRank> {
-    async findAllServiceRank(standardDate: String, standardhour: String) {
+    async findAllServiceRank(standardDate: Date, standardhour: String) {
+        const dateString = moment(standardDate).format("YYYY-MM-DD");
         return await this.createQueryBuilder("serviceRank")
             .select("service.*")
             .addSelect("serviceRank.*")
             .where(`serviceRank.service = service.id`)
-            .where(`serviceRank.date = "${standardDate}"`)
+            .where(`serviceRank.date = "${dateString}"`)
             .where(`serviceRank.time = "${standardhour}"`)
             .innerJoin("serviceRank.service", "service")
             .orderBy("rank")
