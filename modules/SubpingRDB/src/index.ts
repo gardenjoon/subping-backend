@@ -14,6 +14,7 @@ import { User } from "./entity/User";
 import { UserAddress } from "./entity/UserAddress";
 import { ServiceTag } from "./entity/ServiceTag";
 import { Subscribe } from "./entity/Subscribe"
+import { Payment } from "./entity/Payment";
 
 import { UserRepository } from "./repository/User";
 import { CategoryRepository } from "./repository/Category";
@@ -43,7 +44,8 @@ export const Entity = {
     ServiceRank: ServiceRank,
     ServiceTag: ServiceTag,
     UserAddress: UserAddress,
-    Subscribe: Subscribe
+    Subscribe: Subscribe,
+    Payment: Payment
 }
 
 export const Repository = {

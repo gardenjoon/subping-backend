@@ -1,6 +1,6 @@
 import SubpingRDB, { Entity, Repository } from "subpingrdb";
 import SubpingDDB from "../../libs/subpingddb"
-import HotChartTimeModel from "subpingddb/model/subpingTable/hotChartTime";
+import HotChartTimeModel from "../../libs/subpingddb/model/subpingTable/hotChartTime";
 
 import * as moment from "moment-timezone";
 
@@ -35,11 +35,11 @@ export const handler:APIGatewayProxyHandler  = async (event, _context) => {
 
         const currentTime = moment.tz("Asia/Seoul");
         const currentHour = makeHour(currentTime.hours());
-        const currentDate = currentTime.format("YYYY-MM-DD");
+        const currentDate = currentTime.toDate();
 
         const standardTime = currentTime.subtract(6, "hours");
         const standardHour = makeHour(standardTime.hours());
-        const standardDate = standardTime.format("YYYY-MM-DD")
+        const standardDate = standardTime.toDate();
         
         const eventRepository = connection.getCustomRepository(Repository.ServiceEvent)
 
@@ -81,7 +81,7 @@ export const handler:APIGatewayProxyHandler  = async (event, _context) => {
             createdAt: null,
             updatedAt: null,
             model: "hotChartTime",
-            date: currentDate,
+            date: moment(currentDate).format("YYYY-MM-DD"),
             time: currentHour
         };
         await controller.create<HotChartTimeModel>(HotChartTimeModel);

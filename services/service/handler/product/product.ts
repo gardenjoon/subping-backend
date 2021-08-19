@@ -19,7 +19,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
                 productModel.summary = "스탠다드 요금제 입니다."
                 productModel.productLogoUrl = "https://subping-assets.s3.ap-northeast-2.amazonaws.com/serviceLogo/watcha.png";
                 productModel.available = true;
-                console.log(productModel)
+
                 await productRepository.saveProduct(productModel)
             }
         }

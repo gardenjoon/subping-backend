@@ -18,7 +18,6 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         
         await repository.updateSubscribe(updateExpiration[0].id, currentDate)
 
-
         return success({
             success: true,
             message: "ReadAlarmSuccess"

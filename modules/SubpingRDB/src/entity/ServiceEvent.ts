@@ -14,7 +14,7 @@ export class ServiceEvent {
     @PrimaryColumn({
         type: "date"
     })
-    date: string;
+    date: Date;
 
     @PrimaryColumn({
         length: 20

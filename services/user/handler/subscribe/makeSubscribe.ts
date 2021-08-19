@@ -21,7 +21,7 @@ export const handler: APIGatewayProxyHandler = async (event , _context) => {
         const subscribeModel = new Entity.Subscribe();
         subscribeModel.user = user.email;
         subscribeModel.product = product.id;
-        subscribeModel.period = 30;
+        subscribeModel.period = "1M";
         subscribeModel.subscribeDate = currentDate;
         subscribeModel.expiredDate = null;
 
