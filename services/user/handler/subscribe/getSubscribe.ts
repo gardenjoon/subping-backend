@@ -5,13 +5,30 @@ import { success, failure } from "../../libs/response-lib";
 
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
-        const subpingRDB = new SubpingRDB();
+        let response;
+
+        const header = event.headers;
+        const PK = header.email;
+        const body = JSON.parse(event.body || "");
+        
+        const { productId } = body;
+
+        const subpingRDB = new SubpingRDB()
         const connection = await subpingRDB.getConnection("dev");
+
         const subscribeRepository = connection.getCustomRepository(Repository.Subscribe);
-        const subscribe = await subscribeRepository.getSubscribe("jsw9808@gmail.com")
+
+        if (productId) {
+            response = await subscribeRepository.getOneSubscribe(PK, productId);
+        }
+
+        else {
+            response = await subscribeRepository.getSubscribes(PK);
+        }
+        
         return success({
             success: true,
-            message: subscribe  
+            message: response  
         })
     }
 

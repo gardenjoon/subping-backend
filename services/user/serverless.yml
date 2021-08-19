@@ -89,6 +89,36 @@ functions:
           cors: true
           authorizer: aws_iam
   
+  getSubscribe:
+    handler: ./handler/subscribe/getSubscribe.handler
+    events:
+      - http:
+          path: getSubscribe
+          method: post
+          cors: true
+          authorizer: aws_iam
+
+  toggleServiceLike:
+    handler: ./handler/like/toggleServiceLike.handler
+    events:
+      - http:
+          path: toggleServiceLike
+          method: post
+          cors: true
+          authorizer: aws_iam
+  
+  getServiceLike:
+    handler: ./handler/like/getServiceLike.handler
+    events:
+      - http:
+          path: getServiceLike
+          method: post
+          cors: true
+          authorizer: aws_iam
+
+  getSchedule:
+    handler: ./handler/calendar/getSchedule.handler
+     
   makeAlarm:
     handler: ./handler/alarm/makeAlarm.handler
 
@@ -97,9 +127,6 @@ functions:
 
   makeSubscribe:
     handler: ./handler/subscribe/makeSubscribe.handler
-
-  getSubscribe:
-    handler: ./handler/subscribe/getSubscribe.handler 
   
   updateSubscribe:
     handler: ./handler/subscribe/updateSubscribe.handler
