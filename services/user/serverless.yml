@@ -98,20 +98,20 @@ functions:
           cors: true
           authorizer: aws_iam
 
-  toggleServiceLike:
-    handler: ./handler/like/toggleServiceLike.handler
+  toggleUserLike:
+    handler: ./handler/like/toggleUserLike.handler
     events:
       - http:
-          path: toggleServiceLike
+          path: toggleUserLike
           method: post
           cors: true
           authorizer: aws_iam
   
-  getServiceLike:
-    handler: ./handler/like/getServiceLike.handler
+  getUserLike:
+    handler: ./handler/like/getUserLike.handler
     events:
       - http:
-          path: getServiceLike
+          path: getUserLike
           method: post
           cors: true
           authorizer: aws_iam

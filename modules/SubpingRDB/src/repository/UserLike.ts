@@ -7,17 +7,20 @@ export class UserLikeRepository extends Repository<UserLike> {
         await this.save(userLike);
     }
 
-    async removeUserLike(userLike: UserLike) {
-        await this.remove(userLike);
+    async removeUserLike(userEmail: string, serviceId: string) {
+        await this.delete({
+            user: userEmail,
+            service: serviceId
+        });
     }
 
-    async getUserLike(userEmail: String, serviceId: String) {
+    async getUserLike(userEmail: string, serviceId: string) {
         return await this.createQueryBuilder("userLike")
             .where("userLike.user = :userEmail AND userLike.service = :serviceId", { userEmail: userEmail, serviceId: serviceId })
             .getOne();
     }
 
-    async getUserLikes(userEmail: String) {
+    async getUserLikes(userEmail: string) {
         return await this.createQueryBuilder("userLike")
             .where("userLike.user = :userEmail", { userEmail: userEmail })
             .getMany();

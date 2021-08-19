@@ -7,6 +7,9 @@ import { success, failure } from "../../libs/response-lib";
 
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
+        const header = event.headers;
+        const PK = header.email;
+        
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
 
@@ -19,7 +22,9 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
             rank: true,
             tag: true,
             standardDate: hotChartTime.date,
-            standardTime: hotChartTime.time
+            standardTime: hotChartTime.time,
+            like: true,
+            userEmail: PK
         });
 
         if(serviceRank.length === 0) {
