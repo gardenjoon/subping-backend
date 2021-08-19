@@ -6,10 +6,9 @@ import { success, failure } from "../../libs/response-lib";
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
         let response = [];
-        // const body = JSON.parse(event.body || "");
+        const body = JSON.parse(event.body || "");
         
-        // const requestedService = body.service || null;
-        const requestedService = "4dd6a155-be2e-4ca3-b3b0-6e044d5766dd";
+        const requestedService = body.service || null;
 
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
