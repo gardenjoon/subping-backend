@@ -132,7 +132,28 @@ functions:
     handler: ./handler/subscribe/updateSubscribe.handler
 
   duplicateNickName:
-    handler: ./handler/user/duplicateNickName.handler
+    handler: ./handler/nickname/duplicateNickName.handler
+    events:
+      - http:
+          path: duplicateNickName
+          method: post
+          cors: true
+          authorizer: aws_iam
 
   updateNickName:
-    handler: ./handler/user/updateNickName.handler
+    handler: ./handler/nickname/updateNickName.handler
+    events:
+      - http:
+          path: updateNickName
+          method: post
+          cors: true
+          authorizer: aws_iam
+
+  getUserInfo:
+    handler: ./handler/user/getUserInfo.handler
+    events:
+      - http:
+          path: getUserInfo
+          method: get
+          cors: true
+          authorizer: aws_iam

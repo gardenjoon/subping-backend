@@ -23,29 +23,15 @@ export class UserRepository extends Repository<User> {
         await this.delete({ email: userEmail });
     }
 
-    findByName(userName: string) {
+    async findByName(userName: string) {
         return this.createQueryBuilder("user")
             .where(`user.userName = ${userName}`)
             .getMany()
     }
 
-    async duplicateNickName(userEmail: string, nickName: string): Promise<Object> {
-        const result = {
-            duplicate: false,
-            invalid: false
-        };
-
-        const regExp = /^[ㄱ-ㅎ|가-힣|a-z|A-Z|0-9]+$/;
-
-        const duplicate = await this.createQueryBuilder("user")
-            .select("user.nickName", "nickName")
-            .where(`user.email != "${userEmail}"`)
-            .andWhere(`user.nickName = "${nickName}"`)
+    async findByNickName(nickName: string): Promise<Object> {
+        return await this.createQueryBuilder("user")
+            .where(`user.nickName = "${nickName}"`)
             .getRawOne();
-
-        result.duplicate = (duplicate) ? true : false;
-        result.invalid = (regExp.test(nickName)) ? false : true;
-
-        return result;
     }
 }
