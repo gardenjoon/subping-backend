@@ -81,7 +81,7 @@ export class ServiceRepository extends Repository<Service> {
             }
         }
 
-        if(category || tag || rank) {
+        if(category || tag || rank || like) {
             query = query.groupBy("service.id")
         }
 
