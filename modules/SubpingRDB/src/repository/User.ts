@@ -7,21 +7,45 @@ export class UserRepository extends Repository<User> {
         return this.find();
     }
 
-    findOneUser(email: string): Promise<User> {
-        return this.findOne(email);
+    findOneUser(userEmail: string): Promise<User> {
+        return this.findOne(userEmail);
     }
 
-    async saveUser(user: User): Promise<void> {
-        await this.save(user);
+    async updateNickName(userEmail: string, nickName: string): Promise<void> {
+        await this.update(userEmail, { nickName: nickName})
     }
 
-    async deleteUser(email: string): Promise<void> {
-        await this.delete({ email: email });
+    async saveUser(User: User): Promise<void> {
+        await this.save(User);
     }
 
-    findByName(name: string) {
+    async deleteUser(userEmail: string): Promise<void> {
+        await this.delete({ email: userEmail });
+    }
+
+    findByName(userName: string) {
         return this.createQueryBuilder("user")
-            .where("user.name = :name", { name })
+            .where(`user.userName = ${userName}`)
             .getMany()
+    }
+
+    async duplicateNickName(userEmail: string, nickName: string): Promise<Object> {
+        const result = {
+            duplicate: false,
+            invalid: false
+        };
+
+        const regExp = /^[ㄱ-ㅎ|가-힣|a-z|A-Z|0-9]+$/;
+
+        const duplicate = await this.createQueryBuilder("user")
+            .select("user.nickName", "nickName")
+            .where(`user.email != "${userEmail}"`)
+            .andWhere(`user.nickName = "${nickName}"`)
+            .getRawOne();
+
+        result.duplicate = (duplicate) ? true : false;
+        result.invalid = (regExp.test(nickName)) ? false : true;
+
+        return result;
     }
 }

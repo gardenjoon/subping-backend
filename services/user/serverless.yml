@@ -130,3 +130,9 @@ functions:
   
   updateSubscribe:
     handler: ./handler/subscribe/updateSubscribe.handler
+
+  duplicateNickName:
+    handler: ./handler/user/duplicateNickName.handler
+
+  updateNickName:
+    handler: ./handler/user/updateNickName.handler
