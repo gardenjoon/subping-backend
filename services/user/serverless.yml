@@ -107,12 +107,12 @@ functions:
           cors: true
           authorizer: aws_iam
   
-  getUserLike:
-    handler: ./handler/like/getUserLike.handler
+  getUserLikeServices:
+    handler: ./handler/like/getUserLikeServices.handler
     events:
       - http:
-          path: getUserLike
-          method: post
+          path: getUserLikeServices
+          method: get
           cors: true
           authorizer: aws_iam
 

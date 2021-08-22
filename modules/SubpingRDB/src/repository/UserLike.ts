@@ -22,7 +22,9 @@ export class UserLikeRepository extends Repository<UserLike> {
 
     async getUserLikes(userEmail: string) {
         return await this.createQueryBuilder("userLike")
-            .where("userLike.user = :userEmail", { userEmail: userEmail })
-            .getMany();
+            .select("service.*")
+            .addSelect("IF(userLike.createdAt IS NULL, False, True)", "like")
+            .innerJoin("userLike.service", "service", `userLike.user = "${userEmail}"`)
+            .getRawMany();
     }
 }

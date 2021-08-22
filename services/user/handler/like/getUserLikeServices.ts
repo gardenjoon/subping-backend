@@ -9,26 +9,15 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
 
         const header = event.headers;
         const PK = header.email;
-        const body = JSON.parse(event.body || "");
-
-        const { serviceId } = body;
 
         const subpingRDB = new SubpingRDB();
         const coneection = await subpingRDB.getConnection("dev");
 
         const userLikeRepository = coneection.getCustomRepository(Repository.UserLike)
 
-        if(serviceId) {
-            const existUserLike = await userLikeRepository.getUserLike(PK, serviceId);
-            
-            response.push(existUserLike);
-        }   
-
-        else {
-            const existUserLike = await userLikeRepository.getUserLikes(PK);
-
-            response = existUserLike;
-        }
+        const existUserLike = await userLikeRepository.getUserLikes(PK);
+        
+        response = existUserLike;
 
         return success({
             success: true,
@@ -40,7 +29,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         console.log(e);
         return failure({
             success: false,
-            message: "getUserLikeException"
+            message: "getUserLikeServicesException"
         })
     }
 } 
