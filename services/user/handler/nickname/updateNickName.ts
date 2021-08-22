@@ -14,13 +14,25 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
         const UserRepository = connection.getCustomRepository(Repository.User);
+        
+        const regExp = /^[ㄱ-ㅎ|가-힣|a-z|A-Z|0-9]+$/;
 
-        await UserRepository.updateNickName(userEmail, nickName)
+        if(regExp.test(nickName)) {
+            await UserRepository.updateNickName(userEmail, nickName)
 
-        return success({
-            success: true,
-            message: "UpdateNickNameSuccess"
-        })
+            return success({
+                success: true,
+                message: "UpdateNickNameSuccess"
+            })
+        } 
+
+        else {
+            return failure({
+                success: false,
+                message: "NickNameInvalidException"
+            })
+        }
+
     }
     
     catch (e) {
