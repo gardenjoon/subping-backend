@@ -1,4 +1,4 @@
-import SubpingRDB, { Repository, Entity } from "subpingrdb";
+import SubpingRDB, { Entity } from "subpingrdb";
 import  * as moment from "moment-timezone";
 
 import { APIGatewayProxyHandler } from 'aws-lambda';
@@ -7,22 +7,23 @@ import { success, failure } from "../../libs/response-lib";
 
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
+        const body = JSON.parse(event.body || "");
+
+        const { categories, tags, seller, name, type, serviceLogoUrl, summary } = body;
+
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
-        
-        const categories = ['사회'];
-        const tags = ["tag#1", "tag#2"];
 
         const serviceModel = new Entity.Service();
         const serviceEventModel = new Entity.ServiceEvent();
         const serviceCategoryModel = new Entity.ServiceCategory();
         const serviceTagModel = new Entity.ServiceTag();
 
-        serviceModel.seller = "wonjoon@joiple.co"
-        serviceModel.name = "test2";
-        serviceModel.type = "online"
-        serviceModel.serviceLogoUrl = "https://subping-assets.s3.ap-northeast-2.amazonaws.com/serviceLogo/watcha.png"
-        serviceModel.summary = "test2";
+        serviceModel.seller = seller;
+        serviceModel.name = name;
+        serviceModel.type = type;
+        serviceModel.serviceLogoUrl = serviceLogoUrl;
+        serviceModel.summary = summary;
 
         const currentTime = moment.tz("Asia/Seoul");
         const hour = currentTime.hour();
@@ -48,20 +49,20 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         serviceEventModel.time = standardHour;
 
         const queryRunner = connection.createQueryRunner();
-        
+
         try {
             await queryRunner.startTransaction();
 
             await queryRunner.manager.save(serviceModel);
             
             serviceEventModel.service = serviceModel.id;
-    
+
             await queryRunner.manager.save(serviceEventModel);
             
             for(const category of categories) {
                 serviceCategoryModel.service = serviceModel.id;
                 serviceCategoryModel.category = category;
-    
+
                 await queryRunner.manager.save(serviceCategoryModel);
             }
 
@@ -71,7 +72,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
 
                 await queryRunner.manager.save(serviceTagModel);
             }
-    
+
             await queryRunner.commitTransaction();
         }
         catch(e) {
@@ -85,7 +86,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         return success({
             success: true,
             message: "MakeServiceSuccess"
-        })
+        });
     } 
 
     catch (e) {
@@ -93,7 +94,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         return failure({
             success: false,
             message: "MakeServiceException"
-        })
+        });
     }
 }
 

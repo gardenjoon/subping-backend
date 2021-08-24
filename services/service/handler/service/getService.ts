@@ -1,6 +1,6 @@
-import SubpingRDB, { Repository, Entity } from "subpingrdb";
-import { APIGatewayProxyHandler } from 'aws-lambda';
+import SubpingRDB, { Repository } from "subpingrdb";
 
+import { APIGatewayProxyHandler } from 'aws-lambda';
 import { success, failure } from "../../libs/response-lib";
 
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
@@ -9,7 +9,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const header = event.headers;
         const PK = header.email;
         const body = JSON.parse(event.body || "");
-        
+
         const requestedService = body.service || null;
 
         const subpingRDB = new SubpingRDB();
@@ -21,15 +21,15 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
 
             return success({
                 success: true,
-                message: response  
-            })
+                message: response
+            });
         }
 
         else {
             return failure({
                 success: false,
                 message: "NoRequestedServiceException"
-            })
+            });
         }
     }
 
@@ -38,7 +38,6 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         return failure({
             success: false,
             message: "GetServicesException"
-        })
+        });
     }
 }
-

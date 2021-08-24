@@ -1,32 +1,21 @@
-import {Entity, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, PrimaryColumn, OneToMany} from "typeorm";
+import { Entity, Column, CreateDateColumn, UpdateDateColumn, PrimaryColumn, OneToMany } from "typeorm";
 import { ServiceCategory } from "./ServiceCategory";
 
 @Entity()
 export class Category {
-    @PrimaryColumn({
-        length: 100
-    })
+    @PrimaryColumn({ length: 100 })
     name: string;
 
-    @Column({
-        nullable: false
-    })
+    @Column({ nullable: false })
     summary: string;
 
-    @Column({
-        nullable: true,
-        length: 1000
-    })
+    @Column({ length: 1000, nullable: true })
     categoryLogoUrl: string;
 
-    @CreateDateColumn({
-        nullable: false
-    })
+    @CreateDateColumn({ nullable: false })
     createdAt: Date;
 
-    @UpdateDateColumn({
-        nullable: false
-    })
+    @UpdateDateColumn({ nullable: false })
     updatedAt: Date;
 
     @OneToMany(type => ServiceCategory, serviceCategory => serviceCategory.category)

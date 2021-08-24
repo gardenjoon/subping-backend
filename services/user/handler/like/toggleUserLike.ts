@@ -12,9 +12,9 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const { serviceId, toggle } = body;
 
         const subpingRDB = new SubpingRDB();
-        const coneection = await subpingRDB.getConnection("dev");
+        const connection = await subpingRDB.getConnection("dev");
 
-        const userLikeRepository = coneection.getCustomRepository(Repository.UserLike)
+        const userLikeRepository = connection.getCustomRepository(Repository.UserLike);
         const existUserLike = await userLikeRepository.getUserLike(PK, serviceId);
         
         const userLikeEntity = new Entity.UserLike();
@@ -45,13 +45,13 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
             success: true,
             message: existUserLike ? true : false
         });
-    }   
+    }
 
     catch (e) {
         console.log(e);
         return failure({
             success: false,
             message: "makeUserLikeException"
-        })
+        });
     }
-} 
+}

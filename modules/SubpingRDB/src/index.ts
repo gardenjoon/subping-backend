@@ -70,7 +70,7 @@ export const Repository = {
 class SubpingRDB {
     async getConnection(stage: StageType) {
         const CONN_NAME = "default";
-        const connManager = getConnectionManager()
+        const connManager = getConnectionManager();
         
         let conn: Connection;
 

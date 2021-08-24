@@ -1,4 +1,4 @@
-import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn} from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne } from "typeorm";
 import { User } from "./User";
 
 type AlarmType = "delivery" | "payment" | "expiration" | "info" | "important";
@@ -8,41 +8,25 @@ export class Alarm {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @ManyToOne(type => User, user => user.alarms, {
-        nullable: false,
-        cascade: true
-    })
+    @ManyToOne(type => User, user => user.alarms, 
+        { nullable: false, cascade: true })
     user: string;
 
-    @Column({
-        nullable: false
-    })
+    @Column({ nullable: false })
     type: AlarmType;
 
-    @Column({
-        nullable: false
-    })
+    @Column({ nullable: false })
     title: string;
 
-    @Column({
-        type: "text",
-        nullable: false
-    })
+    @Column({ type: "text", nullable: false })
     content: string;
 
-    @Column({
-        nullable: false,
-        default: false
-    })
+    @Column({ nullable: false, default: false })
     read: boolean;
 
-    @CreateDateColumn({
-        nullable: false
-    })
+    @CreateDateColumn({ nullable: false })
     createdAt: Date;
 
-    @UpdateDateColumn({
-        nullable: false
-    })
+    @UpdateDateColumn({ nullable: false })
     updatedAt: Date;
 }

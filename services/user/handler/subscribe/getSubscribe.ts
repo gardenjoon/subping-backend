@@ -5,7 +5,7 @@ import { success, failure } from "../../libs/response-lib";
 
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
-        let response;
+        let response = [];
 
         const header = event.headers;
         const PK = header.email;
@@ -29,7 +29,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         return success({
             success: true,
             message: response  
-        })
+        });
     }
 
     catch (e) {
@@ -37,6 +37,6 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         return failure({
             success: false,
             message: "GetSubscribeException"
-        })
+        });
     }
-} 
+}
