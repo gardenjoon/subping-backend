@@ -1,6 +1,28 @@
 import { EntityRepository, Repository } from "typeorm";
 import { Service } from "../entity/Service";
 import { ServiceCategoryRepository } from "./ServiceCategory";
+import  * as moment from "moment-timezone";
+
+const makeHour = (hour: Number) => {
+    let standardHour = null;
+    
+    if (6 <= hour && hour < 12) {
+        standardHour = "06:00";
+    }
+    
+    else if (12 <= hour && hour < 18) {
+        standardHour = "12:00";
+    }
+    
+    else if (18 <= hour && hour < 24) {
+        standardHour = "18:00";
+    }
+    
+    else {
+        standardHour = "24:00";
+    }
+    return standardHour;
+}
 
 @EntityRepository(Service)
 export class ServiceRepository extends Repository<Service> {
@@ -130,11 +152,21 @@ export class ServiceRepository extends Repository<Service> {
         return servicesOfCategory;
     }
 
-    async getServiceWithId(id: string, userEmail: string) {
+    async getServiceWithId(serviceId: string, userEmail: string) {
+        const currentHour = makeHour(moment.tz("Asia/Seoul").hours());
+        const currentDate = moment.tz("Asia/Seoul").format("YYYY-MM-DD");
+
+        await this.createQueryBuilder()
+            .update("service_event", {view: () => "view + 1"})
+            .where(`serviceId = "${serviceId}"`)
+            .andWhere(`date = "${currentDate}"`)
+            .andWhere(`time = "${currentHour}"`)
+            .execute();
+
         const service = await this.createQueryBuilder("service")
             .select("service.*")
             .addSelect("GROUP_CONCAT(DISTINCT serviceCategory.categoryName)", "category")
-            .where(`service.id = "${id}"`)
+            .where(`service.id = "${serviceId}"`)
             .innerJoin("service.serviceCategories", "serviceCategory")
             .addSelect("GROUP_CONCAT(DISTINCT serviceTag.tag)", "tag")
             .innerJoin("service.serviceTags", "serviceTag")
