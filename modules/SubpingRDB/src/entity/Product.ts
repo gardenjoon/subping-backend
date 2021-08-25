@@ -2,8 +2,7 @@ import { Entity, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, PrimaryG
 import { Review } from "./Review";
 import { Service } from "./Service";
 import { SubscribeItem } from "./SubscribeItem";
-
-type Period = "1W" | "2W" | "3W" | "1M" | "2M" | "3M";
+import { ProductPeriod } from "./ProductPeriod";
 
 @Entity()
 export class Product {
@@ -26,9 +25,6 @@ export class Product {
     @Column({ length: 1000, nullable: true })
     productLogoUrl: string;
 
-    @Column({ length: 50, nullable: false })
-    period: Period;
-
     @Column({ nullable: false })
     amount: number;
 
@@ -46,4 +42,7 @@ export class Product {
 
     @OneToMany(type => SubscribeItem, subscribeItem => subscribeItem.product)
     subscribeItems: SubscribeItem[];
+
+    @OneToMany(type => ProductPeriod, productPeriod => productPeriod.product)
+    periods: ProductPeriod[];
 }
