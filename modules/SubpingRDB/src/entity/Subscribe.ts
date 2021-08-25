@@ -1,9 +1,7 @@
 import { Entity, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, PrimaryGeneratedColumn, OneToMany } from "typeorm";
 import { Payment } from "./Payment";
-import { Product } from "./Product";
+import { SubscribeItem } from "./SubscribeItem";
 import { User } from "./User";
-
-type Period = "1W" | "2W" | "1M";
 
 @Entity()
 export class Subscribe {
@@ -14,12 +12,9 @@ export class Subscribe {
         { cascade: true })
     user: string;
 
-    @ManyToOne(type => Product, product => product.subscribes, 
+    @OneToMany(type => SubscribeItem, subscribeItem => subscribeItem.subscribe, 
         { cascade: true })
-    product: string;
-
-    @Column({ length: 50, nullable: false })
-    period: Period;
+    subscribeItems: SubscribeItem[];
 
     @Column({ type: "date", nullable: false })
     subscribeDate: Date;

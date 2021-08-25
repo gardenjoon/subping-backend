@@ -1,7 +1,9 @@
 import { Entity, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, PrimaryGeneratedColumn, OneToMany } from "typeorm";
 import { Review } from "./Review";
 import { Service } from "./Service";
-import { Subscribe } from "./Subscribe";
+import { SubscribeItem } from "./SubscribeItem";
+
+type Period = "1W" | "2W" | "3W" | "1M" | "2M" | "3M";
 
 @Entity()
 export class Product {
@@ -13,7 +15,7 @@ export class Product {
     service: string;
 
     @Column({ nullable: false })
-    price: Number;
+    price: number;
 
     @Column({ nullable: false })
     name: string;
@@ -23,6 +25,12 @@ export class Product {
 
     @Column({ length: 1000, nullable: true })
     productLogoUrl: string;
+
+    @Column({ length: 50, nullable: false })
+    period: Period;
+
+    @Column({ nullable: false })
+    amount: number;
 
     @Column({ nullable: false })
     available: boolean;
@@ -36,6 +44,6 @@ export class Product {
     @OneToMany(type => Review, review => review.product)
     reviews: Review[];
 
-    @OneToMany(type => Subscribe, subscribe => subscribe.product)
-    subscribes: Subscribe[];
+    @OneToMany(type => SubscribeItem, subscribeItem => subscribeItem.product)
+    subscribeItems: SubscribeItem[];
 }

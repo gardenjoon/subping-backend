@@ -6,6 +6,7 @@ import { ServiceEvent } from "./ServiceEvent";
 import { ServiceRank } from "./ServiceRank";
 import { ServiceTag } from "./ServiceTag";
 import { UserLike } from "./UserLike";
+import { ColumnMetadata } from "typeorm/metadata/ColumnMetadata";
 
 type ServiceType = "delivery" | "online"
 
@@ -32,6 +33,9 @@ export class Service {
 
     @Column({ type: "text" })
     summary: string;
+
+    @Column({ nullable: false })
+    customizable : boolean;
 
     @CreateDateColumn({ nullable: false })
     createdAt: Date;
