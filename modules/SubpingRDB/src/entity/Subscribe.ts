@@ -12,8 +12,7 @@ export class Subscribe {
         { cascade: true })
     user: string;
 
-    @OneToMany(type => SubscribeItem, subscribeItem => subscribeItem.subscribe, 
-        { cascade: true })
+    @OneToMany(type => SubscribeItem, subscribeItem => subscribeItem.subscribe)
     subscribeItems: SubscribeItem[];
 
     @Column({ type: "date", nullable: false })

@@ -1,13 +1,17 @@
 import SubpingRDB, { Repository, Entity } from "subpingrdb";
+import SubpingDDB from "../../libs/SubpingDDB"
+import HotChartTimeModel from "../../libs/subpingddb/model/subpingTable/hotChartTime";
+import * as moment from "moment-timezone";
 
-import  * as moment from "moment-timezone";
-
-import { APIGatewayProxyHandler } from 'aws-lambda';
 import { success, failure } from "../../libs/response-lib";
 
-export const handler: APIGatewayProxyHandler = async (_event, _context) => {
+export const handler = async (event, _context) => {
     const subpingRDB = new SubpingRDB();
     const connection = await subpingRDB.getConnection("dev");
+
+    const body = event;
+    const { logourl, userProfileImageUrl, category, seller, service, product,productPeriod, user, subscribe, subscribeItem, alarm, like, review, reviewImage } = body;
+
     const makeHour = (hour: Number) => {
         let standardHour = null;
 
@@ -30,49 +34,30 @@ export const handler: APIGatewayProxyHandler = async (_event, _context) => {
         return standardHour;
     }
     const makeCategory = async() => {
-        const repository = connection.getCustomRepository(Repository.Category);
-
-        const backupData = {
-            "사회" : "정치, 뉴스 등에 관한 카테고리입니다",
-            "미디어" : "영화, 드라마 등에 관한 카테고리입니다",
-            "식품" : "음식, 주류 등에 관한 카테고리입니다"
-        };
-
-        for (const element in backupData){
+        const repository = connection.getCustomRepository(Repository.Category)
+        for (const element in category){
             const categoryModel = new Entity.Category();
-            categoryModel.name = element;
-            categoryModel.summary = backupData[element];
-            categoryModel.categoryLogoUrl = null;
-            await repository.saveCategory(categoryModel);
-        };
-
-        console.log("makeCategoryComplete");
+            categoryModel.name = element
+            categoryModel.summary = category[element]
+            categoryModel.categoryLogoUrl = null
+            await repository.saveCategory(categoryModel)
+        }
+        console.log("makeCategoryComplete")
     }
     const makeSeller = async() => {
-        const repository = connection.getCustomRepository(Repository.Seller);
-        const backupData = {
-            "정원준" : "wonjoon@joiple.co",
-            "정승우" : "seungwoo@joiple.co"
-        };
+        const repository = connection.getCustomRepository(Repository.Seller)
 
-        for (const element in backupData){
+        for (const element in seller){
             const sellerModel = new Entity.Seller();
             sellerModel.name = element;
-            sellerModel.email = backupData[element]
+            sellerModel.email = seller[element]
             await repository.saveSeller(sellerModel)
-        };
+        }
 
-        console.log("makeSellerComplete");
+        console.log("makeSellerComplete")
     }
     const makeService = async() => {
-        const backupData = {
-            "넷플릭스" : ["35f6a231-4832-49dc-be76-c8241ebb8135","online","https://subping-assets.s3.ap-northeast-2.amazonaws.com/serviceLogo/watcha.png","전세계 모든 미디어를 한곳에서!","wonjoon@joiple.co",["미디어"],["영화", "드라마"]],
-            "왓챠" : ["4dd6a155-be2e-4ca3-b3b0-6e044d5766dd	","online","https://subping-assets.s3.ap-northeast-2.amazonaws.com/serviceLogo/watcha.png","국내외 영화, 드라마를 한곳에서","wonjoon@joiple.co",["미디어"],["영화","드라마"]],
-            "부산일보": ["87a8fa90-a720-43f7-9fdc-7e7bab2721cf	", "delivery", "https://subping-assets.s3.ap-northeast-2.amazonaws.com/serviceLogo/watcha.png", "부산에서 무슨일이 일어날까요","wonjoon@joiple.co",["사회"],["뉴스","신문"]],
-            "술담화": ["bb1f2016-7945-44cc-a6b1-0f0ad152cdb2	", "delivery", "https://subping-assets.s3.ap-northeast-2.amazonaws.com/serviceLogo/watcha.png", "매달 다른 술을 배송해드릴게요 😀","wonjoon@joiple.co",["식품"],["주류","전통주"]],
-        };
-
-        for (const element in backupData){
+        for (const element in service){
             const serviceModel = new Entity.Service();
             const serviceEventModel = new Entity.ServiceEvent();
             const serviceCategoryModel = new Entity.ServiceCategory();
@@ -86,28 +71,29 @@ export const handler: APIGatewayProxyHandler = async (_event, _context) => {
             serviceEventModel.time = standardHour;
 
             serviceModel.name = element;
-            serviceModel.id = backupData[element][0];
-            serviceModel.type = backupData[element][1];
-            serviceModel.serviceLogoUrl = backupData[element][2];
-            serviceModel.summary = backupData[element][3];
-            serviceModel.seller = backupData[element][4];
+            serviceModel.id = service[element][0];
+            serviceModel.type = service[element][1];
+            serviceModel.serviceLogoUrl = logourl;
+            serviceModel.summary = service[element][2];
+            serviceModel.seller = service[element][3];
+            serviceModel.customizable = false;
 
             const queryRunner = connection.createQueryRunner();
             try {
                 await queryRunner.startTransaction();
                 await queryRunner.manager.save(serviceModel);
-
-                serviceEventModel.service = backupData[element][0];
+                
+                serviceEventModel.service = service[element][0];
                 await queryRunner.manager.save(serviceEventModel);
-
-                for(const category of backupData[element][5]) {
-                    serviceCategoryModel.service = backupData[element][0];
+                
+                for(const category of service[element][4]) {
+                    serviceCategoryModel.service = service[element][0];
                     serviceCategoryModel.category = category;
                     await queryRunner.manager.save(serviceCategoryModel);
                 }
-
-                for(const tag of backupData[element][6]) {
-                    serviceTagModel.service = backupData[element][0];
+    
+                for(const tag of service[element][5]) {
+                    serviceTagModel.service = service[element][0];
                     serviceTagModel.tag = tag;
                     await queryRunner.manager.save(serviceTagModel);
                 }
@@ -127,115 +113,173 @@ export const handler: APIGatewayProxyHandler = async (_event, _context) => {
 
         console.log("makeServiceComplete");
     }
+    const makeRank = async() => {
+        const eventRepository = connection.getCustomRepository(Repository.ServiceEvent)
+        const rankRepository = connection.getCustomRepository(Repository.ServiceRank)
+
+        const currentTime = moment.tz("Asia/Seoul")
+        const currentHour = makeHour(currentTime.hours());
+        const currentDate = currentTime.toDate();
+        
+        const eventModelForRank = await eventRepository.getServiceEvents(currentDate, currentHour);
+        
+        for (const [index, element] of eventModelForRank.entries()) {
+            const serviceRankModel = new Entity.ServiceRank();
+            serviceRankModel.service = element.service;
+            serviceRankModel.date = currentDate;
+            serviceRankModel.time = currentHour;
+            serviceRankModel.rank = index+1;
+            await rankRepository.saveServiceRank(serviceRankModel);
+        }
+
+        const subpingDDB = new SubpingDDB(process.env.subpingTable);
+        const controller = subpingDDB.getController();
+
+        const HotChartTimeModel: HotChartTimeModel = {
+            PK: "hotChartTime",
+            SK: "hotChartTime",
+            createdAt: null,
+            updatedAt: null,
+            model: "hotChartTime",
+            date: moment(currentDate).format("YYYY-MM-DD"),
+            time: currentHour
+        };
+        await controller.create<HotChartTimeModel>(HotChartTimeModel);
+        console.log("makeRankComplete")
+    }
     const makeProduct = async() => {
         const repository = connection.getCustomRepository(Repository.Product);
-        const logourl = "https://subping-assets.s3.ap-northeast-2.amazonaws.com/serviceLogo/watcha.png"
 
-        const backupData = {
-            "28864f6c-44c7-4dc9-9bce-e81d1b173aa9" : ["14500","Premium","넷플릭스 프리미엄 요금제 입니다.",logourl,true,"35f6a231-4832-49dc-be76-c8241ebb8135"],
-            "3c1ba7ea-33e1-4271-9ae9-46e3165c011c" : ["9500","Basic","넷플릭스 베이직 요금제 입니다.",logourl,true,"35f6a231-4832-49dc-be76-c8241ebb8135"],
-            "4d23346f-f14d-4a4e-be77-f1f254ec250d" : ["12000","Standard","넷플릭스 스탠다드 요금제 입니다.",logourl,true,"35f6a231-4832-49dc-be76-c8241ebb8135"],
-            "a0f4ea49-223a-49c7-b076-c2f06055c22a" : ["12900","Premium","왓챠 프리미엄 요금제 입니다.",logourl,true,"4dd6a155-be2e-4ca3-b3b0-6e044d5766dd"],
-            "b3bda359-df7c-4615-bb7e-b8a1e0c43887" : ["4900","Basic","왓챠 베이직 요금제 입니다.",logourl,true,"4dd6a155-be2e-4ca3-b3b0-6e044d5766dd"],
-        };
-
-        for (const element in backupData){
+        for (const element in product){
             const productModel = new Entity.Product();
             productModel.id = element;
-            productModel.price = backupData[element][0]
-            productModel.name = backupData[element][1]
-            productModel.summary = backupData[element][2]
-            productModel.productLogoUrl = backupData[element][3]
-            productModel.available = backupData[element][4]
-            productModel.service = backupData[element][5]
-            await repository.saveProduct(productModel)
+            productModel.price = product[element][0];
+            productModel.name = product[element][1];
+            productModel.summary = product[element][2];
+            productModel.productLogoUrl = logourl;
+            productModel.amount = 0;
+            productModel.available = product[element][3];
+            productModel.service = product[element][4];
+            await repository.saveProduct(productModel);
+        };
+
+        const productPeriodRepository = connection.getRepository(Entity.ProductPeriod);
+        for (const element in productPeriod){
+            const productPeriodModel = new Entity.ProductPeriod();
+            productPeriodModel.product = element;
+            productPeriodModel.period = product[element][0];
+            await productPeriodRepository.save(productPeriodModel);
         };
 
         console.log("makeProductComplete");
     }
     const makeUser = async() => {
-        const repository = connection.getCustomRepository(Repository.User);
+        const repository = connection.getCustomRepository(Repository.User)
 
-        const backupData = {
-            "dlwjdwls6504@gmail.com" : ["이정진",null,null,"1998-09-02","M","testCI","SKT","01050362687"],
-            "jsw9808@gmail.com" : ["정승우",null,null,"1998-08-03","M","testCI","SKT","01088812173"],
-            "qkrrhkddl7@naver.com" : ["박광이",null,null,"1998-08-03","M","testCI","SKT","01099481351"],
-        };
-
-        for (const user in backupData){
+        for (const element in user){
             const userModel = new Entity.User();
-            userModel.email = user;
-            userModel.name = backupData[user][0];
-            userModel.nickName = backupData[user][1];
-            userModel.userProfileImageUrl = backupData[user][2];
-            userModel.birthday = backupData[user][3];
-            userModel.gender = backupData[user][4];
-            userModel.ci = backupData[user][5];
-            userModel.carrier = backupData[user][6];
-            userModel.phoneNumber = backupData[user][7];
-            await repository.saveUser(userModel);
-        };
-
-        console.log("makeUserComplete");
+            userModel.email = element;
+            userModel.name = user[element][0];
+            userModel.nickName = user[element][1];
+            userModel.userProfileImageUrl = userProfileImageUrl;
+            userModel.birthday = user[element][2];
+            userModel.gender = user[element][3];
+            userModel.ci = user[element][4];
+            userModel.carrier = user[element][5];
+            userModel.phoneNumber = user[element][6];
+            await repository.saveUser(userModel)
+        }
+        console.log("makeUserComplete")
     }
     const makeSubscribe = async() => {
-        const repository = connection.getCustomRepository(Repository.Subscribe);
+        const subscribeRepository = connection.getCustomRepository(Repository.Subscribe);
 
-        const currentTime = moment.tz("Asia/Seoul");
-        const currentDate = currentTime.format("YYYY-MM-DD");
+        const currentDate = moment.tz("Asia/Seoul").toDate();
 
-        const backupData = {
-            "dlwjdwls6504@gmail.com" : [30,currentDate,"b3bda359-df7c-4615-bb7e-b8a1e0c43887"],
-            "jsw9808@gmail.com" : [30,currentDate,"28864f6c-44c7-4dc9-9bce-e81d1b173aa9"],
-            "qkrrhkddl7@naver.com" : [30,currentDate,"a0f4ea49-223a-49c7-b076-c2f06055c22a"]
-        };
-
-        for (const element in backupData){
+        for (const element in subscribe){
             const subscribeModel = new Entity.Subscribe();
-            subscribeModel.user = element;
-            subscribeModel.period = backupData[element][0];
-            subscribeModel.subscribeDate = backupData[element][1];
-            subscribeModel.product = backupData[element][2];
+            subscribeModel.id = element
+            subscribeModel.user = subscribe[element][0];
+            subscribeModel.subscribeDate = currentDate;
+            subscribeModel.product = subscribe[element][1];
             subscribeModel.expiredDate = null;
-            await repository.saveSubscribe(subscribeModel);
-        };
+            await subscribeRepository.saveSubscribe(subscribeModel);
+        }
+
+        const subscribeItemRepository = connection.getRepository(Entity.SubscirbeItem)
+        for (const element in subscribeItem){
+            const subscribeItemModel = new Entity.SubscirbeItem();
+            subscribeItemModel.subscribe = element;
+            subscribeItemModel.product = subscribeItem[element][0]
+            subscribeItemModel.period = subscribeItem[element][1]
+            subscribeItemModel.amount = subscribeItem[element][2]
+            await subscribeItemRepository.save(subscribeItemModel)
+        }
 
         console.log("makeSubscribeComplete");
     }
     const makeAlarm = async() => {
-        const repository = connection.getCustomRepository(Repository.Alarm);
+        const repository = connection.getCustomRepository(Repository.Alarm)
 
-        const backupData = {
-            "051d4419-48f1-4a59-a6c2-8eeaae90ad05" : ["info","이정진 전용","Info Message",true,"dlwjdwls6504@gmail.com"],
-            "146c6a92-a032-43f6-8616-f7563292dde1" : ["delivery","이정진 전용","Delivery Message",true,"dlwjdwls6504@gmail.com"],
-            "2118a203-7eaa-4cdc-a261-67c9cfb5b229" : ["payment","이정진 전용","Payment Message",true,"dlwjdwls6504@gmail.com"],
-            "253ec1a1-29b9-4836-84b7-33bccb469ae2" : ["important","정승우","Important Message",true,"jsw9808@gmail.com"],
-            "6b21c1c7-9548-4813-82cc-72b1d546baf1" : ["expiration","이정진 전용","Expriration Message",true,"dlwjdwls6504@gmail.com"],
-        };
-
-        for (const element in backupData){
+        for (const element in alarm){
             const alarmModel = new Entity.Alarm();
             alarmModel.id = element;
-            alarmModel.type = backupData[element][0];
-            alarmModel.title = backupData[element][1];
-            alarmModel.content = backupData[element][2];
-            alarmModel.read = backupData[element][3];
-            alarmModel.user = backupData[element][4];
-            await repository.saveAlarm(alarmModel);
+            alarmModel.type = alarm[element][0]
+            alarmModel.title = alarm[element][1]
+            alarmModel.content = alarm[element][2]
+            alarmModel.read = false
+            alarmModel.user = alarm[element][3]
+            await repository.saveAlarm(alarmModel)
+        }
+        console.log("makeAlarmComplete")
+    }
+    const userLike = async() => {
+        const userLikeRepository = connection.getCustomRepository(Repository.UserLike);
+
+        for (const element in like){
+            const userLikeEntity = new Entity.UserLike();
+            userLikeEntity.service = element;
+            userLikeEntity.user = like[element];
+            await userLikeRepository.makeUserLike(userLikeEntity);
         };
 
-        console.log("makeAlarmComplete");
+        console.log("makeUserLikeComplete");
     }
-
+    const makeReview = async() => {
+        const reviewRepository = connection.getCustomRepository(Repository.Review);
+        for (const element in review){
+            const reviewModel = new Entity.Review();
+            reviewModel.id = element;
+            reviewModel.title = review[element][0];
+            reviewModel.content = review[element][1];
+            reviewModel.rating = review[element][2];
+            reviewModel.user = review[element][3];
+            reviewModel.product = review[element][4];
+            await reviewRepository.saveReview(reviewModel);
+        };
+        
+        const reviewImageRepository = connection.getRepository(Entity.ReviewImage)
+        for (const element in reviewImage){
+            const reviewImageModel = new Entity.ReviewImage();
+            reviewImageModel.id = element;
+            reviewImageModel.imageUrl = reviewImage[element][0];
+            reviewImageModel.review = reviewImage[element][1];
+            await reviewImageRepository.save(reviewImageModel)
+        }
+        console.log("makeReviewComplete");
+    }
     try {
         await connection.synchronize();
         await makeCategory();
         await makeSeller();
         await makeService();
+        await makeRank();
         await makeProduct();
         await makeUser();
         await makeSubscribe();
         await makeAlarm();
+        await userLike();
+        await makeReview();
 
         return success({
             success: true,
