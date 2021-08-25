@@ -1,6 +1,5 @@
 import "reflect-metadata";
 import { createConnection, getConnectionManager, Connection } from "typeorm";
-
 import { Alarm } from "./entity/Alarm";
 import { Category } from "./entity/Category";
 import { Product } from "./entity/Product";
@@ -13,7 +12,10 @@ import { ServiceEvent } from "./entity/ServiceEvent";
 import { ServiceRank } from "./entity/ServiceRank";
 import { User } from "./entity/User";
 import { UserAddress } from "./entity/UserAddress";
+import { UserLike } from "./entity/UserLike";
 import { ServiceTag } from "./entity/ServiceTag";
+import { Subscribe } from "./entity/Subscribe"
+import { Payment } from "./entity/Payment";
 
 import { UserRepository } from "./repository/User";
 import { CategoryRepository } from "./repository/Category";
@@ -24,11 +26,16 @@ import { AlarmRepository } from "./repository/Alarm";
 import { ServiceEventRepository } from "./repository/ServiceEvent";
 import { ServiceRankRepository } from "./repository/ServiceRank";
 import { ServiceTagRespository } from "./repository/ServiceTags";
+import { ProductRepository } from "./repository/Product";
+import { SubscribeRepository } from "./repository/Subscribe";
+import { UserLikeRepository } from "./repository/UserLike";
 
 type StageType = "prod" | "dev";
 
 export const Entity = {
     User: User,
+    UserLike: UserLike,
+    UserAddress: UserAddress,
     Alarm: Alarm,
     Category: Category,
     Product: Product,
@@ -40,11 +47,13 @@ export const Entity = {
     ServiceEvent: ServiceEvent,
     ServiceRank: ServiceRank,
     ServiceTag: ServiceTag,
-    UserAddress: UserAddress,
+    Subscribe: Subscribe,
+    Payment: Payment
 }
 
 export const Repository = {
     User : UserRepository,
+    UserLike: UserLikeRepository,
     Category: CategoryRepository,
     Service: ServiceRepository,
     Seller: SellerRepository,
@@ -53,13 +62,15 @@ export const Repository = {
     ServiceRank: ServiceRankRepository,
     ServiceTag: ServiceTagRespository,
     Alarm: AlarmRepository,
+    Product: ProductRepository,
+    Subscribe: SubscribeRepository
 }
 
 
 class SubpingRDB {
     async getConnection(stage: StageType) {
         const CONN_NAME = "default";
-        const connManager = getConnectionManager()
+        const connManager = getConnectionManager();
         
         let conn: Connection;
 
@@ -92,4 +103,5 @@ class SubpingRDB {
         })
     }
 }
+
 export default SubpingRDB;

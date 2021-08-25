@@ -5,17 +5,19 @@ import { success, failure } from "../../libs/response-lib";
 
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
+        const body = JSON.parse(event.body || "");
+        const header = event.headers;
+
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
-        const alarmRepository = connection.getCustomRepository(Repository.Alarm)
+        const alarmRepository = connection.getCustomRepository(Repository.Alarm);
         
         const alarmModel = new Entity.Alarm();
-        alarmModel.user = "dlwjdwls6504@gmail.com"
-        alarmModel.type = "info"
-        alarmModel.title = "이정진 전용"
-        alarmModel.content = "정진님 오늗도 1정진 했어!\n-다일-"
-        alarmModel.read = false
-
+        alarmModel.user = header.email;
+        alarmModel.type = body.type;
+        alarmModel.title = body.title;
+        alarmModel.content = body.content;
+        alarmModel.read = false;
         await alarmRepository.saveAlarm(alarmModel)
 
         return success({

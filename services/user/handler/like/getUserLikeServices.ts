@@ -5,22 +5,23 @@ import { success, failure } from "../../libs/response-lib";
 
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
+        let response = [];
+
         const header = event.headers;
         const PK = header.email;
 
         const subpingRDB = new SubpingRDB();
-        const connection = await subpingRDB.getConnection("dev");
-        const alarmRepository = connection.getCustomRepository(Repository.Alarm);
+        const coneection = await subpingRDB.getConnection("dev");
 
-        const unReadAlarms = await alarmRepository.findUserUnreadAlarms(PK)
+        const userLikeRepository = coneection.getCustomRepository(Repository.UserLike)
 
-        for (const unReadAlarm of unReadAlarms){
-            await alarmRepository.updateAlarmRead(unReadAlarm.id, true);
-        }
+        const existUserLike = await userLikeRepository.getUserLikes(PK);
+        
+        response = existUserLike;
 
         return success({
             success: true,
-            message: "ReadAlarmSuccess"
+            message: response
         });
     }
 
@@ -28,7 +29,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         console.log(e);
         return failure({
             success: false,
-            message: "ReadAlarmException"
+            message: "getUserLikeServicesException"
         })
     }
 }

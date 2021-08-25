@@ -7,7 +7,8 @@ import { ServiceCategory } from "./ServiceCategory";
     expression: (connection: Connection) => 
         connection.createQueryBuilder()
 
-})  
+})
+
 export class ServiceCategoryView {
     @ViewColumn()
     id: string;
@@ -31,8 +32,8 @@ export class ServiceCategoryView {
     summary: string;
 
     @ViewColumn()
-    createdAt: Date
+    createdAt: Date;
 
     @ViewColumn()
-    updatedAt: Date
+    updatedAt: Date;
 }

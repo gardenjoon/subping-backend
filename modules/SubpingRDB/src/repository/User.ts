@@ -1,4 +1,4 @@
-import {EntityRepository, Repository} from "typeorm";
+import { EntityRepository, Repository } from "typeorm";
 import { User } from "../entity/User";
 
 @EntityRepository(User)
@@ -7,21 +7,31 @@ export class UserRepository extends Repository<User> {
         return this.find();
     }
 
-    findOneUser(email: string): Promise<User> {
-        return this.findOne(email);
+    findOneUser(userEmail: string): Promise<User> {
+        return this.findOne(userEmail);
     }
 
-    async saveUser(user: User): Promise<void> {
-        await this.save(user);
+    async updateNickName(userEmail: string, nickName: string): Promise<void> {
+        await this.update(userEmail, { nickName: nickName})
     }
 
-    async deleteUser(email: string): Promise<void> {
-        await this.delete({ email: email });
+    async saveUser(User: User): Promise<void> {
+        await this.save(User);
     }
 
-    findByName(name: string) {
+    async deleteUser(userEmail: string): Promise<void> {
+        await this.delete({ email: userEmail });
+    }
+
+    async findByName(userName: string) {
         return this.createQueryBuilder("user")
-            .where("user.name = :name", { name })
+            .where(`user.userName = ${userName}`)
             .getMany()
+    }
+
+    async findByNickName(nickName: string): Promise<Object> {
+        return await this.createQueryBuilder("user")
+            .where(`user.nickName = "${nickName}"`)
+            .getRawOne();
     }
 }

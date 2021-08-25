@@ -22,6 +22,6 @@ export class SellerRepository extends Repository<Seller> {
     findByName(name: string) {
         return this.createQueryBuilder("name")
             .where("Seller.name = :name", { name })
-            .getMany()
+            .getMany();
     }
 }

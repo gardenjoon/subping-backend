@@ -1,22 +1,28 @@
 import SubpingRDB, { Repository } from "subpingrdb";
 
+import * as moment from "moment-timezone";
+
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import { success, failure } from "../../libs/response-lib";
 
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
+        const body = JSON.parse(event.body || "");
         const header = event.headers;
-        const PK = header.email;
+        const PK = header.PK;
+
+        const { productId } = body;
 
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
-        const alarmRepository = connection.getCustomRepository(Repository.Alarm);
+        const repository = connection.getCustomRepository(Repository.Subscribe);
 
-        const unReadAlarms = await alarmRepository.findUserUnreadAlarms(PK)
+        const userSubscribeProduct = await repository.getOneSubscribe(PK, productId);
 
-        for (const unReadAlarm of unReadAlarms){
-            await alarmRepository.updateAlarmRead(unReadAlarm.id, true);
-        }
+        const currentTime = moment.tz("Asia/Seoul");
+        const currentDate = currentTime.format("YYYY-MM-DD");
+
+        await repository.updateSubscribe(userSubscribeProduct[0].id, currentDate);
 
         return success({
             success: true,
@@ -29,6 +35,6 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         return failure({
             success: false,
             message: "ReadAlarmException"
-        })
+        });
     }
 }

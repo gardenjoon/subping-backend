@@ -1,13 +1,13 @@
 import SubpingRDB, { Entity, Repository } from "subpingrdb";
-import SubpingDDB from "../../libs/subpingddb"
-import HotChartTimeModel from "subpingddb/model/subpingTable/hotChartTime";
+import SubpingDDB from "../../libs/subpingddb";
+import HotChartTimeModel from "../../libs/subpingddb/model/subpingTable/hotChartTime";
 
 import * as moment from "moment-timezone";
 
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import { success, failure } from "../../libs/response-lib";
 
-export const handler:APIGatewayProxyHandler  = async (event, _context) => {
+export const handler:APIGatewayProxyHandler  = async (_event, _context) => {
     const makeHour = (hour: Number) => {
         let standardHour = null;
         
@@ -35,16 +35,16 @@ export const handler:APIGatewayProxyHandler  = async (event, _context) => {
 
         const currentTime = moment.tz("Asia/Seoul");
         const currentHour = makeHour(currentTime.hours());
-        const currentDate = currentTime.format("YYYY-MM-DD");
+        const currentDate = currentTime.toDate();
 
         const standardTime = currentTime.subtract(6, "hours");
         const standardHour = makeHour(standardTime.hours());
-        const standardDate = standardTime.format("YYYY-MM-DD")
+        const standardDate = standardTime.toDate();
         
-        const eventRepository = connection.getCustomRepository(Repository.ServiceEvent)
+        const eventRepository = connection.getCustomRepository(Repository.ServiceEvent);
 
         // service와 serviceEvent를 조인하고 정보를 읽어 rating을 생성
-        const rankRepository = connection.getCustomRepository(Repository.ServiceRank)
+        const rankRepository = connection.getCustomRepository(Repository.ServiceRank);
 
         const eventModelForRank = await eventRepository.getServiceEvents(standardDate, standardHour);
         for (const [index, element] of eventModelForRank.entries()) {
@@ -53,11 +53,11 @@ export const handler:APIGatewayProxyHandler  = async (event, _context) => {
             serviceRankModel.date = currentDate;
             serviceRankModel.time = currentHour;
             serviceRankModel.rank = index+1;
-            await rankRepository.saveServiceRank(serviceRankModel)
+            await rankRepository.saveServiceRank(serviceRankModel);
         }
 
         // 매 standardHour마다 serviceEvent 생성
-        const serviceRepository = connection.getCustomRepository(Repository.Service)
+        const serviceRepository = connection.getCustomRepository(Repository.Service);
         const allServices = await serviceRepository.findAllService();
 
         for (const element of allServices){
@@ -68,8 +68,8 @@ export const handler:APIGatewayProxyHandler  = async (event, _context) => {
             serviceEventModel.subscribe = 0;
             serviceEventModel.review = 0;
             serviceEventModel.view = 0;
-            await eventRepository.saveServiceEvent(serviceEventModel)
-        }
+            await eventRepository.saveServiceEvent(serviceEventModel);
+        };
 
         //핫차트 기준시간 모델 생성
         const subpingDDB = new SubpingDDB(process.env.subpingTable);
@@ -81,7 +81,7 @@ export const handler:APIGatewayProxyHandler  = async (event, _context) => {
             createdAt: null,
             updatedAt: null,
             model: "hotChartTime",
-            date: currentDate,
+            date: moment(currentDate).format("YYYY-MM-DD"),
             time: currentHour
         };
         await controller.create<HotChartTimeModel>(HotChartTimeModel);
@@ -98,5 +98,5 @@ export const handler:APIGatewayProxyHandler  = async (event, _context) => {
           success: false,
           message: "cronMakeRankException"
       });
-    };
-};
+    }
+}
