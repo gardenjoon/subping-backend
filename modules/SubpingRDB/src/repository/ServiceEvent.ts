@@ -21,7 +21,8 @@ export class ServiceEventRepository extends Repository<ServiceEvent> {
     }
 
     async getServiceEvents(date: Date, standardHour: Number) {
-        const dateString = moment(date).format('YYYY-MM-DD')
+        const dateString = moment(date).format('YYYY-MM-DD');
+
         return await this.createQueryBuilder("serviceEvent")
             .select("service.id", "service")
             .addSelect("serviceEvent.*")
@@ -30,6 +31,6 @@ export class ServiceEventRepository extends Repository<ServiceEvent> {
             .where(`serviceEvent.time = "${standardHour}"`)
             .innerJoin("serviceEvent.service", "service")
             .orderBy("subscribe + view + review")
-            .getRawMany()
+            .getRawMany();
     }
 }

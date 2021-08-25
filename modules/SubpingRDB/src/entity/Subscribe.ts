@@ -1,44 +1,34 @@
 import { Entity, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, PrimaryGeneratedColumn, OneToMany } from "typeorm";
 import { Payment } from "./Payment";
-import { Product } from "./Product";
+import { SubscribeItem } from "./SubscribeItem";
 import { User } from "./User";
-
-type Period = "1W" | "2W" | "1M";
 
 @Entity()
 export class Subscribe {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @ManyToOne(type => User, user => user.subscribes, {
-        cascade: true,
-    })
+    @ManyToOne(type => User, user => user.subscribes, 
+        { cascade: true })
     user: string;
 
-    @ManyToOne(type => Product, product => product.subscribes, {
-        cascade: true,
-    })
-    product: string;
-
-    @Column({ length: 50, nullable: false })
-    // 주기는 Day 기준입니다.
-    period: Period;
+    @OneToMany(type => SubscribeItem, subscribeItem => subscribeItem.subscribe)
+    subscribeItems: SubscribeItem[];
 
     @Column({ type: "date", nullable: false })
-    subscribeDate: string;
+    subscribeDate: Date;
 
     @Column({ type: "date", nullable: true })
-    expiredDate: string;
+    expiredDate: Date;
 
-    @CreateDateColumn({
-        nullable: false
-    })
-    createdAt: Date
+    @Column({ type: "date", nullable: true})
+    reSubscribeDate: Date;
 
-    @UpdateDateColumn({
-        nullable: false
-    })
-    updatedAt: Date
+    @CreateDateColumn({ nullable: false })
+    createdAt: Date;
+
+    @UpdateDateColumn({ nullable: false })
+    updatedAt: Date;
 
     @OneToMany(type => Payment, payment => payment.subscribe)
     payments: Payment[];

@@ -4,7 +4,8 @@
   "description": "Serverless webpack example using Typescript",
   "main": "handler.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "backup": "serverless invoke local -f backup -p ../service/handler/backup/backup.json"
   },
   "dependencies": {
     "aws-sdk": "^2.800.0",

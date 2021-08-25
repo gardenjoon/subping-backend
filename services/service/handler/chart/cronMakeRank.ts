@@ -1,5 +1,5 @@
 import SubpingRDB, { Entity, Repository } from "subpingrdb";
-import SubpingDDB from "../../libs/subpingddb"
+import SubpingDDB from "../../libs/subpingddb";
 import HotChartTimeModel from "../../libs/subpingddb/model/subpingTable/hotChartTime";
 
 import * as moment from "moment-timezone";
@@ -7,7 +7,7 @@ import * as moment from "moment-timezone";
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import { success, failure } from "../../libs/response-lib";
 
-export const handler:APIGatewayProxyHandler  = async (event, _context) => {
+export const handler:APIGatewayProxyHandler  = async (_event, _context) => {
     const makeHour = (hour: Number) => {
         let standardHour = null;
         
@@ -57,7 +57,7 @@ export const handler:APIGatewayProxyHandler  = async (event, _context) => {
         }
 
         // 매 standardHour마다 serviceEvent 생성
-        const serviceRepository = connection.getCustomRepository(Repository.Service)
+        const serviceRepository = connection.getCustomRepository(Repository.Service);
         const allServices = await serviceRepository.findAllService();
 
         for (const element of allServices){
@@ -69,7 +69,7 @@ export const handler:APIGatewayProxyHandler  = async (event, _context) => {
             serviceEventModel.review = 0;
             serviceEventModel.view = 0;
             await eventRepository.saveServiceEvent(serviceEventModel);
-        }
+        };
 
         //핫차트 기준시간 모델 생성
         const subpingDDB = new SubpingDDB(process.env.subpingTable);
@@ -98,5 +98,5 @@ export const handler:APIGatewayProxyHandler  = async (event, _context) => {
           success: false,
           message: "cronMakeRankException"
       });
-    };
-};
+    }
+}

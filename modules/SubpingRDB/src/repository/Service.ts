@@ -23,7 +23,7 @@ export class ServiceRepository extends Repository<Service> {
     async findByName(name: string) {
         return await this.createQueryBuilder("name")
             .where("Service.name = :name", { name })
-            .getMany()
+            .getMany();
     }
 
     async getServices(options?:{
@@ -35,9 +35,9 @@ export class ServiceRepository extends Repository<Service> {
             like?: boolean,
             userEmail?: string
         }) {
-        
+
         const { category, tag, rank, standardDate, standardTime, like, userEmail } = options;
-        
+
         let query = this.createQueryBuilder("service")
 
         query = query.select("service.*");
@@ -45,13 +45,13 @@ export class ServiceRepository extends Repository<Service> {
         if(category) {
             query = query
                 .addSelect("GROUP_CONCAT(DISTINCT serviceCategory.categoryName)", "category")
-                .innerJoin("service.serviceCategories", "serviceCategory")
+                .innerJoin("service.serviceCategories", "serviceCategory");
         }
 
         if(tag) {
             query = query
                 .addSelect("GROUP_CONCAT(DISTINCT serviceTag.tag)", "tag")
-                .innerJoin("service.serviceTags", "serviceTag")
+                .innerJoin("service.serviceTags", "serviceTag");
         }
 
         if(rank) {
@@ -65,7 +65,7 @@ export class ServiceRepository extends Repository<Service> {
             }
 
             else {
-                throw new Error("[SubpingRDB] getServices Rank가 정의되었지만 기준시간이 없습니다.")
+                throw new Error("[SubpingRDB] getServices Rank가 정의되었지만 기준시간이 없습니다.");
             }
         }
 
@@ -115,7 +115,7 @@ export class ServiceRepository extends Repository<Service> {
             .leftJoin("service.userLikes", "userLike", `userLike.user = "${userEmail}"`)
             .groupBy("service.id")
             .getSql();
-        
+
         const servicesOfCategory = await this.manager.createQueryBuilder()
             .select("s.*")
             .from("(" + getAllServiceSQL + ")", "s")
@@ -125,8 +125,8 @@ export class ServiceRepository extends Repository<Service> {
         servicesOfCategory.map(service => {
             service.tag = service.tag.split(",");
             service.category = service.category.split(",");
-        })
-        
+        });
+
         return servicesOfCategory;
     }
 
@@ -142,7 +142,7 @@ export class ServiceRepository extends Repository<Service> {
             .leftJoin("service.userLikes", "userLike", `userLike.user = "${userEmail}"`)
             .groupBy("service.id")
             .getRawOne();
-        
+
         service.tag = service.tag.split(",");
         service.category = service.category.split(",");
 

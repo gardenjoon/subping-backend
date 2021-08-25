@@ -1,4 +1,4 @@
-import {EntityRepository, Repository} from "typeorm";
+import { EntityRepository, Repository } from "typeorm";
 import { Category } from "../entity/Category";
 
 @EntityRepository(Category)
@@ -22,6 +22,6 @@ export class CategoryRepository extends Repository<Category> {
     findByCategory(name: string) {
         return this.createQueryBuilder("name")
             .where("Category.name = :name", { name })
-            .getMany()
+            .getMany();
     }
 }

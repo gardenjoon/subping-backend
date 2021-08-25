@@ -29,6 +29,9 @@ import { ServiceTagRespository } from "./repository/ServiceTags";
 import { ProductRepository } from "./repository/Product";
 import { SubscribeRepository } from "./repository/Subscribe";
 import { UserLikeRepository } from "./repository/UserLike";
+import { ProductPeriod } from "./entity/ProductPeriod";
+import { SubscribeItem } from "./entity/SubscribeItem";
+import { ReviewRepository } from "./repository/Review";
 
 type StageType = "prod" | "dev";
 
@@ -39,6 +42,7 @@ export const Entity = {
     Alarm: Alarm,
     Category: Category,
     Product: Product,
+    ProductPeriod: ProductPeriod,
     Review: Review,
     ReviewImage: ReviewImage,
     Seller: Seller,
@@ -48,6 +52,7 @@ export const Entity = {
     ServiceRank: ServiceRank,
     ServiceTag: ServiceTag,
     Subscribe: Subscribe,
+    SubscirbeItem: SubscribeItem,
     Payment: Payment
 }
 
@@ -63,14 +68,15 @@ export const Repository = {
     ServiceTag: ServiceTagRespository,
     Alarm: AlarmRepository,
     Product: ProductRepository,
-    Subscribe: SubscribeRepository
+    Subscribe: SubscribeRepository,
+    Review: ReviewRepository
 }
 
 
 class SubpingRDB {
     async getConnection(stage: StageType) {
         const CONN_NAME = "default";
-        const connManager = getConnectionManager()
+        const connManager = getConnectionManager();
         
         let conn: Connection;
 

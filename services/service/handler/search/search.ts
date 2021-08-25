@@ -1,9 +1,9 @@
 import SubpingRDB, { Repository } from "subpingrdb";
 
-import { APIGatewayProxyHandler } from 'aws-lambda';
-
-import { success, failure } from "../../libs/response-lib";
 import { escapeRegExp } from "lodash";
+
+import { APIGatewayProxyHandler } from 'aws-lambda';
+import { success, failure } from "../../libs/response-lib";
 
 const createPattern = (str : string) => {
     const offset = 44032; //'가'의 코드
@@ -38,9 +38,8 @@ const createPattern = (str : string) => {
         return `[${str}\\u${begin.toString(16)}-\\u${end.toString(16)}]`;
     }
 
-    return escapeRegExp(str)
+    return escapeRegExp(str);
 }
-
 const createRegExp = (input) => {
     const pattern = input.split('').map(createPattern).join('.*?');
     return new RegExp(pattern);
@@ -51,7 +50,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
         const result = {
             "tagResult": [],
             "serviceResult": []
-        }
+        };
 
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
@@ -60,24 +59,23 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
 
         const requestWord = "ㄴ";
 
-        const regExp = createRegExp(requestWord)
+        const regExp = createRegExp(requestWord);
 
         const services = await serviceRepository.getServices({
             tag: true
         });
-        const tags = await serviceTagRepository.getTags()
-
+        const tags = await serviceTagRepository.getTags();
 
         for(const service of services) {
             const { name } = service;
             
-            const regexResult = regExp.exec(name)
+            const regexResult = regExp.exec(name);
 
             if(regexResult) {
                 result.serviceResult.push({
                     ...service,
                     matchedIndex: regexResult.index
-                })
+                });
             }
         }
 
@@ -89,23 +87,21 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
                     matchedTag: tag,
                     matchedIndex: regexResult.index,
                     length: requestWord.length
-                })
+                });
             }
         }
-
-        console.log(result);
 
         return success({
             success: true,
             message: result
         })
     }
-    
+
     catch (e) {
         console.log(e);
         return failure({
             success: false,
             message: "SearchException"
-        })
+        });
     }
 }

@@ -1,27 +1,28 @@
-import SubpingRDB, { Repository } from "subpingrdb";
+import SubpingRDB, { Repository, Entity } from "subpingrdb";
 
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import { success, failure } from "../../libs/response-lib";
 
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
+        const body = JSON.parse(event.body || "");
+
+        const { email, name } = body;
+
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
-        await connection.synchronize();
 
-        const sellerRepository = connection.getCustomRepository(Repository.SellerRepository)
-        
-        const sellerModel = new Repository.SellerRepository();
-        sellerModel.email = "wonjoon@joiple.co"
-        sellerModel.name = "정원준"
-        
-        await sellerRepository.save(sellerModel)
+        const sellerRepository = connection.getCustomRepository(Repository.Seller);
 
-        console.log(await sellerRepository.findAllSeller())
+        const sellerModel = new Entity.Seller();
+        sellerModel.email = email;
+        sellerModel.name = name;
+        await sellerRepository.save(sellerModel);
+
         return success({
             success: true,
             message: "MakeSellerSuccess"
-        })
+        });
     } 
 
     catch (e) {
@@ -29,7 +30,6 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         return failure({
             success: false,
             message: "MakeSellerException"
-        })
+        });
     }
 }
-

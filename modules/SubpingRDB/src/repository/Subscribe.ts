@@ -12,7 +12,7 @@ export class SubscribeRepository extends Repository<Subscribe> {
     }
 
     async updateSubscribe(id: string, date: string): Promise<void> {
-        await this.update(id, { expiredDate : date })
+        await this.update(id, { expiredDate : date });
     }
 
     async saveSubscribe(Subscribe: Subscribe): Promise<void> {
@@ -31,7 +31,7 @@ export class SubscribeRepository extends Repository<Subscribe> {
             .where(`subscribe.user = "${userEmail}"`)
             .innerJoin("subscribe.user", "user")
             .innerJoin("subscribe.product", "product")
-            .getRawMany()
+            .getRawMany();
     }
 
     async getOneSubscribe(userEmail: string, productId: string) {
@@ -43,6 +43,6 @@ export class SubscribeRepository extends Repository<Subscribe> {
             .where(`subscribe.product = "${productId}"`)
             .innerJoin("subscribe.user", "user")
             .innerJoin("subscribe.product", "product")
-            .getRawMany()
+            .getRawMany();
     }
 }

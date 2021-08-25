@@ -6,6 +6,7 @@ import * as moment from "moment-timezone";
 export class ServiceRankRepository extends Repository<ServiceRank> {
     async findAllServiceRank(standardDate: Date, standardhour: String) {
         const dateString = moment(standardDate).format("YYYY-MM-DD");
+
         return await this.createQueryBuilder("serviceRank")
             .select("service.*")
             .addSelect("serviceRank.*")

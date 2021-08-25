@@ -18,4 +18,11 @@ export class ProductRepository extends Repository<Product> {
     async deleteProduct(id: string): Promise<void> {
         await this.delete({ id : id });
     }
+
+    async getProducts(serviceId: string) {
+        return await this.createQueryBuilder("product")
+            .select("product.*")
+            .where(`product.service = "${serviceId}"`)
+            .getRawMany();
+    }
 }
