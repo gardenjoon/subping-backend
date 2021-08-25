@@ -26,9 +26,6 @@ export class Product {
     productLogoUrl: string;
 
     @Column({ nullable: false })
-    amount: number;
-
-    @Column({ nullable: false })
     available: boolean;
 
     @CreateDateColumn({ nullable: false })
