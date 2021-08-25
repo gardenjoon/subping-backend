@@ -102,7 +102,16 @@ functions:
           method: get
           cors: true
           authorizer: aws_iam
-      
+  
+  getProducts:
+    handler: ./handler/product/getProducts.handler
+    events:
+      - http:
+          path: getProducts
+          method: post
+          cors: true
+          authorizer: aws_iam
+
   makeCategory:
     handler: ./handler/category/makeCategory.handler
 
@@ -117,6 +126,12 @@ functions:
   
   search:
     handler: ./handler/search/search.handler
+    events:
+      - http:
+          path: search
+          method: post
+          cors: true
+          authorizer: aws_iam
   
   backup:
     handler: ./handler/backup/backup.handler
