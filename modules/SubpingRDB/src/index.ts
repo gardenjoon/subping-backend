@@ -16,6 +16,8 @@ import { UserLike } from "./entity/UserLike";
 import { ServiceTag } from "./entity/ServiceTag";
 import { Subscribe } from "./entity/Subscribe"
 import { Payment } from "./entity/Payment";
+import { ServicePeriod } from "./entity/ServicePeriod";
+import { SubscribeItem } from "./entity/SubscribeItem";
 
 import { UserRepository } from "./repository/User";
 import { CategoryRepository } from "./repository/Category";
@@ -29,8 +31,6 @@ import { ServiceTagRespository } from "./repository/ServiceTags";
 import { ProductRepository } from "./repository/Product";
 import { SubscribeRepository } from "./repository/Subscribe";
 import { UserLikeRepository } from "./repository/UserLike";
-import { ProductPeriod } from "./entity/ProductPeriod";
-import { SubscribeItem } from "./entity/SubscribeItem";
 import { ReviewRepository } from "./repository/Review";
 
 type StageType = "prod" | "dev";
@@ -42,7 +42,6 @@ export const Entity = {
     Alarm: Alarm,
     Category: Category,
     Product: Product,
-    ProductPeriod: ProductPeriod,
     Review: Review,
     ReviewImage: ReviewImage,
     Seller: Seller,
@@ -51,8 +50,9 @@ export const Entity = {
     ServiceEvent: ServiceEvent,
     ServiceRank: ServiceRank,
     ServiceTag: ServiceTag,
+    ServicePeriod: ServicePeriod,
     Subscribe: Subscribe,
-    SubscirbeItem: SubscribeItem,
+    SubscribeItem: SubscribeItem,
     Payment: Payment
 }
 

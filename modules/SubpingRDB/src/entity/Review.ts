@@ -1,5 +1,5 @@
 import { Entity, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, PrimaryGeneratedColumn, OneToMany } from "typeorm";
-import { Product } from "./Product";
+import { Service } from "./Service";
 import { ReviewImage } from "./ReviewImage";
 import { User } from "./User";
 
@@ -12,14 +12,14 @@ export class Review {
         { cascade: true })
     user: string;
 
-    @ManyToOne(type => Product, product => product.reviews, 
+    @ManyToOne(type => Service, service => service.reviews, 
         { cascade: true })
-    product: string;
+    service: string;
 
-    @Column({ nullable: false })
+    @Column({ nullable: true })
     title: string;
 
-    @Column({ type: "text", nullable: false })
+    @Column({ type: "text", nullable: true })
     content: string;
 
     @Column({ nullable: false })

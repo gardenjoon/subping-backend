@@ -1,5 +1,5 @@
 import SubpingRDB, { Repository, Entity } from "subpingrdb";
-import SubpingDDB from "../../libs/SubpingDDB"
+import SubpingDDB from "../../libs/SubpingDDB";
 import HotChartTimeModel from "../../libs/subpingddb/model/subpingTable/hotChartTime";
 import * as moment from "moment-timezone";
 
@@ -10,7 +10,7 @@ export const handler = async (event, _context) => {
     const connection = await subpingRDB.getConnection("dev");
 
     const body = event;
-    const { logourl, userProfileImageUrl, category, seller, service, product,productPeriod, user, subscribe, subscribeItem, alarm, like, review, reviewImage } = body;
+    const { logourl, userProfileImageUrl, category, seller, service, product, user, subscribe, subscribeItem, alarm, like, review, reviewImage } = body;
 
     const makeHour = (hour: Number) => {
         let standardHour = null;
@@ -34,26 +34,25 @@ export const handler = async (event, _context) => {
         return standardHour;
     }
     const makeCategory = async() => {
-        const repository = connection.getCustomRepository(Repository.Category)
+        const repository = connection.getCustomRepository(Repository.Category);
         for (const element in category){
             const categoryModel = new Entity.Category();
-            categoryModel.name = element
-            categoryModel.summary = category[element]
-            categoryModel.categoryLogoUrl = null
-            await repository.saveCategory(categoryModel)
+            categoryModel.name = element;
+            categoryModel.summary = category[element];
+            categoryModel.categoryLogoUrl = null;
+            await repository.saveCategory(categoryModel);
         }
-        console.log("makeCategoryComplete")
+        console.log("makeCategoryComplete");
     }
     const makeSeller = async() => {
-        const repository = connection.getCustomRepository(Repository.Seller)
+        const repository = connection.getCustomRepository(Repository.Seller);
 
         for (const element in seller){
             const sellerModel = new Entity.Seller();
             sellerModel.name = element;
-            sellerModel.email = seller[element]
-            await repository.saveSeller(sellerModel)
+            sellerModel.email = seller[element];
+            await repository.saveSeller(sellerModel);
         }
-
         console.log("makeSellerComplete")
     }
     const makeService = async() => {
@@ -62,6 +61,7 @@ export const handler = async (event, _context) => {
             const serviceEventModel = new Entity.ServiceEvent();
             const serviceCategoryModel = new Entity.ServiceCategory();
             const serviceTagModel = new Entity.ServiceTag();
+            const servicePeriodModel = new Entity.ServicePeriod();
 
             const currentTime = moment.tz("Asia/Seoul");
             const standardHour = makeHour(currentTime.hours());
@@ -98,6 +98,12 @@ export const handler = async (event, _context) => {
                     await queryRunner.manager.save(serviceTagModel);
                 }
 
+                for (const servicePeriod of service[element][6]) {
+                    servicePeriodModel.service = service[element][0];
+                    servicePeriodModel.period = servicePeriod
+                    await queryRunner.manager.save(servicePeriodModel)
+                }
+
                 await queryRunner.commitTransaction();
             }
 
@@ -114,10 +120,10 @@ export const handler = async (event, _context) => {
         console.log("makeServiceComplete");
     }
     const makeRank = async() => {
-        const eventRepository = connection.getCustomRepository(Repository.ServiceEvent)
-        const rankRepository = connection.getCustomRepository(Repository.ServiceRank)
+        const eventRepository = connection.getCustomRepository(Repository.ServiceEvent);
+        const rankRepository = connection.getCustomRepository(Repository.ServiceRank);
 
-        const currentTime = moment.tz("Asia/Seoul")
+        const currentTime = moment.tz("Asia/Seoul");
         const currentHour = makeHour(currentTime.hours());
         const currentDate = currentTime.toDate();
         
@@ -145,7 +151,7 @@ export const handler = async (event, _context) => {
             time: currentHour
         };
         await controller.create<HotChartTimeModel>(HotChartTimeModel);
-        console.log("makeRankComplete")
+        console.log("makeRankComplete");
     }
     const makeProduct = async() => {
         const repository = connection.getCustomRepository(Repository.Product);
@@ -157,18 +163,9 @@ export const handler = async (event, _context) => {
             productModel.name = product[element][1];
             productModel.summary = product[element][2];
             productModel.productLogoUrl = logourl;
-            productModel.amount = 0;
             productModel.available = product[element][3];
             productModel.service = product[element][4];
             await repository.saveProduct(productModel);
-        };
-
-        const productPeriodRepository = connection.getRepository(Entity.ProductPeriod);
-        for (const element in productPeriod){
-            const productPeriodModel = new Entity.ProductPeriod();
-            productPeriodModel.product = element;
-            productPeriodModel.period = product[element][0];
-            await productPeriodRepository.save(productPeriodModel);
         };
 
         console.log("makeProductComplete");
@@ -187,51 +184,53 @@ export const handler = async (event, _context) => {
             userModel.ci = user[element][4];
             userModel.carrier = user[element][5];
             userModel.phoneNumber = user[element][6];
-            await repository.saveUser(userModel)
+            await repository.saveUser(userModel);
         }
-        console.log("makeUserComplete")
+        console.log("makeUserComplete");
     }
     const makeSubscribe = async() => {
-        const subscribeRepository = connection.getCustomRepository(Repository.Subscribe);
+        const subscribeRepository = connection.getRepository(Entity.Subscribe);
+        const subscribeItemRepository = connection.getRepository(Entity.SubscribeItem);
 
         const currentDate = moment.tz("Asia/Seoul").toDate();
 
         for (const element in subscribe){
             const subscribeModel = new Entity.Subscribe();
-            subscribeModel.id = element
+            subscribeModel.id = element;
             subscribeModel.user = subscribe[element][0];
+            subscribeModel.subscribeItems = [subscribe[element][1]];
             subscribeModel.subscribeDate = currentDate;
-            subscribeModel.product = subscribe[element][1];
             subscribeModel.expiredDate = null;
-            await subscribeRepository.saveSubscribe(subscribeModel);
+            subscribeModel.reSubscribeDate = null;
+            await subscribeRepository.save(subscribeModel);
         }
 
-        const subscribeItemRepository = connection.getRepository(Entity.SubscirbeItem)
-        for (const element in subscribeItem){
-            const subscribeItemModel = new Entity.SubscirbeItem();
-            subscribeItemModel.subscribe = element;
-            subscribeItemModel.product = subscribeItem[element][0]
-            subscribeItemModel.period = subscribeItem[element][1]
-            subscribeItemModel.amount = subscribeItem[element][2]
-            await subscribeItemRepository.save(subscribeItemModel)
+        for(const element in subscribeItem) {
+            const subscribeItemModel = new Entity.SubscribeItem();
+            subscribeItemModel.id = element;
+            subscribeItemModel.subscribe = subscribeItem[element][0];
+            subscribeItemModel.service = subscribeItem[element][1];
+            subscribeItemModel.period = subscribeItem[element][2];
+            subscribeItemModel.amount = subscribeItem[element][3];
+            await subscribeItemRepository.save(subscribeItemModel);
         }
 
         console.log("makeSubscribeComplete");
     }
     const makeAlarm = async() => {
-        const repository = connection.getCustomRepository(Repository.Alarm)
+        const repository = connection.getCustomRepository(Repository.Alarm);
 
         for (const element in alarm){
             const alarmModel = new Entity.Alarm();
             alarmModel.id = element;
-            alarmModel.type = alarm[element][0]
-            alarmModel.title = alarm[element][1]
-            alarmModel.content = alarm[element][2]
-            alarmModel.read = false
-            alarmModel.user = alarm[element][3]
-            await repository.saveAlarm(alarmModel)
+            alarmModel.type = alarm[element][0];
+            alarmModel.title = alarm[element][1];
+            alarmModel.content = alarm[element][2];
+            alarmModel.read = false;
+            alarmModel.user = alarm[element][3];
+            await repository.saveAlarm(alarmModel);
         }
-        console.log("makeAlarmComplete")
+        console.log("makeAlarmComplete");
     }
     const userLike = async() => {
         const userLikeRepository = connection.getCustomRepository(Repository.UserLike);
@@ -254,17 +253,17 @@ export const handler = async (event, _context) => {
             reviewModel.content = review[element][1];
             reviewModel.rating = review[element][2];
             reviewModel.user = review[element][3];
-            reviewModel.product = review[element][4];
+            reviewModel.service = review[element][4];
             await reviewRepository.saveReview(reviewModel);
         };
         
-        const reviewImageRepository = connection.getRepository(Entity.ReviewImage)
+        const reviewImageRepository = connection.getRepository(Entity.ReviewImage);
         for (const element in reviewImage){
             const reviewImageModel = new Entity.ReviewImage();
             reviewImageModel.id = element;
             reviewImageModel.imageUrl = reviewImage[element][0];
             reviewImageModel.review = reviewImage[element][1];
-            await reviewImageRepository.save(reviewImageModel)
+            await reviewImageRepository.save(reviewImageModel);
         }
         console.log("makeReviewComplete");
     }

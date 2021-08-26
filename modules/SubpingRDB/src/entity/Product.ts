@@ -1,8 +1,5 @@
 import { Entity, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, PrimaryGeneratedColumn, OneToMany } from "typeorm";
-import { Review } from "./Review";
 import { Service } from "./Service";
-import { SubscribeItem } from "./SubscribeItem";
-import { ProductPeriod } from "./ProductPeriod";
 
 @Entity()
 export class Product {
@@ -33,13 +30,4 @@ export class Product {
 
     @UpdateDateColumn({ nullable: false })
     updatedAt: Date;
-
-    @OneToMany(type => Review, review => review.product)
-    reviews: Review[];
-
-    @OneToMany(type => SubscribeItem, subscribeItem => subscribeItem.product)
-    subscribeItems: SubscribeItem[];
-
-    @OneToMany(type => ProductPeriod, productPeriod => productPeriod.product)
-    periods: ProductPeriod[];
 }

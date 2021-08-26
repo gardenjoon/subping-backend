@@ -6,7 +6,9 @@ import { ServiceEvent } from "./ServiceEvent";
 import { ServiceRank } from "./ServiceRank";
 import { ServiceTag } from "./ServiceTag";
 import { UserLike } from "./UserLike";
-import { ColumnMetadata } from "typeorm/metadata/ColumnMetadata";
+import { SubscribeItem } from "./SubscribeItem";
+import { Review } from "./Review";
+import { ServicePeriod } from "./ServicePeriod";
 
 type ServiceType = "delivery" | "online"
 
@@ -60,4 +62,13 @@ export class Service {
 
     @OneToMany(type => UserLike, userLike => userLike.service)
     userLikes: UserLike[];
+
+    @OneToMany(type => Review, review => review.service)
+    reviews: Review[];
+
+    @OneToMany(type => SubscribeItem, subscribeItem => subscribeItem.service)
+    subscribeItems: SubscribeItem[];
+
+    @OneToMany(type => ServicePeriod, servicePeriod => servicePeriod.service)
+    periods: ServicePeriod[];
 }
