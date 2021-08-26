@@ -154,11 +154,14 @@ export class ServiceRepository extends Repository<Service> {
             .innerJoin("service.serviceTags", "serviceTag")
             .addSelect("IF(userLike.createdAt IS NULL, False, True)", "like")
             .leftJoin("service.userLikes", "userLike", `userLike.user = "${userEmail}"`)
+            .addSelect("GROUP_CONCAT(DISTINCT periods.period)", "period")
+            .innerJoin("service.periods", "periods")
             .groupBy("service.id")
             .getRawOne();
 
         service.tag = service.tag.split(",");
         service.category = service.category.split(",");
+        service.period = service.period.split(",");
 
         return service;
     }

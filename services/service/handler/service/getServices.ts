@@ -5,8 +5,9 @@ import { success, failure } from "../../libs/response-lib";
 
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
+        const PK = event.headers.email;
         const body = JSON.parse(event.body || "");
-        const { limit, page } = body;
+        const { category } = body;
 
         let standardTime = new Date();
         standardTime.setHours(standardTime.getHours() + 9);
@@ -15,19 +16,12 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const connection = await subpingRDB.getConnection("dev");
         const serviceRepository = connection.getCustomRepository(Repository.Service);
 
-        const services = await serviceRepository.getServices({
-            category: true,
-            tag:  true,
-            standardTime: standardTime.toISOString(),
-            pagination: {
-                limit: limit,
-                page: page
-            }
-        });
+        const services = await serviceRepository.getServicesWithCategory(category, PK);
 
         if (services.length === 0){
             throw 'NoMoreServices';
         }
+
         else {
             return success({
                 success: true,
