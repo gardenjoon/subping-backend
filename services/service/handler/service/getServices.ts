@@ -5,30 +5,33 @@ import { success, failure } from "../../libs/response-lib";
 
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
-        let response = [];
-        const header = event.headers;
-        const PK = header.email;
         const body = JSON.parse(event.body || "");
+        const { limit, page } = body;
 
-        const requestedCategory = body.category || null;
+        let standardTime = new Date();
+        standardTime.setHours(standardTime.getHours() + 9);
 
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
         const serviceRepository = connection.getCustomRepository(Repository.Service);
 
-        if(requestedCategory) {
-            response = await serviceRepository.getServicesWithCategory(requestedCategory, PK);
+        const services = await serviceRepository.getServices({
+            category: true,
+            tag:  true,
+            standardTime: standardTime.toISOString(),
+            pagination: {
+                limit: limit,
+                page: page
+            }
+        });
 
+        if (services.length === 0){
+            throw 'NoMoreServices';
+        }
+        else {
             return success({
                 success: true,
-                message: response
-            });
-        }
-
-        else {
-            return failure({
-                success: false,
-                message: "NoRequestedCategoryException"
+                message: services
             });
         }
     }
@@ -37,7 +40,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         console.log(e);
         return failure({
             success: false,
-            message: "GetServicesException"
+            message: "getServicesException"
         });
     }
 }
