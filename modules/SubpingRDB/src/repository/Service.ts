@@ -33,11 +33,15 @@ export class ServiceRepository extends Repository<Service> {
             standardDate?: string,
             standardTime?: string,
             like?: boolean,
-            userEmail?: string
+            userEmail?: string,
+            pagination?: {
+                limit: number,
+                page: number
+            }
         }) {
-
-        const { category, tag, rank, standardDate, standardTime, like, userEmail } = options;
-
+        
+        const { category, tag, rank, standardDate, standardTime, like, userEmail, pagination: { limit, page } } = options;
+        
         let query = this.createQueryBuilder("service")
 
         query = query.select("service.*");
@@ -47,23 +51,23 @@ export class ServiceRepository extends Repository<Service> {
                 .addSelect("GROUP_CONCAT(DISTINCT serviceCategory.categoryName)", "category")
                 .innerJoin("service.serviceCategories", "serviceCategory");
         }
-
+        
         if(tag) {
             query = query
-                .addSelect("GROUP_CONCAT(DISTINCT serviceTag.tag)", "tag")
-                .innerJoin("service.serviceTags", "serviceTag");
+              .addSelect("GROUP_CONCAT(DISTINCT serviceTag.tag)", "tag")
+              .innerJoin("service.serviceTags", "serviceTag")
         }
-
+        
         if(rank) {
             if(standardTime && standardDate) {
                 query = query
-                    .addSelect("serviceRank.rank", "rank")
-                    .innerJoin("service.serviceRank", "serviceRank", 
-                        `serviceRank.date = "${standardDate}" 
-                        AND serviceRank.time = "${standardTime}"`)
-                    .orderBy("serviceRank.rank");
+                .addSelect("serviceRank.rank", "rank")
+                .innerJoin("service.serviceRank", "serviceRank", 
+                `serviceRank.date = "${standardDate}" 
+                AND serviceRank.time = "${standardTime}"`)
+                .orderBy("serviceRank.rank");
             }
-
+            
             else {
                 throw new Error("[SubpingRDB] getServices Rank가 정의되었지만 기준시간이 없습니다.");
             }
@@ -75,17 +79,26 @@ export class ServiceRepository extends Repository<Service> {
                     .addSelect("IF(userLike.createdAt IS NULL, False, True)", "like")
                     .leftJoin("service.userLikes", "userLike", `userLike.user = "${userEmail}"`)
             }
-            
+
             else {
                 throw new Error("[SubpingRDB] getServices Like가 정의되었지만 userEmail이 없습니다.")
             }
+        }
+        
+        if(limit && page && standardTime) {
+            query = query
+                .andWhere(`service.createdAt < "${standardTime}"`)
+                .orderBy("service.createdAt", "ASC")
+                .offset(limit*(page-1))
+                .limit(limit)
         }
 
         if(category || tag || rank || like) {
             query = query.groupBy("service.id")
         }
 
-        const result = await query.getRawMany();
+        const result = await query
+            .getRawMany();
 
         if(category || tag) {
             result.map(service => {
@@ -98,8 +111,9 @@ export class ServiceRepository extends Repository<Service> {
                 }
             })
         }
-
+    
         return result;
+        
     }
 
     async getServicesWithCategory(category: string, userEmail: string) {
