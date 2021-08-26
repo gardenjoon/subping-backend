@@ -1,16 +1,16 @@
 import { Entity, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { Product } from "./Product";
+import { Service } from "./Service";
 
 type Period = "1W" | "2W" | "3W" | "1M" | "2M" | "3M";
 
 @Entity()
-export class ProductPeriod {
+export class ServicePeriod {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @ManyToOne(type => Product, service => service.periods, 
+    @ManyToOne(type => Service, service => service.periods, 
         { cascade: true })
-    product: string;
+    service: string;
 
     @Column({ length: 50, nullable: false })
     period: Period;
