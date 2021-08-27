@@ -9,25 +9,24 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const body = JSON.parse(event.body || "");
         const { category } = body;
 
-        let standardTime = new Date();
-        standardTime.setHours(standardTime.getHours() + 9);
-
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
         const serviceRepository = connection.getCustomRepository(Repository.Service);
 
-        const services = await serviceRepository.getServicesWithCategory(category, PK);
+        const services = await serviceRepository.getServices({
+            category: true,
+            filter: {
+                categoryName: category
+            },
+            like: {
+                userEmail: PK
+            }
+        });
 
-        if (services.length === 0){
-            throw 'NoMoreServices';
-        }
-
-        else {
-            return success({
-                success: true,
-                message: services
-            });
-        }
+        return success({
+            success: true,
+            message: services
+        });
     }
 
     catch (e) {
