@@ -15,6 +15,9 @@ export class ServicePeriod {
     @Column({ length: 50, nullable: false })
     period: Period;
 
+    @Column({ nullable: false, default: false })
+    default: boolean;
+    
     @CreateDateColumn({ nullable: false })
     createdAt: Date;
 
