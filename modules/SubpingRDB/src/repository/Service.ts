@@ -83,7 +83,7 @@ export class ServiceRepository extends Repository<Service> {
             if (rank.standardTime && rank.standardDate) {
                 query = query
                     .addSelect("serviceRank.rank", "rank")
-                    .innerJoin("service.serviceRank", "serviceRank",
+                    .innerJoin("service.serviceRanks", "serviceRank",
                         `serviceRank.date = "${rank.standardDate}" 
                 AND serviceRank.time = "${rank.standardTime}"`)
                     .orderBy("serviceRank.rank");

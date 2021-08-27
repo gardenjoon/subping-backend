@@ -1,6 +1,5 @@
 import { EntityRepository, Repository } from "typeorm";
 import { ServiceEvent } from "../entity/ServiceEvent";
-import * as moment from "moment-timezone";
 
 @EntityRepository(ServiceEvent)
 export class ServiceEventRepository extends Repository<ServiceEvent> {
@@ -20,16 +19,11 @@ export class ServiceEventRepository extends Repository<ServiceEvent> {
         await this.delete({ service : service });
     }
 
-    async getServiceEvents(date: Date, standardHour: Number) {
-        const dateString = moment(date).format('YYYY-MM-DD');
-
+    async getServiceEvents(standardDate: string, standardHour: Number) {
         return await this.createQueryBuilder("serviceEvent")
             .select("service.id", "service")
-            .addSelect("serviceEvent.*")
-            .where("serviceEvent.service = service.id")
-            .where(`serviceEvent.date.date = "${dateString}"`)
-            .where(`serviceEvent.time = "${standardHour}"`)
-            .innerJoin("serviceEvent.service", "service")
+            .where(`serviceEvent.date = "${standardDate}"`)
+            .andWhere(`serviceEvent.time = "${standardHour}"`)
             .orderBy("subscribe + view + review")
             .getRawMany();
     }

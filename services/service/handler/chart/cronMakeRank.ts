@@ -35,11 +35,11 @@ export const handler:APIGatewayProxyHandler  = async (_event, _context) => {
 
         const currentTime = moment.tz("Asia/Seoul");
         const currentHour = makeHour(currentTime.hours());
-        const currentDate = currentTime.toDate();
+        const currentDate = currentTime.format("YYYY-MM-DD");
 
         const standardTime = currentTime.subtract(6, "hours");
         const standardHour = makeHour(standardTime.hours());
-        const standardDate = standardTime.toDate();
+        const standardDate = standardTime.format("YYYY-MM-DD");
         
         const eventRepository = connection.getCustomRepository(Repository.ServiceEvent);
 
@@ -81,7 +81,7 @@ export const handler:APIGatewayProxyHandler  = async (_event, _context) => {
             createdAt: null,
             updatedAt: null,
             model: "hotChartTime",
-            date: moment(currentDate).format("YYYY-MM-DD"),
+            date: currentDate,
             time: currentHour
         };
         await controller.create<HotChartTimeModel>(HotChartTimeModel);

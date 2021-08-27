@@ -10,7 +10,7 @@ export class ServiceEvent {
     service: string;
 
     @PrimaryColumn({ type: "date" })
-    date: Date;
+    date: string;
 
     @PrimaryColumn({ length: 20 })
     time: RankTime;
