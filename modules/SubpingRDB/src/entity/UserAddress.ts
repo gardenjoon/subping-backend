@@ -10,7 +10,10 @@ export class UserAddress {
     user: string;
     
     @Column({ nullable: false })
-    name: string;
+    userName: string;
+
+    @Column({ nullable: false})
+    userPhoneNumber: string;
 
     @Column({ nullable: false })
     postCode: string;
