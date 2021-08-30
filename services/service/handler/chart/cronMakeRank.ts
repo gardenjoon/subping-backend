@@ -44,16 +44,16 @@ export const handler:APIGatewayProxyHandler  = async (_event, _context) => {
         const eventRepository = connection.getCustomRepository(Repository.ServiceEvent);
 
         // service와 serviceEvent를 조인하고 정보를 읽어 rating을 생성
-        const rankRepository = connection.getCustomRepository(Repository.ServiceRank);
+        const rankRepository = connection.getRepository(Entity.ServiceRank);
 
         const eventModelForRank = await eventRepository.getServiceEvents(standardDate, standardHour);
         for (const [index, element] of eventModelForRank.entries()) {
             const serviceRankModel = new Entity.ServiceRank();
-            serviceRankModel.service = element.service;
+            serviceRankModel.service = element.serviceId;
             serviceRankModel.date = currentDate;
             serviceRankModel.time = currentHour;
             serviceRankModel.rank = index+1;
-            await rankRepository.saveServiceRank(serviceRankModel);
+            await rankRepository.save(serviceRankModel);
         }
 
         // 매 standardHour마다 serviceEvent 생성
