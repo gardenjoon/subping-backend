@@ -19,9 +19,9 @@ export class ServiceEventRepository extends Repository<ServiceEvent> {
         await this.delete({ service : service });
     }
 
-    async getServiceEvents(standardDate: string, standardHour: Number) {
+    async getServiceEvents(standardDate: string, standardHour: string) {
         return await this.createQueryBuilder("serviceEvent")
-            .select("service.id", "service")
+            .select("serviceEvent.*")
             .where(`serviceEvent.date = "${standardDate}"`)
             .andWhere(`serviceEvent.time = "${standardHour}"`)
             .orderBy("subscribe + view + review")

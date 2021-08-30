@@ -25,7 +25,7 @@ export class UserAddress {
     detailedAddress: string;
 
     @Column({ nullable: false, default: false })
-    default: boolean;
+    isDefault: boolean;
 
     @CreateDateColumn({ nullable: false })
     createdAt: Date;

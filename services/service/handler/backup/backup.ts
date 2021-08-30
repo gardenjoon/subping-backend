@@ -61,11 +61,10 @@ export const handler = async (event, _context) => {
             const serviceEventModel = new Entity.ServiceEvent();
             const serviceCategoryModel = new Entity.ServiceCategory();
             const serviceTagModel = new Entity.ServiceTag();
-            const servicePeriodModel = new Entity.ServicePeriod();
 
             const currentTime = moment.tz("Asia/Seoul");
             const standardHour = makeHour(currentTime.hours());
-            const currentDate = currentTime.toDate();
+            const currentDate = currentTime.format("YYYY-MM-DD");
 
             serviceEventModel.date = currentDate;
             serviceEventModel.time = standardHour;
@@ -98,12 +97,6 @@ export const handler = async (event, _context) => {
                     await queryRunner.manager.save(serviceTagModel);
                 }
 
-                for (const servicePeriod of service[element][6]) {
-                    servicePeriodModel.service = service[element][0];
-                    servicePeriodModel.period = servicePeriod
-                    await queryRunner.manager.save(servicePeriodModel)
-                }
-
                 await queryRunner.commitTransaction();
             }
 
@@ -119,23 +112,38 @@ export const handler = async (event, _context) => {
 
         console.log("makeServiceComplete");
     }
+    const makeServicePeriod = async() => {
+        const servicePeriodRepository = connection.getRepository(Entity.ServicePeriod);
+
+        for (const element in service){
+            for (const servicePeriod of service[element][6][0]) {
+                const servicePeriodModel = new Entity.ServicePeriod();
+                servicePeriodModel.service = service[element][0];
+                servicePeriodModel.period = servicePeriod;
+                servicePeriodModel.default = (servicePeriod == service[element][6][1]) ? true : false;
+                await servicePeriodRepository.save(servicePeriodModel);
+            }
+        }
+
+        console.log("makeServicePeriodComplete");
+    }
     const makeRank = async() => {
         const eventRepository = connection.getCustomRepository(Repository.ServiceEvent);
-        const rankRepository = connection.getCustomRepository(Repository.ServiceRank);
+        const rankRepository = connection.getRepository(Entity.ServiceRank);
 
         const currentTime = moment.tz("Asia/Seoul");
         const currentHour = makeHour(currentTime.hours());
-        const currentDate = currentTime.toDate();
+        const currentDate = currentTime.format("YYYY-MM-DD");
         
         const eventModelForRank = await eventRepository.getServiceEvents(currentDate, currentHour);
         
         for (const [index, element] of eventModelForRank.entries()) {
             const serviceRankModel = new Entity.ServiceRank();
-            serviceRankModel.service = element.service;
+            serviceRankModel.service = element.serviceId;
             serviceRankModel.date = currentDate;
             serviceRankModel.time = currentHour;
             serviceRankModel.rank = index+1;
-            await rankRepository.saveServiceRank(serviceRankModel);
+            await rankRepository.save(serviceRankModel);
         }
 
         const subpingDDB = new SubpingDDB(process.env.subpingTable);
@@ -147,7 +155,7 @@ export const handler = async (event, _context) => {
             createdAt: null,
             updatedAt: null,
             model: "hotChartTime",
-            date: moment(currentDate).format("YYYY-MM-DD"),
+            date: currentDate,
             time: currentHour
         };
         await controller.create<HotChartTimeModel>(HotChartTimeModel);
@@ -272,6 +280,7 @@ export const handler = async (event, _context) => {
         await makeCategory();
         await makeSeller();
         await makeService();
+        await makeServicePeriod();
         await makeRank();
         await makeProduct();
         await makeUser();

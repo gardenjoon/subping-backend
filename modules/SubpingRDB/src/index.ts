@@ -13,6 +13,7 @@ import { ServiceRank } from "./entity/ServiceRank";
 import { User } from "./entity/User";
 import { UserAddress } from "./entity/UserAddress";
 import { UserLike } from "./entity/UserLike";
+import { UserCard } from "./entity/UserCard";
 import { ServiceTag } from "./entity/ServiceTag";
 import { Subscribe } from "./entity/Subscribe"
 import { Payment } from "./entity/Payment";
@@ -38,6 +39,7 @@ export const Entity = {
     User: User,
     UserLike: UserLike,
     UserAddress: UserAddress,
+    UserCard: UserCard,
     Alarm: Alarm,
     Category: Category,
     Product: Product,
