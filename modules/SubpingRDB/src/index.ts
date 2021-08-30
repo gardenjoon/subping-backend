@@ -32,6 +32,7 @@ import { ProductRepository } from "./repository/Product";
 import { SubscribeRepository } from "./repository/Subscribe";
 import { UserLikeRepository } from "./repository/UserLike";
 import { ReviewRepository } from "./repository/Review";
+import { UserAddressRepository } from "./repository/UserAddress";
 
 type StageType = "prod" | "dev";
 
@@ -69,7 +70,8 @@ export const Repository = {
     Alarm: AlarmRepository,
     Product: ProductRepository,
     Subscribe: SubscribeRepository,
-    Review: ReviewRepository
+    Review: ReviewRepository,
+    UserAddress: UserAddressRepository
 }
 
 

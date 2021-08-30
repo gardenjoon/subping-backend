@@ -41,16 +41,7 @@ iamRoleStatements:
         - "Fn::GetAtt": [ SubpingTable, Arn ]
         - "Fn::GetAtt": [ KeyTable, Arn ]
 
-functions:
-  makeAddress:
-    handler: ./handler/address/makeAddress.handler
-    events:
-      - http:
-          path: makeAddress
-          method: post
-          cors: true
-          authorizer: aws_iam
-  
+functions:  
   getAlarm:
     handler: ./handler/alarm/getAlarm.handler
     events:
@@ -135,5 +126,23 @@ functions:
       - http:
           path: getUserInfo
           method: get
+          cors: true
+          authorizer: aws_iam
+
+  getUserAddresses:
+    handler: ./handler/address/getUserAddresses.handler
+    events:
+      - http:
+          path: getUserAddresses
+          method: get
+          cors: true
+          authorizer: aws_iam
+  
+  makeUserAddress:
+    handler: ./handler/address/makeUserAddress.handler
+    events:
+      - http:
+          path: makeUserAddress
+          method: post
           cors: true
           authorizer: aws_iam
