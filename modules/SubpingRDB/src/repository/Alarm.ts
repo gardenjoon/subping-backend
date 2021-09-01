@@ -18,6 +18,8 @@ export class AlarmRepository extends Repository<Alarm> {
     async findUserAlarms(email: string) {
         return await this.createQueryBuilder("alarm")
             .select("alarm.*")
+            .addSelect(`DATE_ADD(alarm.updatedAt, INTERVAL 9 HOUR)`, "createdAt")
+            .addSelect("DATE_ADD(alarm.updatedAt, INTERVAL 9 HOUR)", "updatedAt")
             .where(`alarm.userEmail = "${email}"`)
             .orderBy("alarm.updatedAt", "DESC")
             .getRawMany();

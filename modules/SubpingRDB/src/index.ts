@@ -34,6 +34,8 @@ import { UserLikeRepository } from "./repository/UserLike";
 import { ReviewRepository } from "./repository/Review";
 import { UserAddressRepository } from "./repository/UserAddress";
 
+process.env.TZ = "UTC";
+
 type StageType = "prod" | "dev";
 
 export const Entity = {
