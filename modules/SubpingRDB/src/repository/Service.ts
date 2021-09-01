@@ -110,9 +110,11 @@ export class ServiceRepository extends Repository<Service> {
             if (pagination.limit && pagination.page && pagination.standardTime) {
                 query = query
                     .andWhere(`service.createdAt < "${pagination.standardTime}"`)
-                    .orderBy("service.createdAt", "ASC")
                     .offset(pagination.limit * (pagination.page - 1))
                     .limit(pagination.limit)
+            }
+            if (!rank) {
+                    query = query.orderBy("service.createdAt", "ASC")
             }
         }
 
