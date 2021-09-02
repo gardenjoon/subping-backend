@@ -14,7 +14,7 @@ export class UserCard {
     cardVendor: string;
 
     @Column({ nullable: false })
-    cardNumber: string;
+    cardName: string;
 
     @Column({ nullable: false })
     billingKey: string

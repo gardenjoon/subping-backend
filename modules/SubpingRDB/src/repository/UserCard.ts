@@ -13,7 +13,7 @@ export class UserCardRepository extends Repository<UserCard> {
         else {
             query = query.select("userCard.id")
                 .addSelect("userCard.user")
-                .addSelect("userCard.cardNumber")
+                .addSelect("userCard.cardName")
                 .addSelect("userCard.cardVendor")
                 .addSelect("userCard.method");
         }
