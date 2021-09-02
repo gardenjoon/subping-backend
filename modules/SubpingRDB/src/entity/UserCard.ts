@@ -1,15 +1,15 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne } from "typeorm";
+import { Entity, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, PrimaryColumn } from "typeorm";
 import { User } from "./User";
 
 @Entity()
 export class UserCard {
-    @PrimaryGeneratedColumn("uuid")
+    @PrimaryColumn({ nullable: false })
     id: string;
 
-    @ManyToOne(type => User, user => user.userCards, 
+    @ManyToOne(type => User, user => user.userCards,
         { nullable: false, cascade: true })
     user: string;
-    
+
     @Column({ nullable: false })
     cardVendor: string;
 
@@ -25,7 +25,7 @@ export class UserCard {
     @Column({ nullable: false })
     method: string;
 
-    @Column({ nullable: false })
+    @Column({ nullable: true })
     expiredAt: string;
 
     @CreateDateColumn({ nullable: false })

@@ -33,6 +33,7 @@ import { SubscribeRepository } from "./repository/Subscribe";
 import { UserLikeRepository } from "./repository/UserLike";
 import { ReviewRepository } from "./repository/Review";
 import { UserAddressRepository } from "./repository/UserAddress";
+import { UserCardRepository } from "./repository/UserCard";
 
 process.env.TZ = "UTC";
 
@@ -63,6 +64,7 @@ export const Entity = {
 export const Repository = {
     User : UserRepository,
     UserLike: UserLikeRepository,
+    UserCard: UserCardRepository,
     Category: CategoryRepository,
     Service: ServiceRepository,
     Seller: SellerRepository,
