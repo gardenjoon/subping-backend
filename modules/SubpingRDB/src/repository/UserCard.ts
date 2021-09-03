@@ -19,7 +19,7 @@ export class UserCardRepository extends Repository<UserCard> {
         }
 
         query = query.where(`userCard.user = "${userEmail}"`);
-        
+
         return await query.getRawMany();
     }
 }

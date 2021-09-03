@@ -10,7 +10,7 @@ export const handler = async (event, _context) => {
     const connection = await subpingRDB.getConnection("dev");
 
     const body = event;
-    const { logourl, userProfileImageUrl, category, seller, service, product, user, subscribe, subscribeItem, alarm, like, review, reviewImage } = body;
+    const { logourl, userProfileImageUrl, category, seller, service, product, user, userAddress, subscribe, subscribeItem, alarm, like, review, reviewImage } = body;
 
     const makeHour = (hour: Number) => {
         let standardHour = null;
@@ -196,6 +196,24 @@ export const handler = async (event, _context) => {
         }
         console.log("makeUserComplete");
     }
+    const makeUserAddress = async() => {
+        const userAddressRepository = connection.getRepository(Entity.UserAddress)
+
+        for (const address in userAddress) {
+            const addressModel = new Entity.UserAddress();
+            addressModel.id = address
+            addressModel.user = userAddress[address][0];
+            addressModel.userName = userAddress[address][1];
+            addressModel.userPhoneNumber = userAddress[address][2];
+            addressModel.postCode = userAddress[address][3];
+            addressModel.address = userAddress[address][4];
+            addressModel.detailedAddress = userAddress[address][5];
+            addressModel.isDefault = userAddress[address][6];
+            await userAddressRepository.save(addressModel)
+        }
+
+        console.log("makeUserAddressComplete")
+    }
     const makeSubscribe = async() => {
         const subscribeRepository = connection.getRepository(Entity.Subscribe);
         const subscribeItemRepository = connection.getRepository(Entity.SubscribeItem);
@@ -284,6 +302,7 @@ export const handler = async (event, _context) => {
         await makeRank();
         await makeProduct();
         await makeUser();
+        await makeUserAddress();
         await makeSubscribe();
         await makeAlarm();
         await userLike();
