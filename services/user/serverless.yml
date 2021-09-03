@@ -146,3 +146,21 @@ functions:
           method: post
           cors: true
           authorizer: aws_iam
+  
+  createUserCard:
+    handler: ./handler/card/createUserCard.handler
+    events:
+      - http:
+          path: createUserCard
+          method: post
+          cors: true
+          authorizer: aws_iam
+
+  getUserCards:
+    handler: ./handler/card/getUserCards.handler
+    events:
+      - http:
+          path: getUserCards
+          method: get
+          cors: true
+          authorizer: aws_iam
