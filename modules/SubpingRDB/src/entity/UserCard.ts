@@ -3,7 +3,7 @@ import { User } from "./User";
 
 @Entity()
 export class UserCard {
-    @PrimaryColumn({ nullable: false })
+    @PrimaryGeneratedColumn("uuid")
     id: string;
 
     @ManyToOne(type => User, user => user.userCards,
