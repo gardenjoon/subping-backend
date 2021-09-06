@@ -2,6 +2,7 @@ import { Entity, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, PrimaryG
 import { Payment } from "./Payment";
 import { SubscribeItem } from "./SubscribeItem";
 import { User } from "./User";
+import { UserCard } from "./UserCard";
 
 type Period = "1W" | "2W" | "3W" | "1M" | "2M" | "3M";
 
@@ -13,6 +14,10 @@ export class Subscribe {
     @ManyToOne(type => User, user => user.subscribes, 
         { cascade: true })
     user: string;
+
+    @ManyToOne(type => UserCard, userCard => userCard.subscribes,
+        { nullable: false, cascade: true })
+    userCard: string;
 
     @OneToMany(type => SubscribeItem, subscribeItem => subscribeItem.subscribe)
     subscribeItems: SubscribeItem[];

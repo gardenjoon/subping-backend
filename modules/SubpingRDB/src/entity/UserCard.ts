@@ -1,4 +1,5 @@
-import { Entity, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, PrimaryGeneratedColumn, OneToMany } from "typeorm";
+import { Subscribe } from "./Subscribe";
 import { User } from "./User";
 
 @Entity()
@@ -33,4 +34,7 @@ export class UserCard {
 
     @UpdateDateColumn({ nullable: false })
     updatedAt: Date;
+
+    @OneToMany(type => Subscribe, subscribe => subscribe.userCard)
+    subscribes: Subscribe[]
 }
