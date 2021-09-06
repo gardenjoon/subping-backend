@@ -1,5 +1,6 @@
 import { Entity, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, PrimaryGeneratedColumn, OneToMany } from "typeorm";
 import { Service } from "./Service";
+import { SubscribeItem } from "./SubscribeItem";
 
 @Entity()
 export class Product {
@@ -30,4 +31,7 @@ export class Product {
 
     @UpdateDateColumn({ nullable: false })
     updatedAt: Date;
+
+    @OneToMany(type => SubscribeItem, subscribeItem => subscribeItem.product)
+    subscribeItems: SubscribeItem[];
 }

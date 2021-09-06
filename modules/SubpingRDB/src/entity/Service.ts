@@ -6,7 +6,6 @@ import { ServiceEvent } from "./ServiceEvent";
 import { ServiceRank } from "./ServiceRank";
 import { ServiceTag } from "./ServiceTag";
 import { UserLike } from "./UserLike";
-import { SubscribeItem } from "./SubscribeItem";
 import { Review } from "./Review";
 import { ServicePeriod } from "./ServicePeriod";
 
@@ -65,9 +64,6 @@ export class Service {
 
     @OneToMany(type => Review, review => review.service)
     reviews: Review[];
-
-    @OneToMany(type => SubscribeItem, subscribeItem => subscribeItem.service)
-    subscribeItems: SubscribeItem[];
 
     @OneToMany(type => ServicePeriod, servicePeriod => servicePeriod.service)
     periods: ServicePeriod[];

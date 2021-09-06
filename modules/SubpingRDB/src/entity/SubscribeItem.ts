@@ -1,8 +1,6 @@
 import { Entity, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { Service } from "./Service";
+import { Product } from "./Product";
 import { Subscribe } from "./Subscribe";
-
-type Period = "1W" | "2W" | "3W" | "1M" | "2M" | "3M";
 
 @Entity()
 export class SubscribeItem {
@@ -13,12 +11,9 @@ export class SubscribeItem {
         { cascade: true })
     subscribe: string;
 
-    @ManyToOne(type => Service, service => service.subscribeItems, 
+    @ManyToOne(type => Product, product => product.subscribeItems, 
         { cascade: true })
-    service: string;
-
-    @Column({ length: 50, nullable: false })
-    period: Period;
+    product: string;
 
     @Column({ nullable: false })
     amount: number;
