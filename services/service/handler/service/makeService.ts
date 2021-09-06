@@ -4,7 +4,27 @@ import  * as moment from "moment-timezone";
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import { success, failure } from "../../libs/response-lib";
 
+const makeHour = (hour: Number) => {
+    let standardHour = null;
+    
+    if (3 <= hour && hour < 9) {
+        standardHour = "03:00";
+    }
+    
+    else if (9 <= hour && hour < 15) {
+        standardHour = "09:00";
+    }
+    
+    else if (15 <= hour && hour <= 21) {
+        standardHour = "15:00";
+    }
 
+    else {
+        standardHour = "21:00";
+    }
+
+    return standardHour;
+}
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
         const body = JSON.parse(event.body || "");
@@ -25,28 +45,11 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         serviceModel.serviceLogoUrl = serviceLogoUrl;
         serviceModel.summary = summary;
 
-        const currentTime = moment.tz("Asia/Seoul");
-        const hour = currentTime.hour();
+        const currentTime = moment().utc();
+        const currentHour = makeHour(currentTime.hours());
 
-        let standardHour = null;
-
-        if (6 <= hour && hour < 12) {
-            standardHour = "06:00";
-        }
-
-        else if (12 <= hour && hour < 18) {
-            standardHour = "12:00";
-        }
-
-        else if (18 <= hour && hour < 24) {
-            standardHour = "18:00";
-        }
-        else {
-            standardHour = "24:00";
-        }
-
-        serviceEventModel.date = currentTime.toDate();
-        serviceEventModel.time = standardHour;
+        serviceEventModel.date = currentTime.format("YYYY-MM-DD");
+        serviceEventModel.time = currentHour;
 
         const queryRunner = connection.createQueryRunner();
 

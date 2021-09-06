@@ -5,34 +5,62 @@ import * as moment from "moment-timezone";
 
 import { success, failure } from "../../libs/response-lib";
 
-export const handler = async (event, _context) => {
-    const subpingRDB = new SubpingRDB();
-    const connection = await subpingRDB.getConnection("dev");
+const makeHour = (hour: Number) => {
+    let standardHour = null;
+    
+    if (3 <= hour && hour < 9) {
+        standardHour = "03:00";
+    }
+    
+    else if (9 <= hour && hour < 15) {
+        standardHour = "09:00";
+    }
+    
+    else if (15 <= hour && hour <= 21) {
+        standardHour = "15:00";
+    }
 
+
+    else {
+        standardHour = "21:00";
+    }
+  
     const body = event;
     const { logourl, userProfileImageUrl, category, seller, service, product, user, userAddress, subscribe, subscribeItem, alarm, like, review, reviewImage } = body;
 
-    const makeHour = (hour: Number) => {
-        let standardHour = null;
-
-        if (6 <= hour && hour < 12) {
-            standardHour = "06:00";
-        }
-
-        else if (12 <= hour && hour < 18) {
-            standardHour = "12:00";
-        }
-
-        else if (18 <= hour && hour < 24) {
-            standardHour = "18:00";
-        }
-
-        else {
-            standardHour = "24:00";
-        }
-
-        return standardHour;
+    return standardHour;
+}
+const setTime = () => {
+    const time = {
+        currentHour : null,
+        currentDate : null,
+        standardHour : null,
+        standardDate : null
     }
+
+    const currentTime = moment().utc();
+    time.currentHour = makeHour(currentTime.hours())
+    time.currentDate = currentTime.format("YYYY-MM-DD")
+
+    let standardTime = currentTime.subtract(6, "hours");
+    time.standardHour = makeHour(standardTime.hours());
+
+    if(time.standardHour == "21:00") {
+        standardTime = currentTime.subtract(1, "days");
+    }
+
+    time.standardDate = standardTime.format("YYYY-MM-DD");
+    return time
+}
+export const handler = async (event, _context) => {
+    const subpingRDB = new SubpingRDB();
+    const connection = await subpingRDB.getConnection("dev");
+    
+    const body = event;
+    const { logourl, userProfileImageUrl, category, seller, service, product, user, subscribe, subscribeItem, alarm, like, review, reviewImage } = body;
+    
+    const time = setTime()
+
     const makeCategory = async() => {
         const repository = connection.getCustomRepository(Repository.Category);
         for (const element in category){
@@ -62,12 +90,8 @@ export const handler = async (event, _context) => {
             const serviceCategoryModel = new Entity.ServiceCategory();
             const serviceTagModel = new Entity.ServiceTag();
 
-            const currentTime = moment.tz("Asia/Seoul");
-            const standardHour = makeHour(currentTime.hours());
-            const currentDate = currentTime.format("YYYY-MM-DD");
-
-            serviceEventModel.date = currentDate;
-            serviceEventModel.time = standardHour;
+            serviceEventModel.date = time.currentDate;
+            serviceEventModel.time = time.currentHour;
 
             serviceModel.name = element;
             serviceModel.id = service[element][0];
@@ -130,18 +154,14 @@ export const handler = async (event, _context) => {
     const makeRank = async() => {
         const eventRepository = connection.getCustomRepository(Repository.ServiceEvent);
         const rankRepository = connection.getRepository(Entity.ServiceRank);
-
-        const currentTime = moment.tz("Asia/Seoul");
-        const currentHour = makeHour(currentTime.hours());
-        const currentDate = currentTime.format("YYYY-MM-DD");
         
-        const eventModelForRank = await eventRepository.getServiceEvents(currentDate, currentHour);
+        const eventModelForRank = await eventRepository.getServiceEvents(time.currentDate, time.currentHour);
         
         for (const [index, element] of eventModelForRank.entries()) {
             const serviceRankModel = new Entity.ServiceRank();
             serviceRankModel.service = element.serviceId;
-            serviceRankModel.date = currentDate;
-            serviceRankModel.time = currentHour;
+            serviceRankModel.date = time.currentDate;
+            serviceRankModel.time = time.currentHour;
             serviceRankModel.rank = index+1;
             await rankRepository.save(serviceRankModel);
         }
@@ -155,10 +175,11 @@ export const handler = async (event, _context) => {
             createdAt: null,
             updatedAt: null,
             model: "hotChartTime",
-            date: currentDate,
-            time: currentHour
+            date: time.currentDate,
+            time: time.currentHour
         };
         await controller.create<HotChartTimeModel>(HotChartTimeModel);
+
         console.log("makeRankComplete");
     }
     const makeProduct = async() => {

@@ -16,7 +16,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
 
-        const currentTime = moment.tz("Asia/Seoul");
+        const currentTime = moment().utc();
 
         const subpingDDB = new SubpingDDB(process.env.subpingTable);
         const controller = subpingDDB.getController();
@@ -34,6 +34,9 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
                 standardTime: currentTime.toISOString()
             }
         });
+        const standardTime = moment(hotChartTime.date+hotChartTime.time, "YYYY-MM-DDThh").add(9, "hours");
+        const resultDate = standardTime.format("YYYY-MM-DD")
+        const resultTime = standardTime.format("hh:00")
 
         if(serviceRank.length === 0) {
             return failure({
@@ -46,8 +49,8 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
             return success({
                 success: true,
                 message: {
-                    date: hotChartTime.date,
-                    time: hotChartTime.time,
+                    date: resultDate,
+                    time: resultTime,
                     serviceRank: serviceRank
                 }
             });

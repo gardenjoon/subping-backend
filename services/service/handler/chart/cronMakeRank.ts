@@ -11,47 +11,63 @@ export const handler:APIGatewayProxyHandler  = async (_event, _context) => {
     const makeHour = (hour: Number) => {
         let standardHour = null;
         
-        if (6 <= hour && hour < 12) {
-            standardHour = "06:00";
+        if (3 <= hour && hour < 9) {
+            standardHour = "03:00";
         }
         
-        else if (12 <= hour && hour < 18) {
-            standardHour = "12:00";
+        else if (9 <= hour && hour < 15) {
+            standardHour = "09:00";
         }
         
-        else if (18 <= hour && hour < 24) {
-            standardHour = "18:00";
+        else if (15 <= hour && hour <= 21) {
+            standardHour = "15:00";
         }
-        
+
         else {
-            standardHour = "24:00";
+            standardHour = "21:00";
         }
+
         return standardHour;
     }
+    const setTime = () => {
+        const time = {
+            currentHour : null,
+            currentDate : null,
+            standardHour : null,
+            standardDate : null
+        }
 
+        const currentTime = moment().utc();
+        time.currentHour = makeHour(currentTime.hours())
+        time.currentDate = currentTime.format("YYYY-MM-DD")
+
+        let standardTime = currentTime.subtract(6, "hours");
+        time.standardHour = makeHour(standardTime.hours());
+
+        if(time.standardHour == "21:00") {
+            standardTime = currentTime.subtract(1, "days");
+        }
+
+        time.standardDate = standardTime.format("YYYY-MM-DD");
+        return time
+    }
     try {
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
 
-        const currentTime = moment.tz("Asia/Seoul");
-        const currentHour = makeHour(currentTime.hours());
-        const currentDate = currentTime.format("YYYY-MM-DD");
+        const time = setTime()
 
-        const standardTime = currentTime.subtract(6, "hours");
-        const standardHour = makeHour(standardTime.hours());
-        const standardDate = standardTime.format("YYYY-MM-DD");
-        
         const eventRepository = connection.getCustomRepository(Repository.ServiceEvent);
 
         // service와 serviceEvent를 조인하고 정보를 읽어 rating을 생성
         const rankRepository = connection.getRepository(Entity.ServiceRank);
 
-        const eventModelForRank = await eventRepository.getServiceEvents(standardDate, standardHour);
+        const eventModelForRank = await eventRepository.getServiceEvents(time.standardDate, time.standardHour);
         for (const [index, element] of eventModelForRank.entries()) {
             const serviceRankModel = new Entity.ServiceRank();
             serviceRankModel.service = element.serviceId;
-            serviceRankModel.date = currentDate;
-            serviceRankModel.time = currentHour;
+            serviceRankModel.date = time.currentDate;
+            serviceRankModel.time = time.currentHour;
             serviceRankModel.rank = index+1;
             await rankRepository.save(serviceRankModel);
         }
@@ -63,12 +79,12 @@ export const handler:APIGatewayProxyHandler  = async (_event, _context) => {
         for (const element of allServices){
             const serviceEventModel = new Entity.ServiceEvent;
             serviceEventModel.service = element.id;
-            serviceEventModel.date = currentDate;
-            serviceEventModel.time = currentHour;
+            serviceEventModel.date = time.currentDate;
+            serviceEventModel.time = time.currentHour;
             serviceEventModel.subscribe = 0;
             serviceEventModel.review = 0;
             serviceEventModel.view = 0;
-            await eventRepository.saveServiceEvent(serviceEventModel);
+            // await eventRepository.saveServiceEvent(serviceEventModel);
         };
 
         //핫차트 기준시간 모델 생성
@@ -81,10 +97,10 @@ export const handler:APIGatewayProxyHandler  = async (_event, _context) => {
             createdAt: null,
             updatedAt: null,
             model: "hotChartTime",
-            date: currentDate,
-            time: currentHour
+            date: time.currentDate,
+            time: time.currentHour
         };
-        await controller.create<HotChartTimeModel>(HotChartTimeModel);
+        // await controller.create<HotChartTimeModel>(HotChartTimeModel);
 
         return success({
             success: true,
