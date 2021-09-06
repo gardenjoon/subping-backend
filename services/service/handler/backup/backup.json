@@ -37,14 +37,14 @@
         "797df1b9-1e2e-47f7-a2c7-443f82e16ba1" : ["jsw9808@gmail.com","정승우","010-8881-2173","48513","부산 남구 용소로 45 부경대학교","공학1관",false]
     },
     "subscribeItem":{
-        "06cd86d6-ece7-40b6-8a36-b44019a48871" : ["04d8c938-a3bf-4291-b27b-710900e08912", "bb1f2016-7945-44cc-a6b1-0f0ad152cdb2", "3M", 1],
-        "671de9ce-edde-448a-b960-73a6f57819eb" : ["b676db18-9c92-4741-963d-73d836edb230", "35f6a231-4832-49dc-be76-c8241ebb8135", "1W", 2],
-        "ecd73257-9b6e-411c-a8da-8f993d26eaa2" : ["bdaa1334-bd6f-4d1f-a954-a73edf0dcf16", "4dd6a155-be2e-4ca3-b3b0-6e044d5766dd", "3W", 3]
+        "06cd86d6-ece7-40b6-8a36-b44019a48871" : ["04d8c938-a3bf-4291-b27b-710900e08912", "28864f6c-44c7-4dc9-9bce-e81d1b173aa9", 1],
+        "671de9ce-edde-448a-b960-73a6f57819eb" : ["b676db18-9c92-4741-963d-73d836edb230", "a0f4ea49-223a-49c7-b076-c2f06055c22a", 2],
+        "ecd73257-9b6e-411c-a8da-8f993d26eaa2" : ["bdaa1334-bd6f-4d1f-a954-a73edf0dcf16", "b3bda359-df7c-4615-bb7e-b8a1e0c43887", 3]
     },
     "subscribe":{
-        "04d8c938-a3bf-4291-b27b-710900e08912" : ["qkrrhkddl7@naver.com", "06cd86d6-ece7-40b6-8a36-b44019a48871"],
-        "b676db18-9c92-4741-963d-73d836edb230" : ["dlwjdwls6504@gmail.com", "671de9ce-edde-448a-b960-73a6f57819eb"],
-        "bdaa1334-bd6f-4d1f-a954-a73edf0dcf16" : ["jsw9808@gmail.com", "ecd73257-9b6e-411c-a8da-8f993d26eaa2"]
+        "04d8c938-a3bf-4291-b27b-710900e08912" : ["qkrrhkddl7@naver.com", "3W"],
+        "b676db18-9c92-4741-963d-73d836edb230" : ["dlwjdwls6504@gmail.com", "1W"],
+        "bdaa1334-bd6f-4d1f-a954-a73edf0dcf16" : ["jsw9808@gmail.com", "1M"]
     },
     "alarm":{
         "051d4419-48f1-4a59-a6c2-8eeaae90ad05" : ["info","이정진 전용","Info Message","dlwjdwls6504@gmail.com"],

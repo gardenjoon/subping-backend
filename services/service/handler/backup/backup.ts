@@ -218,16 +218,16 @@ export const handler = async (event, _context) => {
         const subscribeRepository = connection.getRepository(Entity.Subscribe);
         const subscribeItemRepository = connection.getRepository(Entity.SubscribeItem);
 
-        const currentDate = moment.tz("Asia/Seoul").toDate();
+        const currentDate = new Date();
 
         for (const element in subscribe){
             const subscribeModel = new Entity.Subscribe();
             subscribeModel.id = element;
             subscribeModel.user = subscribe[element][0];
-            subscribeModel.subscribeItems = [subscribe[element][1]];
             subscribeModel.subscribeDate = currentDate;
             subscribeModel.expiredDate = null;
             subscribeModel.reSubscribeDate = null;
+            subscribeModel.period = subscribe[element][1]
             await subscribeRepository.save(subscribeModel);
         }
 
@@ -235,9 +235,8 @@ export const handler = async (event, _context) => {
             const subscribeItemModel = new Entity.SubscribeItem();
             subscribeItemModel.id = element;
             subscribeItemModel.subscribe = subscribeItem[element][0];
-            subscribeItemModel.service = subscribeItem[element][1];
-            subscribeItemModel.period = subscribeItem[element][2];
-            subscribeItemModel.amount = subscribeItem[element][3];
+            subscribeItemModel.product = subscribeItem[element][1];
+            subscribeItemModel.amount = subscribeItem[element][2];
             await subscribeItemRepository.save(subscribeItemModel);
         }
 
