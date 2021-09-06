@@ -11,11 +11,11 @@ export class UserCardRepository extends Repository<UserCard> {
         } 
 
         else {
-            query = query.select("userCard.id")
-                .addSelect("userCard.user")
-                .addSelect("userCard.cardName")
-                .addSelect("userCard.cardVendor")
-                .addSelect("userCard.method");
+            query = query.select("userCard.id", "id")
+                .addSelect("userCard.user", "user")
+                .addSelect("userCard.cardName", "cardName")
+                .addSelect("userCard.cardVendor", "cardVendor")
+                .addSelect("userCard.method", "method");
         }
 
         query = query.where(`userCard.user = "${userEmail}"`);
