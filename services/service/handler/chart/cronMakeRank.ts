@@ -29,6 +29,7 @@ export const handler:APIGatewayProxyHandler  = async (_event, _context) => {
 
         return standardHour;
     }
+
     const setTime = () => {
         const time = {
             currentHour : null,
@@ -51,6 +52,7 @@ export const handler:APIGatewayProxyHandler  = async (_event, _context) => {
         time.standardDate = standardTime.format("YYYY-MM-DD");
         return time
     }
+
     try {
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
@@ -84,7 +86,7 @@ export const handler:APIGatewayProxyHandler  = async (_event, _context) => {
             serviceEventModel.subscribe = 0;
             serviceEventModel.review = 0;
             serviceEventModel.view = 0;
-            // await eventRepository.saveServiceEvent(serviceEventModel);
+            await eventRepository.saveServiceEvent(serviceEventModel);
         };
 
         //핫차트 기준시간 모델 생성
@@ -100,7 +102,7 @@ export const handler:APIGatewayProxyHandler  = async (_event, _context) => {
             date: time.currentDate,
             time: time.currentHour
         };
-        // await controller.create<HotChartTimeModel>(HotChartTimeModel);
+        await controller.create<HotChartTimeModel>(HotChartTimeModel);
 
         return success({
             success: true,
