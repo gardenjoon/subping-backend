@@ -1,17 +1,14 @@
 import { EntityRepository, Repository } from "typeorm";
 import { Service } from "../entity/Service";
-import { ServiceCategoryRepository } from "./ServiceCategory";
 
 @EntityRepository(Service)
 export class ServiceRepository extends Repository<Service> {
     findAllService(): Promise<Service[]> {
         return this.find();
     }
-
     findOneService(name: string): Promise<Service> {
         return this.findOne(name);
     }
-
     async saveService(Service: Service): Promise<void> {
         await this.save(Service);
     }
@@ -148,6 +145,22 @@ export class ServiceRepository extends Repository<Service> {
         }
 
         return result;
+    }
 
+    async searchService(requestWord: string){
+        const services = await this.createQueryBuilder("service")
+            .select("service.*")
+            .addSelect("GROUP_CONCAT(DISTINCT serviceTag.tag)", "tag")
+            .where(`name LIKE "%${requestWord}%"`)
+            .orWhere(`summary LIKE "%${requestWord}%"`)
+            .innerJoin("service.serviceTags", "serviceTag")
+            .groupBy("service.id")
+            .getRawMany();
+
+        services.map(service => {
+            service.tag = service.tag.split(",");
+        });
+
+        return services
     }
 }

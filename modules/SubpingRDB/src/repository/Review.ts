@@ -57,4 +57,21 @@ export class ReviewRepository extends Repository<Review> {
 
         return result
     }
+
+    async searchReview(requestWord){
+        const reviews = await this.createQueryBuilder("review")
+            .select("review.*")
+            .addSelect("GROUP_CONCAT(DISTINCT reviewImage.imageUrl)", "reviewImage")
+            .where(`title LIKE "%${requestWord}%"`)
+            .orWhere(`content LIKE "%${requestWord}%"`)
+            .leftJoin("review.images", "reviewImage")
+            .groupBy("review.user")
+            .getRawMany();
+        reviews.map(review => {
+            if (review.reviewImage){
+                review.reviewImage = (review.reviewImage.includes(',')) ? review.reviewImage.split(',') : review.reviewImage.split();
+            };
+        });
+        return reviews
+    }
 }

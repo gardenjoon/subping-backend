@@ -1,8 +1,8 @@
 import SubpingRDB, { Repository } from "subpingrdb";
 
 import { APIGatewayProxyHandler } from 'aws-lambda';
-import { success, failure } from "../../libs/response-lib";
 
+import { success, failure } from "../../libs/response-lib";
 export const handler: APIGatewayProxyHandler = async (event, context) => {
     try {
         const body = JSON.parse(event.body || "");
@@ -12,14 +12,14 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
         const serviceRepository = connection.getCustomRepository(Repository.Service);
-        const reviewRepository = connection.getCustomRepository(Repository.Review);
+        const tagRepository = connection.getCustomRepository(Repository.ServiceTag);
 
         const searchService = await serviceRepository.searchService(requestWord);
-        const searchReview = await reviewRepository.searchReview(requestWord);
+        const searchTag = await tagRepository.searchTag(requestWord);
 
         const result = {
-            "serviceResult": [...new Set(searchService)],
-            "reviewResult": [...new Set(searchReview)]
+            "tagResult": [...new Set(searchTag)],
+            "serviceResult": [...new Set(searchService)]
         };
 
         return success({
@@ -27,12 +27,12 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
             message: result
         });
     }
-
+    
     catch (e) {
         console.log(e);
         return failure({
             success: false,
-            message: "searchException"
-        });
+            message: "autoCompleteException"
+        })
     }
 }

@@ -104,6 +104,15 @@ functions:
   makeProduct:
     handler: ./handler/product/product.handler
 
+  autoComplete:
+    handler: ./handler/search/autoComplete.handler
+    events:
+      - http:
+          path: autoComplete
+          method: post
+          cors: true
+          authorizer: aws_iam
+
   search:
     handler: ./handler/search/search.handler
     events:

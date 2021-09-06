@@ -10,4 +10,12 @@ export class ServiceTagRespository extends Repository<ServiceTag> {
 
         return result
     }
+
+    async searchTag(requestWord){
+        const tags = await this.createQueryBuilder("serviceTag")
+        .select("serviceTag.tag, serviceTag.service")
+        .where(`tag LIKE "%${requestWord}%"`)
+        .getRawMany();
+        return tags
+    }
 }

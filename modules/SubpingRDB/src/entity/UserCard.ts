@@ -7,7 +7,7 @@ export class UserCard {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @ManyToOne(type => User, user => user.userCards,
+    @ManyToOne(type => User, user => user.userCards, 
         { nullable: false, cascade: true })
     user: string;
 
