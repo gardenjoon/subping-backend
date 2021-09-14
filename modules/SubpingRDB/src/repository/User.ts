@@ -7,20 +7,20 @@ export class UserRepository extends Repository<User> {
         return this.find();
     }
 
-    findOneUser(userEmail: string): Promise<User> {
-        return this.findOne(userEmail);
+    findOneUser(userId: string): Promise<User> {
+        return this.findOne(userId);
     }
 
-    async updateNickName(userEmail: string, nickName: string): Promise<void> {
-        await this.update(userEmail, { nickName: nickName})
+    async updateNickName(userId: string, nickName: string): Promise<void> {
+        await this.update(userId, { nickName: nickName})
     }
 
     async saveUser(User: User): Promise<void> {
         await this.save(User);
     }
 
-    async deleteUser(userEmail: string): Promise<void> {
-        await this.delete({ email: userEmail });
+    async deleteUser(userId: string): Promise<void> {
+        await this.delete({ id: userId });
     }
 
     async findByName(userName: string) {

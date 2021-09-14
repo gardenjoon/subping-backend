@@ -11,6 +11,9 @@ type GenterType = "F" | "M";
 @Entity()
 export class User {
     @PrimaryColumn({ length: 100 })
+    id: string;
+
+    @Column({ length: 100 })
     email: string;
 
     @Column ({ nullable: false })

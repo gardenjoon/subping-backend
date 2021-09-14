@@ -7,16 +7,16 @@ export class SellerRepository extends Repository<Seller> {
         return this.find();
     }
 
-    findOneSeller(name: string): Promise<Seller> {
-        return this.findOne(name);
+    findOneSeller(sellerId: string): Promise<Seller> {
+        return this.findOne(sellerId);
     }
 
     async saveSeller(Seller: Seller): Promise<void> {
         await this.save(Seller);
     }
 
-    async deleteSeller(name: string): Promise<void> {
-        await this.delete({ name : name });
+    async deleteSeller(sellerId: string): Promise<void> {
+        await this.delete({ id : sellerId });
     }
 
     findByName(name: string) {

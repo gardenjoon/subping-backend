@@ -3,7 +3,7 @@ import { UserCard } from "../entity/UserCard";
 
 @EntityRepository(UserCard)
 export class UserCardRepository extends Repository<UserCard> {
-    async getUserCards(userEmail: string, sensitive?: boolean) {
+    async getUserCards(userId: string, sensitive?: boolean) {
         let query = this.createQueryBuilder("userCard");
 
         if(sensitive) {
@@ -18,7 +18,7 @@ export class UserCardRepository extends Repository<UserCard> {
                 .addSelect("userCard.method", "method");
         }
 
-        query = query.where(`userCard.user = "${userEmail}"`);
+        query = query.where(`userCard.user = "${userId}"`);
 
         return await query.getRawMany();
     }

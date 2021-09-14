@@ -11,16 +11,16 @@ export class AlarmRepository extends Repository<Alarm> {
         await this.update(id, { read: read });
     }
 
-    async deleteAlarm(user: string): Promise<void> {
-        await this.delete({ user: user });
+    async deleteAlarm(userId: string): Promise<void> {
+        await this.delete({ user: userId });
     }
 
-    async findUserAlarms(email: string) {
+    async findUserAlarms(userId: string) {
         return await this.createQueryBuilder("alarm")
             .select("alarm.*")
             .addSelect(`DATE_ADD(alarm.updatedAt, INTERVAL 9 HOUR)`, "createdAt")
             .addSelect("DATE_ADD(alarm.updatedAt, INTERVAL 9 HOUR)", "updatedAt")
-            .where(`alarm.userEmail = "${email}"`)
+            .where(`alarm.user = "${userId}"`)
             .orderBy("alarm.updatedAt", "DESC")
             .getRawMany();
     }
