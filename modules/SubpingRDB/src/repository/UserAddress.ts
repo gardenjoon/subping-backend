@@ -28,6 +28,13 @@ export class UserAddressRepository extends Repository<UserAddress> {
         });
     }
 
+    async getAddress(addressId: string) {
+        return await this.createQueryBuilder("userAddress")
+            .select("userAddress.*")
+            .where(`userAddress.id = "${addressId}"`)
+            .getRawOne();
+    }
+
     async updateUserAddress(UserAddressId: string, option?:{
         userName?: string, 
         userPhoneNumber?: string, 
@@ -48,5 +55,9 @@ export class UserAddressRepository extends Repository<UserAddress> {
             detailedAddress : detailedAddress || userAddress.detailedAddress,
             isDefault : isDefault || userAddress.isDefault
         })
+    }
+
+    async deleteUserAddress(addressId: string) {
+        await this.delete(addressId);
     }
 }
