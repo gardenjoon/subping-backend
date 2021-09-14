@@ -7,17 +7,17 @@ export class UserAddressRepository extends Repository<UserAddress> {
         await this.save(address);
     }
 
-    async getUserAddresses(userEmail: string) {
+    async getUserAddresses(userId: string) {
         return await this.createQueryBuilder("userAddress")
             .select("userAddress.*")
-            .where(`userAddress.user = "${userEmail}"`)
+            .where(`userAddress.user = "${userId}"`)
             .getRawMany();
     }
 
-    async getUserDefaultAddress(userEmail: string) {
+    async getUserDefaultAddress(userId: string) {
         return await this.createQueryBuilder("userAddress")
             .select("userAddress.*")
-            .where(`userAddress.user = "${userEmail}"`)
+            .where(`userAddress.user = "${userId}"`)
             .andWhere("userAddress.isDefault = True")
             .getRawOne();
     }

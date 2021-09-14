@@ -7,24 +7,24 @@ export class UserLikeRepository extends Repository<UserLike> {
         await this.save(userLike);
     }
 
-    async removeUserLike(userEmail: string, serviceId: string) {
+    async removeUserLike(userId: string, serviceId: string) {
         await this.delete({
-            user: userEmail,
+            user: userId,
             service: serviceId
         });
     }
 
-    async getUserLike(userEmail: string, serviceId: string) {
+    async getUserLike(userId: string, serviceId: string) {
         return await this.createQueryBuilder("userLike")
-            .where("userLike.user = :userEmail AND userLike.service = :serviceId", { userEmail: userEmail, serviceId: serviceId })
+            .where(`userLike.user = "${userId}" AND userLike.service = "${serviceId}"`)
             .getOne();
     }
 
-    async getUserLikes(userEmail: string) {
+    async getUserLikes(userId: string) {
         const result = await this.createQueryBuilder("userLike")
             .select("service.*")
             .addSelect("IF(userLike.createdAt IS NULL, False, True)", "like")
-            .innerJoin("userLike.service", "service", `userLike.user = "${userEmail}"`)
+            .innerJoin("userLike.service", "service", `userLike.user = "${userId}"`)
             .addSelect("GROUP_CONCAT(DISTINCT serviceTag.tag)", "tag")
             .innerJoin("service.serviceTags", "serviceTag")
             .groupBy("service.id")

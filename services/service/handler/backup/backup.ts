@@ -25,9 +25,6 @@ const makeHour = (hour: Number) => {
         standardHour = "21:00";
     }
   
-    const body = event;
-    const { logourl, userProfileImageUrl, category, seller, service, product, user, userAddress, subscribe, subscribeItem, alarm, like, review, reviewImage } = body;
-
     return standardHour;
 }
 const setTime = () => {
@@ -57,10 +54,9 @@ export const handler = async (event, _context) => {
     const connection = await subpingRDB.getConnection("dev");
     
     const body = event;
-    const { logourl, userProfileImageUrl, category, seller, service, product, user, subscribe, subscribeItem, alarm, like, review, reviewImage } = body;
+    const { logourl, userProfileImageUrl, category, seller, service, product, user, userAddress, subscribe, subscribeItem, alarm, like, review, reviewImage } = body;
     
     const time = setTime()
-
     const makeCategory = async() => {
         const repository = connection.getCustomRepository(Repository.Category);
         for (const element in category){
@@ -314,6 +310,11 @@ export const handler = async (event, _context) => {
         console.log("makeReviewComplete");
     }
     try {
+        // const entities = connection.entityMetadatas;
+        // for (const entity of entities) {
+        //     const repository = await connection.getRepository(entity.name);
+        //     await repository.query(`DELETE FROM ${entity.tableName};`);
+        // }
         await connection.synchronize();
         await makeCategory();
         await makeSeller();
@@ -321,12 +322,12 @@ export const handler = async (event, _context) => {
         await makeServicePeriod();
         await makeRank();
         await makeProduct();
-        await makeUser();
-        await makeUserAddress();
-        await makeSubscribe();
-        await makeAlarm();
-        await userLike();
-        await makeReview();
+        // await makeUser();
+        // await makeUserAddress();
+        // await makeSubscribe();
+        // await makeAlarm();
+        // await userLike();
+        // await makeReview();
 
         return success({
             success: true,

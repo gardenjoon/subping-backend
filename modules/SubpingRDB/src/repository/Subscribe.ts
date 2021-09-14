@@ -23,23 +23,23 @@ export class SubscribeRepository extends Repository<Subscribe> {
         await this.delete({ user : userEmail });
     }
 
-    async getSubscribes(userEmail: string) {
+    async getSubscribes(userId: string) {
         return await this.createQueryBuilder("subscribe")
-            .select("user.email", "user")
+            .select("user.id", "user")
             .addSelect("product.*")
             .addSelect("subscribe.*")
-            .where(`subscribe.user = "${userEmail}"`)
+            .where(`subscribe.user = "${userId}"`)
             .innerJoin("subscribe.user", "user")
             .innerJoin("subscribe.product", "product")
             .getRawMany();
     }
 
-    async getOneSubscribe(userEmail: string, productId: string) {
+    async getOneSubscribe(userId: string, productId: string) {
         return await this.createQueryBuilder("subscribe")
-            .select("user.email", "user")
+            .select("user.id", "user")
             .addSelect("product.*")
             .addSelect("subscribe.*")
-            .where(`subscribe.user = "${userEmail}"`)
+            .where(`subscribe.user = "${userId}"`)
             .where(`subscribe.product = "${productId}"`)
             .innerJoin("subscribe.user", "user")
             .innerJoin("subscribe.product", "product")

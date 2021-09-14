@@ -21,9 +21,9 @@ export class ReviewRepository extends Repository<Review> {
 
     async getReviews(options?:{
             productId?: string,
-            userEmail?: string
+            userId?: string
         }) {
-        const { productId , userEmail } = options;
+        const { productId , userId } = options;
 
         let reviews = this.createQueryBuilder("review")
             .select("review.*")
@@ -33,18 +33,18 @@ export class ReviewRepository extends Repository<Review> {
             .leftJoin("review.images", "reviewImage")
             .groupBy("review.user")
 
-        if (productId && !userEmail){
+        if (productId && !userId){
             reviews = reviews
                 .addSelect("user.nickName", "nickName")
                 .where(`review.product = "${productId}"`);
         }
 
-        else if (!productId && userEmail){
-            reviews = reviews.where(`review.user = "${userEmail}"`);
+        else if (!productId && userId){
+            reviews = reviews.where(`review.user = "${userId}"`);
         }
 
         else {
-            return "[SubpingRDB] productId나 userEmail 둘중 하나만 있어야 합니다."
+            return "[SubpingRDB] productId나 userId 둘중 하나만 있어야 합니다."
         }
 
         const result = await reviews.getRawMany();
