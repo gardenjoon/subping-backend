@@ -5,12 +5,9 @@ import { success, failure } from "../../libs/response-lib";
 
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
-        const header = event.headers;
-        const PK = header.email;
+        const userId = event.headers.id;
         const body = JSON.parse(event.body || "");
         
-        console.log(body);
-
         const { userName, userPhoneNumber, postCode, address, detailedAddress, isDefault } = body;
 
         if (!(userName && postCode && address && detailedAddress && isDefault != null && userPhoneNumber)) {
@@ -24,7 +21,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const connection = await subpingRDB.getConnection("dev");
         const addressRepository = connection.getCustomRepository(Repository.UserAddress);
 
-        const existAddresses = await addressRepository.getUserAddresses(PK);
+        const existAddresses = await addressRepository.getUserAddresses(userId);
         let existDefaultAddress;
 
         for (const address of existAddresses) {
@@ -42,7 +39,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         }
 
         const newAddress = new Entity.UserAddress();
-        newAddress.user = PK;
+        newAddress.user = userId;
         newAddress.postCode = postCode;
         newAddress.address = address;
         newAddress.detailedAddress = detailedAddress;

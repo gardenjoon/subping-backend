@@ -7,20 +7,20 @@ export class SubscribeRepository extends Repository<Subscribe> {
         return this.find();
     }
 
-    findOneSubscribe(userEmail: string): Promise<Subscribe> {
-        return this.findOne({ user : userEmail });
+    findOneSubscribe(userId: string): Promise<Subscribe> {
+        return this.findOne({ user : userId });
     }
 
-    async updateSubscribe(id: string, date: string): Promise<void> {
-        await this.update(id, { expiredDate : date });
+    async updateSubscribe(subscribeId: string, date: Date): Promise<void> {
+        await this.update(subscribeId, { expiredDate : date });
     }
 
     async saveSubscribe(Subscribe: Subscribe): Promise<void> {
         await this.save(Subscribe);
     }
 
-    async deleteSubscribe(userEmail: string): Promise<void> {
-        await this.delete({ user : userEmail });
+    async deleteSubscribe(userId: string): Promise<void> {
+        await this.delete({ user : userId });
     }
 
     async getSubscribes(userId: string) {

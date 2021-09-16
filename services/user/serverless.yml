@@ -147,7 +147,7 @@ functions:
           cors: true
           authorizer: aws_iam
 
-editUserAddress:
+  editUserAddress:
     handler: ./handler/address/editUserAddress.handler
   
   createUserCard:

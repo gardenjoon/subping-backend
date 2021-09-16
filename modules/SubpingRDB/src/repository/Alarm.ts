@@ -7,8 +7,8 @@ export class AlarmRepository extends Repository<Alarm> {
         await this.save(Alarm);
     }
 
-    async updateAlarmRead(id: string, read: boolean): Promise<void> {
-        await this.update(id, { read: read });
+    async updateAlarmRead(alarmId: string, read: boolean): Promise<void> {
+        await this.update(alarmId, { read: read });
     }
 
     async deleteAlarm(userId: string): Promise<void> {
@@ -25,9 +25,9 @@ export class AlarmRepository extends Repository<Alarm> {
             .getRawMany();
     }
 
-    async findUserUnreadAlarms(email: string) {
+    async findUserUnreadAlarms(userId: string) {
         return await this.find({
-            user: email,
+            user: userId,
             read: false
         });
     }
