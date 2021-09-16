@@ -5,8 +5,7 @@ import { success, failure } from "../../libs/response-lib";
 
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
-        
-        const userEmail = event.headers.email;
+        const userId = event.headers.id;
         const body = JSON.parse(event.body || "");
 
         const { addressId } = body;
@@ -17,7 +16,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const userAddressRepository = connection.getCustomRepository(Repository.UserAddress);
         const targetAddress = await userAddressRepository.getAddress(addressId);
 
-        if(targetAddress.userEmail != userEmail) {
+        if(targetAddress.userId != userId) {
             return failure({
                 success: false,
                 message: "DeleteAddresUserException"

@@ -17,7 +17,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const defaultAddress = await userAddressRepository.getUserDefaultAddress(userId);
         const targetAddress = await userAddressRepository.getAddress(addressId);
 
-        if(targetAddress.userEmail != userEmail) {
+        if(targetAddress.userId != userId) {
             return failure({
                 success: false,
                 message: "EditAddresUserException"
