@@ -5,13 +5,13 @@ import { success, failure } from "../../libs/response-lib";
 
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
-        const userEmail = event.headers.email;
+        const userId = event.headers.id;
 
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
         const userCardRepository = connection.getCustomRepository(Repository.UserCard);
 
-        const userCards = await userCardRepository.getUserCards(userEmail, false);
+        const userCards = await userCardRepository.getUserCards(userId, false);
 
         return success({
             success: true,

@@ -5,8 +5,7 @@ import { success, failure } from "../../libs/response-lib";
 
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
-        const header = event.headers;
-        const PK = header.email;
+        const userId = event.headers.id;
         const body = JSON.parse(event.body || "");
 
         const { serviceId, toggle } = body;
@@ -15,10 +14,10 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const connection = await subpingRDB.getConnection("dev");
 
         const userLikeRepository = connection.getCustomRepository(Repository.UserLike);
-        const existUserLike = await userLikeRepository.getUserLike(PK, serviceId);
+        const existUserLike = await userLikeRepository.getUserLike(userId, serviceId);
         
         const userLikeEntity = new Entity.UserLike();
-        userLikeEntity.user = PK;
+        userLikeEntity.user = userId;
         userLikeEntity.service = serviceId;
 
         // 만약 토글이 true이고 이미 유저 라이크가 없으면, 생성
@@ -33,7 +32,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
 
         // 만약 토글이 false이고 이미 유저 라이크가 있으면, 제거
         else if(!toggle && existUserLike) {
-            await userLikeRepository.removeUserLike(PK, serviceId);
+            await userLikeRepository.removeUserLike(userId, serviceId);
     
             return success({
                 success: true,

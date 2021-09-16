@@ -8,13 +8,12 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
         const result = {};
 
-        // const header = event.headers;
-        // const PK = header.email;
-        const PK = "jsw9808@gmail.com";
+        // const userId = event.headers.id;
+        const userId = "jsw9808@gmail.com";
         const subpingRDB = new SubpingRDB()
         const connection = await subpingRDB.getConnection("dev");
         const subscribeRepository = connection.getCustomRepository(Repository.Subscribe)
-        const subscribes = await subscribeRepository.getSubscribes(PK);
+        const subscribes = await subscribeRepository.getSubscribes(userId);
 
         const currentMoment = moment.tz("Asia/Seoul")
             .hour(0)

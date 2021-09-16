@@ -7,8 +7,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
         let response = [];
 
-        const header = event.headers;
-        const PK = header.email;
+        const userId = event.headers.id;
         const body = JSON.parse(event.body || "");
         
         const { productId } = body;
@@ -19,11 +18,11 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const subscribeRepository = connection.getCustomRepository(Repository.Subscribe);
 
         if (productId) {
-            response = await subscribeRepository.getOneSubscribe(PK, productId);
+            response = await subscribeRepository.getOneSubscribe(userId, productId);
         }
 
         else {
-            response = await subscribeRepository.getSubscribes(PK);
+            response = await subscribeRepository.getSubscribes(userId);
         }
         
         return success({

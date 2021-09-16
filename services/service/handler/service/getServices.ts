@@ -5,7 +5,7 @@ import { success, failure } from "../../libs/response-lib";
 
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
-        const PK = event.headers.email;
+        const userId = event.headers.id;
         const body = JSON.parse(event.body || "");
         const { category } = body;
 
@@ -19,7 +19,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
                 categoryName: category
             },
             like: {
-                userEmail: PK
+                userId: userId
             }
         });
 

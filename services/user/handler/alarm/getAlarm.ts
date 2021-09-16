@@ -5,14 +5,14 @@ import { success, failure } from "../../libs/response-lib";
 
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
-        const userEmail = event.headers.email;
+        const userId = event.headers.id;
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
 
         let unReadCount = 0;
 
         const alarmRepository = connection.getCustomRepository(Repository.Alarm);
-        const userAlarms = await alarmRepository.findUserAlarms(userEmail);
+        const userAlarms = await alarmRepository.findUserAlarms(userId);
 
         userAlarms.map(item => {
             if(!item.read) {

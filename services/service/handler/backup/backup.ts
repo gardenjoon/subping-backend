@@ -3,53 +3,29 @@ import SubpingDDB from "../../libs/SubpingDDB";
 import HotChartTimeModel from "../../libs/subpingddb/model/subpingTable/hotChartTime";
 import * as moment from "moment-timezone";
 
-import { success, failure } from "../../libs/response-lib";
-
 const makeHour = (hour: Number) => {
-    let standardHour = null;
-    
-    if (3 <= hour && hour < 9) {
-        standardHour = "03:00";
-    }
-    
-    else if (9 <= hour && hour < 15) {
-        standardHour = "09:00";
-    }
-    
-    else if (15 <= hour && hour <= 21) {
-        standardHour = "15:00";
-    }
-
-
-    else {
-        standardHour = "21:00";
-    }
-  
-    return standardHour;
+    let standardHour:string;
+    return standardHour = 
+            (3 <= hour && hour < 9) ? "03:00"
+        :   (9 <= hour && hour < 15) ? "09:00"
+        :   (15 <= hour && hour < 21) ? "15:00"
+        :   "21:00"
 }
 const setTime = () => {
     const time = {
         currentHour : null,
-        currentDate : null,
-        standardHour : null,
-        standardDate : null
+        currentDate : null
     }
 
-    const currentTime = moment().utc();
-    time.currentHour = makeHour(currentTime.hours())
+    const currentTime = moment();
+    time.currentHour = makeHour(currentTime.hours());
     time.currentDate = currentTime.format("YYYY-MM-DD")
 
-    let standardTime = currentTime.subtract(6, "hours");
-    time.standardHour = makeHour(standardTime.hours());
-
-    if(time.standardHour == "21:00") {
-        standardTime = currentTime.subtract(1, "days");
-    }
-
-    time.standardDate = standardTime.format("YYYY-MM-DD");
     return time
 }
 export const handler = async (event, _context) => {
+    const subpingDDB = new SubpingDDB(process.env.subpingTable);
+    const controller = subpingDDB.getController();
     const subpingRDB = new SubpingRDB();
     const connection = await subpingRDB.getConnection("dev");
     
@@ -57,6 +33,29 @@ export const handler = async (event, _context) => {
     const { logourl, userProfileImageUrl, category, seller, service, product, user, userAddress, subscribe, subscribeItem, alarm, like, review, reviewImage } = body;
     
     const time = setTime()
+    const deleteTable = async (service: boolean, user: boolean) => {
+        if(service){
+            await connection.query("SET FOREIGN_KEY_CHECKS = 0;")
+            await connection.query("TRUNCATE TABLE service_event;")
+            await connection.query("TRUNCATE TABLE service_rank;")
+            await connection.query("TRUNCATE TABLE service_tags;")
+            await connection.query("TRUNCATE TABLE service_category;")
+            await connection.query("TRUNCATE TABLE service")
+            await connection.query("SET FOREIGN_KEY_CHECKS = 1;")
+            console.log("Service deleted")
+        }
+        if(user){
+            await connection.query("SET FOREIGN_KEY_CHECKS = 0;")
+            await connection.query("TRUNCATE alarm;")
+            await connection.query("TRUNCATE review")
+            await connection.query("TRUNCATE review_image")
+            await connection.query("TRUNCATE user_address")
+            await connection.query("TRUNCATE user_like")
+            await connection.query("TRUNCATE user")
+            await connection.query("SET FOREIGN_KEY_CHECKS = 1;")
+            console.log("User deleted")
+        }
+    }
     const makeCategory = async() => {
         const repository = connection.getCustomRepository(Repository.Category);
         for (const element in category){
@@ -73,8 +72,9 @@ export const handler = async (event, _context) => {
 
         for (const element in seller){
             const sellerModel = new Entity.Seller();
+            sellerModel.id = seller[element][0]
             sellerModel.name = element;
-            sellerModel.email = seller[element];
+            sellerModel.email = seller[element][1];
             await repository.saveSeller(sellerModel);
         }
         console.log("makeSellerComplete")
@@ -83,11 +83,25 @@ export const handler = async (event, _context) => {
         for (const element in service){
             const serviceModel = new Entity.Service();
             const serviceEventModel = new Entity.ServiceEvent();
+            const serviceRankModel = new Entity.ServiceRank();
             const serviceCategoryModel = new Entity.ServiceCategory();
             const serviceTagModel = new Entity.ServiceTag();
 
             serviceEventModel.date = time.currentDate;
             serviceEventModel.time = time.currentHour;
+
+            serviceRankModel.date = time.currentDate;
+            serviceRankModel.time = time.currentHour;
+
+            const HotChartTimeModel: HotChartTimeModel = {
+                PK: "hotChartTime",
+                SK: "hotChartTime",
+                createdAt: null,
+                updatedAt: null,
+                model: "hotChartTime",
+                date: time.currentDate,
+                time: time.currentHour
+            };
 
             serviceModel.name = element;
             serviceModel.id = service[element][0];
@@ -104,6 +118,12 @@ export const handler = async (event, _context) => {
                 
                 serviceEventModel.service = service[element][0];
                 await queryRunner.manager.save(serviceEventModel);
+
+                serviceRankModel.service = service[element][0]
+                serviceRankModel.rank = service[element][7]
+                await queryRunner.manager.save(serviceRankModel)
+
+                await controller.create<HotChartTimeModel>(HotChartTimeModel);
                 
                 for(const category of service[element][4]) {
                     serviceCategoryModel.service = service[element][0];
@@ -147,37 +167,6 @@ export const handler = async (event, _context) => {
 
         console.log("makeServicePeriodComplete");
     }
-    const makeRank = async() => {
-        const eventRepository = connection.getCustomRepository(Repository.ServiceEvent);
-        const rankRepository = connection.getRepository(Entity.ServiceRank);
-        
-        const eventModelForRank = await eventRepository.getServiceEvents(time.currentDate, time.currentHour);
-        
-        for (const [index, element] of eventModelForRank.entries()) {
-            const serviceRankModel = new Entity.ServiceRank();
-            serviceRankModel.service = element.serviceId;
-            serviceRankModel.date = time.currentDate;
-            serviceRankModel.time = time.currentHour;
-            serviceRankModel.rank = index+1;
-            await rankRepository.save(serviceRankModel);
-        }
-
-        const subpingDDB = new SubpingDDB(process.env.subpingTable);
-        const controller = subpingDDB.getController();
-
-        const HotChartTimeModel: HotChartTimeModel = {
-            PK: "hotChartTime",
-            SK: "hotChartTime",
-            createdAt: null,
-            updatedAt: null,
-            model: "hotChartTime",
-            date: time.currentDate,
-            time: time.currentHour
-        };
-        await controller.create<HotChartTimeModel>(HotChartTimeModel);
-
-        console.log("makeRankComplete");
-    }
     const makeProduct = async() => {
         const repository = connection.getCustomRepository(Repository.Product);
 
@@ -200,15 +189,16 @@ export const handler = async (event, _context) => {
 
         for (const element in user){
             const userModel = new Entity.User();
-            userModel.email = element;
-            userModel.name = user[element][0];
-            userModel.nickName = user[element][1];
+            userModel.id = element
+            userModel.email = user[element][0];
+            userModel.name = user[element][1];
+            userModel.nickName = user[element][2];
             userModel.userProfileImageUrl = userProfileImageUrl;
-            userModel.birthday = user[element][2];
-            userModel.gender = user[element][3];
-            userModel.ci = user[element][4];
-            userModel.carrier = user[element][5];
-            userModel.phoneNumber = user[element][6];
+            userModel.birthday = user[element][3];
+            userModel.gender = user[element][4];
+            userModel.ci = user[element][5];
+            userModel.carrier = user[element][6];
+            userModel.phoneNumber = user[element][7];
             await repository.saveUser(userModel);
         }
         console.log("makeUserComplete");
@@ -310,36 +300,25 @@ export const handler = async (event, _context) => {
         console.log("makeReviewComplete");
     }
     try {
-        // const entities = connection.entityMetadatas;
-        // for (const entity of entities) {
-        //     const repository = await connection.getRepository(entity.name);
-        //     await repository.query(`DELETE FROM ${entity.tableName};`);
-        // }
-        await connection.synchronize();
-        await makeCategory();
-        await makeSeller();
-        await makeService();
-        await makeServicePeriod();
-        await makeRank();
-        await makeProduct();
-        // await makeUser();
-        // await makeUserAddress();
+        await deleteTable(false, true);
+        // await connection.synchronize();
+        // await makeCategory();
+        // await makeSeller();
+        // await makeService();
+        // await makeServicePeriod();
+        // await makeProduct();
         // await makeSubscribe();
-        // await makeAlarm();
-        // await userLike();
-        // await makeReview();
+        await makeUser();
+        await makeUserAddress();
+        await makeAlarm();
+        await userLike();
+        await makeReview();
 
-        return success({
-            success: true,
-            message: "BackupSuccess"
-        });
+        return console.log("BackupSuccess!!!!!!!!")
     } 
 
     catch (e) {
         console.log(e);
-        return failure({
-            success: false,
-            message: "BackupException"
-        });
+        return console.log("NOOooooooo.....")
     }
 }

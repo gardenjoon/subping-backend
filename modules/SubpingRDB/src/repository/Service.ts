@@ -32,7 +32,7 @@ export class ServiceRepository extends Repository<Service> {
             standardTime: string,
         },
         like?: {
-            userEmail: string,
+            userId: string,
         },
         pagination?: {
             limit: number,
@@ -92,14 +92,14 @@ export class ServiceRepository extends Repository<Service> {
         }
 
         if (like) {
-            if (like.userEmail) {
+            if (like.userId) {
                 query = query
                     .addSelect("IF(userLike.createdAt IS NULL, False, True)", "like")
-                    .leftJoin("service.userLikes", "userLike", `userLike.user = "${like.userEmail}"`)
+                    .leftJoin("service.userLikes", "userLike", `userLike.user = "${like.userId}"`)
             }
 
             else {
-                throw new Error("[SubpingRDB] getServices Like가 정의되었지만 userEmail이 없습니다.")
+                throw new Error("[SubpingRDB] getServices Like가 정의되었지만 userId가 없습니다.")
             }
         }
 

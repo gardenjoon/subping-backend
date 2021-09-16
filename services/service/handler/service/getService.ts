@@ -6,10 +6,8 @@ import { success, failure } from "../../libs/response-lib";
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
         let response = [];
-        const header = event.headers;
-        const PK = header.email;
+        const userId = event.headers.id;
         const body = JSON.parse(event.body || "");
-
         const requestedService = body.service || null;
 
         const subpingRDB = new SubpingRDB();
@@ -20,7 +18,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
             response = await serviceRepository.getServices({
                 category: true,
                 like: {
-                    userEmail: PK
+                    userId: userId
                 },
                 period: true,
                 tag: true,

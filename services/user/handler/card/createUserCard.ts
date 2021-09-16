@@ -5,7 +5,7 @@ import { success, failure } from "../../libs/response-lib";
 
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
-        const userEmail = event.headers.email;
+        const userId = event.headers.id;
         const body = JSON.parse(event.body || "");
 
         const { cardVendor, billingKey, method, pg, cardName } = body;
@@ -15,7 +15,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const userCardRepository = connection.getCustomRepository(Repository.UserCard);
 
         const userCard = new Entity.UserCard();
-        userCard.user = userEmail;
+        userCard.user = userId;
         userCard.billingKey = billingKey;
         userCard.cardName = cardName;
         userCard.cardVendor = cardVendor;

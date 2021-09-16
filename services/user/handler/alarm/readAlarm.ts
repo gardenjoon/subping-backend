@@ -5,14 +5,13 @@ import { success, failure } from "../../libs/response-lib";
 
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
-        const header = event.headers;
-        const PK = header.email;
+        const userId = event.headers.id;
 
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
         const alarmRepository = connection.getCustomRepository(Repository.Alarm);
 
-        const unReadAlarms = await alarmRepository.findUserUnreadAlarms(PK)
+        const unReadAlarms = await alarmRepository.findUserUnreadAlarms(userId)
 
         for (const unReadAlarm of unReadAlarms){
             await alarmRepository.updateAlarmRead(unReadAlarm.id, true);

@@ -8,8 +8,7 @@ import { success, failure } from "../../libs/response-lib";
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
         const body = JSON.parse(event.body || "");
-        const header = event.headers;
-        const PK = header.PK;
+        const userId = event.headers.id;
 
         const { productId } = body;
 
@@ -17,10 +16,9 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const connection = await subpingRDB.getConnection("dev");
         const repository = connection.getCustomRepository(Repository.Subscribe);
 
-        const userSubscribeProduct = await repository.getOneSubscribe(PK, productId);
+        const userSubscribeProduct = await repository.getOneSubscribe(userId, productId);
 
-        const currentTime = moment.tz("Asia/Seoul");
-        const currentDate = currentTime.format("YYYY-MM-DD");
+        const currentDate = new Date();
 
         await repository.updateSubscribe(userSubscribeProduct[0].id, currentDate);
 
