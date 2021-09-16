@@ -5,43 +5,30 @@ import { success, failure } from "../../libs/response-lib";
 
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
+        
         const userEmail = event.headers.email;
-        console.log(event.headers);
-
         const body = JSON.parse(event.body || "");
 
-        const { addressId, userName, userPhoneNumber, postCode, address, detailedAddress, isDefault } = body;
+        const { addressId } = body;
 
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
 
         const userAddressRepository = connection.getCustomRepository(Repository.UserAddress);
-        const defaultAddress = await userAddressRepository.getUserDefaultAddress(userEmail);
         const targetAddress = await userAddressRepository.getAddress(addressId);
 
         if(targetAddress.userEmail != userEmail) {
             return failure({
                 success: false,
-                message: "EditAddresUserException"
+                message: "DeleteAddresUserException"
             });
         }
 
-        if (defaultAddress && defaultAddress.id != addressId && isDefault){
-            await userAddressRepository.updateAddressDefault(defaultAddress.id, false);
-        };
-
-        await userAddressRepository.updateUserAddress(addressId, {
-            userName: userName,
-            userPhoneNumber: userPhoneNumber,
-            postCode: postCode,
-            address: address,
-            detailedAddress: detailedAddress,
-            isDefault: isDefault
-        });
+        userAddressRepository.deleteUserAddress(addressId);
 
         return success({
             success: true,
-            message: "editUserAddressSuccess"
+            message: "DeleteUserAddressSuccess"
         });
     }
 
@@ -49,7 +36,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         console.log(e);
         return failure({
             success: false,
-            message: "editUserAddressException"
+            message: "DeleteUserAddressException"
         });
     }
 }
