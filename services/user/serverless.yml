@@ -144,12 +144,18 @@ functions:
       - http:
           path: makeUserAddress
           method: post
+          cors: true  
+          authorizer: aws_iam
+
+  editUserAddress:
+    handler: ./handler/address/editUserAddress.handler
+    events:
+      - http:
+          path: editUserAddress
+          method: post
           cors: true
           authorizer: aws_iam
 
-editUserAddress:
-    handler: ./handler/address/editUserAddress.handler
-  
   createUserCard:
     handler: ./handler/card/createUserCard.handler
     events:

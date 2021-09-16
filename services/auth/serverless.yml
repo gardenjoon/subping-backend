@@ -103,6 +103,8 @@ functions:
           method: post
           cors: true
   
+  preSignUpTrigger:
+    handler: ./handler/trigger/preSignUp.handler
     
 
 #    The following are a few example events you can configure
