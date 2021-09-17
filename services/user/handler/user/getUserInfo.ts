@@ -13,17 +13,24 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
 
         const user = await UserRepository.findOneUser(userId);
 
-        return success({
-            success: true,
-            message: user
-        });
+        if(user) {
+            return success({
+                success: true,
+                message: user
+            });
+        } else {
+            return failure({
+                success: false,
+                message: "NoUserExistException"
+            });
+        }
     }
 
     catch (e) {
         console.log(e)
         return failure({
             success: false,
-            message: "duplicateNickNameException"
+            message: "GetUserInfoException"
         });
     }
 }

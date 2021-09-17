@@ -34,6 +34,15 @@ export class SubscribeRepository extends Repository<Subscribe> {
             .getRawMany();
     }
 
+    async getSubscribesByServiceId(userId: string, serviceId: string) {
+        return await this.createQueryBuilder("subscribe")
+            .select("subscribe.*")
+            .where(`subscribe.user = "${userId}"`)
+            .innerJoin("subscribe.subscribeItems", "subscribeItems")
+            .innerJoin("subscribeItems.product", "product", `product.serviceId = "${serviceId}"`)
+            .getRawMany();
+    }
+
     async getOneSubscribe(userId: string, productId: string) {
         return await this.createQueryBuilder("subscribe")
             .select("user.id", "user")

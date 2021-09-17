@@ -22,4 +22,12 @@ export class UserCardRepository extends Repository<UserCard> {
 
         return await query.getRawMany();
     }
+
+    async getCard(cardId: string) {
+        const query = this.createQueryBuilder("userCard")
+            .select("userCard.*")
+            .where(`userCard.id = "${cardId}"`)
+        
+        return query.getRawOne();
+    }
 }

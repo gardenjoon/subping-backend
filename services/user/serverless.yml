@@ -98,10 +98,16 @@ functions:
 
   makeSubscribe:
     handler: ./handler/subscribe/makeSubscribe.handler
-  
+    events:
+      - http:
+          path: makeSubscribe
+          method: post
+          cors: true
+          authorizer: aws_iam
+          
   updateSubscribe:
     handler: ./handler/subscribe/updateSubscribe.handler
-
+    
   duplicateNickName:
     handler: ./handler/nickname/duplicateNickName.handler
     events:
