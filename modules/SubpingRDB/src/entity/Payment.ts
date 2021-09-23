@@ -10,6 +10,9 @@ export class Payment {
         { cascade: true })
     subscribe: string;
 
+    @Column({ nullable: false })
+    amount: number;
+    
     @Column({ type: "date", nullable: false })
     paymentDate: Date;
 

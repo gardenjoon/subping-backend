@@ -21,9 +21,9 @@ export class Subscribe {
         { nullable: false, cascade: true })
     userCard: string;
     
-    // @Column({ type: "text" })
-    // // 우편번호#주소#상세주소 형식으로 plain text 저장
-    // address: string;
+    @Column({ type: "text" })
+    // 우편번호#주소#상세주소 형식으로 plain text 저장
+    address: string;
 
     @OneToMany(type => SubscribeItem, subscribeItem => subscribeItem.subscribe)
     subscribeItems: SubscribeItem[];
