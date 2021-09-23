@@ -146,6 +146,7 @@ functions:
   
   makeUserAddress:
     handler: ./handler/address/makeUserAddress.handler
+    timeout: 30
     events:
       - http:
           path: makeUserAddress
