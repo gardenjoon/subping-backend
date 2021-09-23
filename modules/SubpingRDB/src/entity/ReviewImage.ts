@@ -7,7 +7,7 @@ export class ReviewImage {
     id: string;
 
     @ManyToOne(type => Review, review => review.images, 
-        { cascade: true })
+        { onDelete: "CASCADE", onUpdate:  "CASCADE" })
     review: string;
 
     @Column({ length: 1000, nullable: false})

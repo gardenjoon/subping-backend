@@ -46,21 +46,27 @@ export class User {
     @UpdateDateColumn({ nullable: false })
     updatedAt: Date;
 
-    @OneToMany(type => Alarm, alarm => alarm.user)
+    @OneToMany(type => Alarm, alarm => alarm.user, 
+        { cascade: true })
     alarms: Alarm[];
 
-    @OneToMany(type => UserAddress, userAddress => userAddress.user)
+    @OneToMany(type => UserAddress, userAddress => userAddress.user, 
+        { cascade: true })
     addresses: UserAddress[];
 
-    @OneToMany(type => Review, review => review.user)
+    @OneToMany(type => Review, review => review.user, 
+        { cascade: true })
     reviews: Review[];
 
-    @OneToMany(type => Subscribe, userSubscribe => userSubscribe.user)
+    @OneToMany(type => Subscribe, userSubscribe => userSubscribe.user, 
+        { cascade: true })
     subscribes: Subscribe[];
     
-    @OneToMany(type => UserLike, userLike => userLike.user)
+    @OneToMany(type => UserLike, userLike => userLike.user, 
+        { cascade: true })
     userLikes: UserLike[];
 
-    @OneToMany(type => UserCard, userCard => userCard.user)
+    @OneToMany(type => UserCard, userCard => userCard.user, 
+        { cascade: true })
     userCards: UserCard[];
 }

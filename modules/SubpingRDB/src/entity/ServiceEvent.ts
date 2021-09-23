@@ -6,7 +6,7 @@ type RankTime = "06:00" | "12:00" | "18:00" | "24:00";
 @Entity()
 export class ServiceEvent {
     @ManyToOne(type => Service, service => service.serviceEvents, 
-        { cascade: true, primary: true })
+        { onDelete: "CASCADE", onUpdate:  "CASCADE", primary: true })
     service: string;
 
     @PrimaryColumn({ type: "date" })

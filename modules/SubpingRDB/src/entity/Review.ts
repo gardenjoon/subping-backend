@@ -9,11 +9,11 @@ export class Review {
     id: string;
 
     @ManyToOne(type => User, user => user.reviews, 
-        { cascade: true })
+        { onDelete: "CASCADE", onUpdate:  "CASCADE" })
     user: string;
 
     @ManyToOne(type => Service, service => service.reviews, 
-        { cascade: true })
+        { onDelete: "CASCADE", onUpdate:  "CASCADE" })
     service: string;
 
     @Column({ nullable: true })
@@ -31,6 +31,7 @@ export class Review {
     @UpdateDateColumn({ nullable: false })
     updatedAt: Date;
 
-    @OneToMany(type => ReviewImage, reviewImage => reviewImage.review)
+    @OneToMany(type => ReviewImage, reviewImage => reviewImage.review, 
+        { cascade: true })
     images: ReviewImage[];
 }

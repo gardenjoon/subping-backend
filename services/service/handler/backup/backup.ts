@@ -30,31 +30,13 @@ export const handler = async (event, _context) => {
     const connection = await subpingRDB.getConnection("dev");
     
     const body = event;
-    const { logourl, userProfileImageUrl, category, seller, service, product, user, userAddress, subscribe, subscribeItem, alarm, like, review, reviewImage } = body;
+    const { logourl, userProfileImageUrl, category, seller, service, product, user, userAddress, userCard, subscribe, subscribeItem, alarm, like, review, reviewImage } = body;
     
     const time = setTime()
-    const deleteTable = async (service: boolean, user: boolean) => {
-        if(service){
-            await connection.query("SET FOREIGN_KEY_CHECKS = 0;")
-            await connection.query("TRUNCATE TABLE service_event;")
-            await connection.query("TRUNCATE TABLE service_rank;")
-            await connection.query("TRUNCATE TABLE service_tags;")
-            await connection.query("TRUNCATE TABLE service_category;")
-            await connection.query("TRUNCATE TABLE service")
-            await connection.query("SET FOREIGN_KEY_CHECKS = 1;")
-            console.log("Service deleted")
-        }
-        if(user){
-            await connection.query("SET FOREIGN_KEY_CHECKS = 0;")
-            await connection.query("TRUNCATE alarm;")
-            await connection.query("TRUNCATE review")
-            await connection.query("TRUNCATE review_image")
-            await connection.query("TRUNCATE user_address")
-            await connection.query("TRUNCATE user_like")
-            await connection.query("TRUNCATE user")
-            await connection.query("SET FOREIGN_KEY_CHECKS = 1;")
-            console.log("User deleted")
-        }
+    const deleteTable = async () => {
+        await connection.query(`delete from service;`)
+        await connection.query(`delete from user;`)
+        console.log("deleteTableComplete")
     }
     const makeCategory = async() => {
         const repository = connection.getCustomRepository(Repository.Category);
@@ -299,20 +281,36 @@ export const handler = async (event, _context) => {
         }
         console.log("makeReviewComplete");
     }
+    const makeUserCard = async() => {
+        const userCardRepository = connection.getRepository(Entity.UserCard);
+        for (const element in userCard) {
+            const userCardModel = new Entity.UserCard();
+            userCardModel.id = element;
+            userCardModel.cardVendor = userCard[element][0]
+            userCardModel.cardName = userCard[element][1]
+            userCardModel.billingKey = userCard[element][2]
+            userCardModel.pg = userCard[element][3]
+            userCardModel.method = userCard[element][4]
+            userCardModel.user = userCard[element][5];
+            await userCardRepository.save(userCardModel)
+        }
+        console.log("makeUserCardComplete")
+    }
     try {
-        await deleteTable(false, true);
-        // await connection.synchronize();
-        // await makeCategory();
-        // await makeSeller();
-        // await makeService();
-        // await makeServicePeriod();
-        // await makeProduct();
+        await deleteTable();
+        await connection.synchronize();
+        await makeCategory();
+        await makeSeller();
+        await makeService();
+        await makeServicePeriod();
+        await makeProduct();
         // await makeSubscribe();
         await makeUser();
         await makeUserAddress();
         await makeAlarm();
         await userLike();
         await makeReview();
+        await makeUserCard();
 
         return console.log("BackupSuccess!!!!!!!!")
     } 

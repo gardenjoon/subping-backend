@@ -14,18 +14,19 @@ export class Subscribe {
     id: string;
 
     @ManyToOne(type => User, user => user.subscribes, 
-        { cascade: true })
+        { onDelete: "CASCADE", onUpdate:  "CASCADE" })
     user: string;
 
     @ManyToOne(type => UserCard, userCard => userCard.subscribes,
-        { nullable: false, cascade: true })
+        { nullable: false, onDelete: "CASCADE", onUpdate:  "CASCADE" })
     userCard: string;
     
-    @Column({ type: "text" })
+    @Column({ nullable: true, type: "text"})
     // 우편번호#주소#상세주소 형식으로 plain text 저장
     address: string;
 
-    @OneToMany(type => SubscribeItem, subscribeItem => subscribeItem.subscribe)
+    @OneToMany(type => SubscribeItem, subscribeItem => subscribeItem.subscribe, 
+        { cascade: true })
     subscribeItems: SubscribeItem[];
 
     @Column({ type: "date", nullable: false })
@@ -46,6 +47,7 @@ export class Subscribe {
     @UpdateDateColumn({ nullable: false })
     updatedAt: Date;
 
-    @OneToMany(type => Payment, payment => payment.subscribe)
+    @OneToMany(type => Payment, payment => payment.subscribe, 
+        { cascade: true })
     payments: Payment[];
 }

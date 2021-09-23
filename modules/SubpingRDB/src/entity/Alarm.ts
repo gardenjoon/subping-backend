@@ -9,7 +9,7 @@ export class Alarm {
     id: string;
 
     @ManyToOne(type => User, user => user.alarms, 
-        { nullable: false, cascade: true })
+        { nullable: false, onDelete: "CASCADE", onUpdate:  "CASCADE" })
     user: string;
 
     @Column({ nullable: false })

@@ -5,11 +5,11 @@ import { User } from "./User";
 @Entity()
 export class UserLike {
     @ManyToOne(type => User, user => user.userLikes, 
-        { cascade: true, primary: true })
+        { onDelete: "CASCADE", onUpdate:  "CASCADE", primary: true })
     user: string;
 
     @ManyToOne(type => Service, service => service.userLikes, 
-        { cascade: true, primary: true })
+        { onDelete: "CASCADE", onUpdate:  "CASCADE", primary: true })
     service: string;
 
     @CreateDateColumn({ nullable: false })
