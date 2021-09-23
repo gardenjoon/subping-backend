@@ -4,7 +4,7 @@ import { Service } from "./Service";
 @Entity()
 export class ServiceTag {
     @ManyToOne(type => Service, service => service.serviceTags,
-        { cascade: true, primary: true })
+        { onDelete: "CASCADE", onUpdate:  "CASCADE", primary: true })
     service: string;
 
     @PrimaryColumn({ length: 100 })

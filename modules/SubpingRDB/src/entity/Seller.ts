@@ -18,6 +18,7 @@ export class Seller {
     @UpdateDateColumn({ nullable: false })
     updatedAt: Date;
 
-    @OneToMany(type => Service, service => service.seller)
+    @OneToMany(type => Service, service => service.seller, 
+        { cascade: true })
     services: Service[];
 }

@@ -7,7 +7,7 @@ export class Payment {
     id: string;
 
     @ManyToOne(type => Subscribe, subscribe => subscribe.payments, 
-        { cascade: true })
+        { onDelete: "CASCADE", onUpdate:  "CASCADE" })
     subscribe: string;
 
     @Column({ nullable: false })

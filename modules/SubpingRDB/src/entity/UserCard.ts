@@ -8,7 +8,7 @@ export class UserCard {
     id: string;
 
     @ManyToOne(type => User, user => user.userCards, 
-        { nullable: false, cascade: true })
+        { nullable: false, onDelete: "CASCADE", onUpdate:  "CASCADE" })
     user: string;
 
     @Column({ nullable: false })
@@ -35,6 +35,7 @@ export class UserCard {
     @UpdateDateColumn({ nullable: false })
     updatedAt: Date;
 
-    @OneToMany(type => Subscribe, subscribe => subscribe.userCard)
+    @OneToMany(type => Subscribe, subscribe => subscribe.userCard, 
+        { cascade: true })
     subscribes: Subscribe[]
 }

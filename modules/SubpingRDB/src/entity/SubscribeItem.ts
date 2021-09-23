@@ -8,11 +8,11 @@ export class SubscribeItem {
     id: string;
 
     @ManyToOne(type => Subscribe, subscribe => subscribe.subscribeItems, 
-        { cascade: true })
+        { onDelete: "CASCADE", onUpdate:  "CASCADE" })
     subscribe: string;
 
     @ManyToOne(type => Product, product => product.subscribeItems, 
-        { cascade: true })
+        { onDelete: "CASCADE", onUpdate:  "CASCADE" })
     product: string;
 
     @Column({ nullable: false })

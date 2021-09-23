@@ -5,11 +5,11 @@ import { Service } from "./Service";
 @Entity()
 export class ServiceCategory {
     @ManyToOne(type => Service, service => service.serviceCategories,
-        { cascade: true, primary: true })
+        { onDelete: "CASCADE", onUpdate:  "CASCADE", primary: true })
     service: string;
 
     @ManyToOne(type => Category, category => category.serviceCategories, 
-        { cascade: true, primary: true })
+        { onDelete: "CASCADE", onUpdate:  "CASCADE", primary: true })
     category: string;
 
     @CreateDateColumn({ nullable: false })

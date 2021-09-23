@@ -18,6 +18,7 @@ export class Category {
     @UpdateDateColumn({ nullable: false })
     updatedAt: Date;
 
-    @OneToMany(type => ServiceCategory, serviceCategory => serviceCategory.category)
+    @OneToMany(type => ServiceCategory, serviceCategory => serviceCategory.category, 
+        { cascade: true })
     serviceCategories: ServiceCategory[]
 }

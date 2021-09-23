@@ -8,7 +8,7 @@ export class Product {
     id: string;
 
     @ManyToOne(type => Service, service => service.products, 
-        { cascade: true })
+        { onDelete: "CASCADE", onUpdate:  "CASCADE" })
     service: string;
 
     @Column({ nullable: false })
@@ -32,6 +32,7 @@ export class Product {
     @UpdateDateColumn({ nullable: false })
     updatedAt: Date;
 
-    @OneToMany(type => SubscribeItem, subscribeItem => subscribeItem.product)
+    @OneToMany(type => SubscribeItem, subscribeItem => subscribeItem.product, 
+        { cascade: true })
     subscribeItems: SubscribeItem[];
 }

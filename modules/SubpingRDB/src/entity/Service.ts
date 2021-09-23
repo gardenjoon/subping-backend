@@ -17,7 +17,7 @@ export class Service {
     id: string;
 
     @ManyToOne(type => Seller, seller => seller.services, 
-        {nullable: false, cascade: true })
+        { nullable: false, onDelete: "CASCADE", onUpdate:  "CASCADE" })
     seller: string;
 
     @Column({ nullable: false })
@@ -44,27 +44,35 @@ export class Service {
     @UpdateDateColumn({ nullable: false })
     updatedAt: Date;
 
-    @OneToMany(type => ServiceCategory, serviceCategory => serviceCategory.service)
+    @OneToMany(type => ServiceCategory, serviceCategory => serviceCategory.service, 
+        { cascade: true })
     serviceCategories: ServiceCategory[];
 
-    @OneToMany(type => Product, product => product.service)
+    @OneToMany(type => Product, product => product.service, 
+        { cascade: true })
     products: Product[];
 
-    @OneToMany(type => ServiceEvent, serviceEvent => serviceEvent.service)
+    @OneToMany(type => ServiceEvent, serviceEvent => serviceEvent.service, 
+        { cascade: true })
     serviceEvents: ServiceEvent[];
 
-    @OneToMany(type => ServiceRank, serviceRank => serviceRank.service)
+    @OneToMany(type => ServiceRank, serviceRank => serviceRank.service, 
+        { cascade: true })
     serviceRanks: ServiceRank[];
 
-    @OneToMany(type => ServiceTag, serviceTag => serviceTag.service)
+    @OneToMany(type => ServiceTag, serviceTag => serviceTag.service, 
+        { cascade: true })
     serviceTags: ServiceTag[];
 
-    @OneToMany(type => UserLike, userLike => userLike.service)
+    @OneToMany(type => UserLike, userLike => userLike.service, 
+        { cascade: true })
     userLikes: UserLike[];
 
-    @OneToMany(type => Review, review => review.service)
+    @OneToMany(type => Review, review => review.service, 
+        { cascade: true })
     reviews: Review[];
 
-    @OneToMany(type => ServicePeriod, servicePeriod => servicePeriod.service)
+    @OneToMany(type => ServicePeriod, servicePeriod => servicePeriod.service, 
+        { cascade: true })
     periods: ServicePeriod[];
 }
