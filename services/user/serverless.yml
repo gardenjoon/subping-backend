@@ -107,6 +107,9 @@ functions:
           
   updateSubscribe:
     handler: ./handler/subscribe/updateSubscribe.handler
+  
+  cronSubscribe:
+    handler: ./handler/subscribe/cronSubscribe.handler
     
   duplicateNickName:
     handler: ./handler/nickname/duplicateNickName.handler

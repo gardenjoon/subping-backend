@@ -7,7 +7,7 @@ import { UserAddressRepository } from "subpingrdb/dist/src/repository/UserAddres
 import { UserCardRepository } from "subpingrdb/dist/src/repository/UserCard";
 import { SubscribeRepository } from "subpingrdb/dist/src/repository/Subscribe";
 import { ProductRepository } from "subpingrdb/dist/src/repository/Product";
-import Payment from "../../libs/payment";
+import Payment from "../../libs/subpingPayment";
 
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
@@ -119,10 +119,14 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
 
             // 결제를 진행합니다.
             const iamport = new Payment();
-            const paymentResponse = await iamport.pay("섭핑 구독결제", card, paymentId, totalPrice);
-            console.log(paymentResponse);
+            // const paymentResponse = await iamport.pay("섭핑 구독결제", card, paymentId, totalPrice);
+            // console.log(paymentResponse);
 
-            const { code, message } = paymentResponse;
+            // const { code, message } = paymentResponse;
+            const code = 0, paymentResponse = {
+                status: "paid"
+            };
+
             if (code === 0) { // 카드사 통신에 성공(실제 승인 성공 여부는 추가 판단이 필요함)
                 if (paymentResponse.status === "paid") { //카드 정상 승인
                     await queryRunner.manager.update(Entity.Payment,
@@ -134,40 +138,53 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
                         });
                         
                     const nextDate = Payment.calcNextPaymentDate(period, subscribeDate);
+                    console.log(nextDate);
 
                     const nextPayment = new Entity.Payment();
-                    payment.amount = 0;
-                    payment.paymentDate = new Date(nextDate);
-                    payment.paymentComplete = false;
-                    payment.rewardComplete = false;
-                    payment.subscribe = id;
+                    nextPayment.amount = 0;
+                    nextPayment.paymentDate = new Date(nextDate);
+                    nextPayment.paymentComplete = false;
+                    nextPayment.rewardComplete = false;
+                    nextPayment.subscribe = id;
 
                     await queryRunner.manager.save(nextPayment);
                 }
 
                 else { //카드 승인 실패 (예: 고객 카드 한도초과, 거래정지카드, 잔액부족 등)
-                    //paymentResult.status : failed 로 수신됨
+                    throw new Error("CardPaymentException")
                 }
             }
 
             else { // 카드사 요청에 실패 (paymentResult is null)
-
+                throw new Error("CardPaymentRequestException")
             }
 
             await queryRunner.commitTransaction();
         }
 
         catch (e) {
-            queryRunner.rollbackTransaction();
-            console.log(e);
-            return failure({
-                success: false,
-                message: "MakeSubscribeTransactionException"
-            });
+            await queryRunner.rollbackTransaction();
+            console.log(e)
+            if(e.message == "CardPaymentException") {
+                return failure({
+                    success: false,
+                    message: "CardPaymentException"
+                })
+            } else if (e.message == "CardPaymentRequersException") {
+                return failure({
+                    success: false,
+                    message: "CardPaymentRequestException"
+                })
+            } else {
+                return failure({
+                    success: false,
+                    message: "MakeSubscribeTransactionException"
+                });
+            }
         }
 
         finally {
-            queryRunner.release();
+            await queryRunner.release();
         }
 
 
