@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany } from "typeorm";
 import { User } from "./User";
+import { Subscribe } from "./Subscribe";
 
 @Entity()
 export class UserAddress {
@@ -33,4 +34,8 @@ export class UserAddress {
 
     @UpdateDateColumn({ nullable: false })
     updatedAt: Date;
+
+    @OneToMany(type => Subscribe, subscribe => subscribe.address, 
+        { nullable: true })
+    subscribes: Subscribe[];
 }

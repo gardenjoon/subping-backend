@@ -1,6 +1,5 @@
 import { Entity, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, PrimaryGeneratedColumn, OneToMany } from "typeorm";
 import { Payment } from "./Payment";
-import { Service } from "./Service";
 import { SubscribeItem } from "./SubscribeItem";
 import { User } from "./User";
 import { UserAddress } from "./UserAddress";
@@ -21,8 +20,8 @@ export class Subscribe {
         { nullable: false, onDelete: "CASCADE", onUpdate:  "CASCADE" })
     userCard: UserCard;
     
-    @Column({ nullable: true, type: "text"})
-    // 우편번호#주소#상세주소 형식으로 plain text 저장
+    @ManyToOne(type => UserAddress, userAddress => userAddress.subscribes, 
+        { nullable: false })
     address: string;
 
     @OneToMany(type => SubscribeItem, subscribeItem => subscribeItem.subscribe, 
