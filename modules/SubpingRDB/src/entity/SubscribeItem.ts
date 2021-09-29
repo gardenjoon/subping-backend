@@ -9,11 +9,11 @@ export class SubscribeItem {
 
     @ManyToOne(type => Subscribe, subscribe => subscribe.subscribeItems, 
         { onDelete: "CASCADE", onUpdate:  "CASCADE" })
-    subscribe: string;
+    subscribe: Subscribe;
 
     @ManyToOne(type => Product, product => product.subscribeItems, 
         { onDelete: "CASCADE", onUpdate:  "CASCADE" })
-    product: string;
+    product: Product;
 
     @Column({ nullable: false })
     amount: number;

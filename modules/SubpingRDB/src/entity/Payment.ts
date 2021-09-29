@@ -6,9 +6,12 @@ export class Payment {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
+    @Column({ nullable: true })
+    iamportUid: string;
+
     @ManyToOne(type => Subscribe, subscribe => subscribe.payments, 
         { onDelete: "CASCADE", onUpdate:  "CASCADE" })
-    subscribe: string;
+    subscribe: Subscribe;
 
     @Column({ nullable: false })
     amount: number;

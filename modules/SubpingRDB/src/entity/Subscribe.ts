@@ -15,11 +15,11 @@ export class Subscribe {
 
     @ManyToOne(type => User, user => user.subscribes, 
         { onDelete: "CASCADE", onUpdate:  "CASCADE" })
-    user: string;
+    user: User;
 
     @ManyToOne(type => UserCard, userCard => userCard.subscribes,
         { nullable: false, onDelete: "CASCADE", onUpdate:  "CASCADE" })
-    userCard: string;
+    userCard: UserCard;
     
     @Column({ nullable: true, type: "text"})
     // 우편번호#주소#상세주소 형식으로 plain text 저장

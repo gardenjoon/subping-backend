@@ -34,6 +34,7 @@ import { UserLikeRepository } from "./repository/UserLike";
 import { ReviewRepository } from "./repository/Review";
 import { UserAddressRepository } from "./repository/UserAddress";
 import { UserCardRepository } from "./repository/UserCard";
+import { PaymentRepository } from "./repository/Payment";
 
 process.env.TZ = "UTC";
 
@@ -75,7 +76,8 @@ export const Repository = {
     Product: ProductRepository,
     Subscribe: SubscribeRepository,
     Review: ReviewRepository,
-    UserAddress: UserAddressRepository
+    UserAddress: UserAddressRepository,
+    Payment: PaymentRepository
 }
 
 
