@@ -56,7 +56,7 @@ class SubpingPayment {
             const queryRunner = connection.createQueryRunner();
     
             const targetPayment = await paymentRepository.queryPayment(payment);
-    
+
             const subscribe = targetPayment.subscribe;
             const subscribeItems = subscribe.subscribeItems;
     
@@ -68,7 +68,7 @@ class SubpingPayment {
                 const paymentResult = await this.iamport.subscribe.again({
                     name: "섭핑 정기결제",
                     customer_uid: subscribe.userCard.billingKey,
-                    merchant_uid: targetPayment.id + "4",
+                    merchant_uid: targetPayment.id,
                     amount: totalPrice
                 });
     
@@ -78,7 +78,7 @@ class SubpingPayment {
                     await queryRunner.startTransaction();
     
                     try {
-                        await queryRunner.manager.update(Entity.Payment, { id: payment.id }, { paymentComplete: true, amount: totalPrice, iamportUid: imp_uid });
+                        await queryRunner.manager.update(Entity.Payment, { id: targetPayment.id }, { paymentComplete: true, amount: totalPrice, iamportUid: imp_uid });
                         const nextPaymentDate = SubpingPayment.calcNextPaymentDate(subscribe.period, today);
     
                         const nextPayment = new Entity.Payment;
@@ -86,7 +86,7 @@ class SubpingPayment {
                         nextPayment.paymentDate = new Date(nextPaymentDate);
                         nextPayment.paymentComplete = false;
                         nextPayment.rewardComplete = false;
-                        nextPayment.subscribe = payment.subscribe;
+                        nextPayment.subscribe = targetPayment.subscribe;
     
                         await queryRunner.manager.save(nextPayment);
                         await queryRunner.commitTransaction();
@@ -98,12 +98,13 @@ price: ${totalPrice}
 nextPaymentDate: ${nextPaymentDate}
 userCard: ${subscribe.userCard.id}
 subscribeId: ${subscribe.id}
-paymentId: ${payment.id}
+paymentId: ${targetPayment.id}
 imp_uid: ${imp_uid}
 status: ${status}`);
                     } catch (e) {
                         console.log(`[SubpingPayment] DB Error: ${e.message}`)
                         await queryRunner.rollbackTransaction()
+                        throw new Error("SubpingPaymentPayError");
                     } finally {
                         await queryRunner.release();
                     }
@@ -116,8 +117,10 @@ status: ${status}`);
 price: ${totalPrice}
 userCard: ${subscribe.userCard.id}
 subscribeId: ${subscribe.id}
-paymentId: ${payment.id}
+paymentId: ${targetPayment.id}
 error: ${e.message}`);
+
+                throw new Error("SubpingPaymentPayError");
             }
         }
         catch(e) {
@@ -126,6 +129,8 @@ error: ${e.message}`);
 `[SubpingPayment] 결제 실패
 paymentId: ${payment.id}
 error: ${e.message}`);
+            throw new Error("SubpingPaymentPayError");
+
         }
         
     }

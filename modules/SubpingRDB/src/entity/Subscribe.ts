@@ -22,7 +22,7 @@ export class Subscribe {
     
     @ManyToOne(type => UserAddress, userAddress => userAddress.subscribes, 
         { nullable: false })
-    address: string;
+    address: UserAddress;
 
     @OneToMany(type => SubscribeItem, subscribeItem => subscribeItem.subscribe, 
         { cascade: true })

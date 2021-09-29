@@ -8,19 +8,21 @@ import SubpingPayment from "../../libs/subpingPayment";
 
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
-        // const today = moment.tz("Asia/Seoul").format("YYYY-MM-DD");
-        const today = "2021-11-25";
+        const today = moment.tz("Asia/Seoul").format("YYYY-MM-DD");
 
         const subpingSubscribe = new SubpingPayment();
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
         const paymentRepository = connection.getCustomRepository(Repository.Payment);
-        const subscribeRepository = connection.getCustomRepository(Repository.Subscribe);
 
         const paymentListOfDate = await paymentRepository.findPaymentListOfDate(today);
 
         for (const payment of paymentListOfDate) {
-            await subpingSubscribe.pay(payment);
+            try {
+                await subpingSubscribe.pay(payment);
+            } catch(e) {
+                console.log(e);
+            }
         }
 
         return success({
