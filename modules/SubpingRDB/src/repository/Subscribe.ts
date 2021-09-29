@@ -7,10 +7,6 @@ export class SubscribeRepository extends Repository<Subscribe> {
         return this.find();
     }
 
-    findOneSubscribe(userId: string): Promise<Subscribe> {
-        return this.findOne({ user : userId });
-    }
-
     async updateSubscribe(subscribeId: string, date: Date): Promise<void> {
         await this.update(subscribeId, { expiredDate : date });
     }
@@ -19,9 +15,6 @@ export class SubscribeRepository extends Repository<Subscribe> {
         await this.save(Subscribe);
     }
 
-    async deleteSubscribe(userId: string): Promise<void> {
-        await this.delete({ user : userId });
-    }
 
     async getSubscribes(userId: string) {
         return await this.createQueryBuilder("subscribe")
