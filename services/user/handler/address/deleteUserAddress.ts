@@ -14,16 +14,17 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const connection = await subpingRDB.getConnection("dev");
 
         const userAddressRepository = connection.getCustomRepository(Repository.UserAddress);
-        const targetAddress = await userAddressRepository.getAddress(addressId);
+        const targetAddress = await userAddressRepository.queryUserAddress(addressId);
 
-        if(targetAddress.userId != userId) {
+        //  요청된 유저와 지울 주소의 유저가 다르면 에러 반환
+        if (targetAddress.userId != userId) {
             return failure({
                 success: false,
-                message: "DeleteAddresUserException"
+                message: "DeleteUserAddressException"
             });
         }
 
-        userAddressRepository.deleteUserAddress(addressId);
+        await userAddressRepository.deleteUserAddress(addressId);
 
         return success({
             success: true,

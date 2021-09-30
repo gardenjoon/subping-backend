@@ -1,6 +1,6 @@
-import { APIGatewayProxyHandler } from 'aws-lambda';
 import SubpingRDB, { Repository, Entity } from "subpingrdb";
 
+import { APIGatewayProxyHandler } from 'aws-lambda';
 import { success, failure } from "../../libs/response-lib";
 
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
@@ -21,7 +21,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const connection = await subpingRDB.getConnection("dev");
         const addressRepository = connection.getCustomRepository(Repository.UserAddress);
 
-        const existAddresses = await addressRepository.getUserAddresses(userId);
+        const existAddresses = await addressRepository.queryAllUserAddresses(userId);
         let existDefaultAddress;
 
         for (const address of existAddresses) {
@@ -53,10 +53,10 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
             await queryRunner.startTransaction();
 
             if (isDefault && existDefaultAddress) {
-                await addressRepository.updateAddressDefault(existDefaultAddress.id, false);
+                await addressRepository.updateUserDefaultAddress(existDefaultAddress.id, false);
             }
 
-            await addressRepository.insertAddress(newAddress);
+            await addressRepository.createUserAddress(newAddress);
         }
 
         catch (e) {
@@ -70,7 +70,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
 
         return success({
             success: true,
-            message: "done"
+            message: "MakeAddressSuccess"
         })
     }
 

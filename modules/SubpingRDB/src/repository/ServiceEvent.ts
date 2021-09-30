@@ -3,28 +3,33 @@ import { ServiceEvent } from "../entity/ServiceEvent";
 
 @EntityRepository(ServiceEvent)
 export class ServiceEventRepository extends Repository<ServiceEvent> {
-    findAllServiceEvent(): Promise<ServiceEvent[]> {
+    // 서비스이벤트 생성
+    async createServiceEvent(serviceEventModel: ServiceEvent): Promise<void> {
+        await this.save(serviceEventModel);
+    }
+
+    // 서비스Id로 서비스이벤트 제거
+    async deleteServiceEvent(serviceId: string): Promise<void> {
+        await this.delete({ service : serviceId });
+    }
+
+    // 모든 서비스이벤트 반환
+    queryAllServiceEvent(): Promise<ServiceEvent[]> {
         return this.find();
     }
 
-    findOneServiceEvent(name: string): Promise<ServiceEvent> {
-        return this.findOne(name);
+    // 서비스 이름으로 서비스이벤트 반환
+    queryServiceEvent(serviceName: string): Promise<ServiceEvent> {
+        return this.findOne(serviceName);
     }
 
-    async saveServiceEvent(ServiceEvent: ServiceEvent): Promise<void> {
-        await this.save(ServiceEvent);
-    }
-
-    async deleteServiceEvent(service: string): Promise<void> {
-        await this.delete({ service : service });
-    }
-
-    async getServiceEvents(standardDate: string, standardHour: string) {
+    // 기준날짜와 기준시간으로 해당하는 모든 서비스이벤트 반환
+    async queryServiceEvents(standardDate: string, standardHour: string) {
         return await this.createQueryBuilder("serviceEvent")
             .select("serviceEvent.*")
-            .where(`serviceEvent.date = "${standardDate}"`)
-            .andWhere(`serviceEvent.time = "${standardHour}"`)
+            .where(`date = "${standardDate}"`)
+            .andWhere(`time = "${standardHour}"`)
             .orderBy("subscribe + view + review")
             .getRawMany();
-    }
+    } 
 }

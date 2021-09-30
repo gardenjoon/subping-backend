@@ -2,7 +2,6 @@ import SubpingRDB, { Entity, Repository } from "subpingrdb";
 
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import { success, failure } from "../../libs/response-lib";
-import * as moment from "moment-timezone";
 import { UserAddressRepository } from "subpingrdb/dist/src/repository/UserAddress";
 import { UserCardRepository } from "subpingrdb/dist/src/repository/UserCard";
 import { SubscribeRepository } from "subpingrdb/dist/src/repository/Subscribe";
@@ -26,7 +25,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const productRepository = connection.getCustomRepository(ProductRepository);
 
         // 해당 유저가 이미 해당 서비스를 구독하고 있는지 검증합니다.
-        const userExistSubscribe = await subscribeRepository.getSubscribesByServiceId(userId, serviceId);
+        const userExistSubscribe = await subscribeRepository.querySubscribesByServiceId(userId, serviceId);
 
         if (userExistSubscribe.length > 0) {
             return failure({
@@ -36,7 +35,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         }
 
         // 구독할 상품이 모두 같은 서비스의 상품이 맞는지 검증합니다.
-        const productsInTargetService = await productRepository.getProducts(serviceId);
+        const productsInTargetService = await productRepository.queryProducts(serviceId);
         let matchCount = 0;
 
         for (const productInTargetService of productsInTargetService) {
@@ -56,7 +55,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
 
         // 주소가 해당 유저의 주소가 맞는지 검증합니다.
         if (address) {
-            const targetAddress = await userAddressRepository.getAddress(address);
+            const targetAddress = await userAddressRepository.queryUserAddress(address);
 
             if (targetAddress.userId != userId) {
                 return failure({
@@ -67,7 +66,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         }
 
         // 카드가 해당 유저의 카드가 맞는지 검증합니다.
-        const targetCard = await userCardRepository.getCard(card);
+        const targetCard = await userCardRepository.queryUserCard(card);
 
         if (targetCard.userId != userId) {
             return failure({

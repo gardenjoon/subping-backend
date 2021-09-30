@@ -12,7 +12,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         let unReadCount = 0;
 
         const alarmRepository = connection.getCustomRepository(Repository.Alarm);
-        const userAlarms = await alarmRepository.findUserAlarms(userId);
+        const userAlarms = await alarmRepository.queryAlarms(userId);
 
         userAlarms.map(item => {
             if(!item.read) {

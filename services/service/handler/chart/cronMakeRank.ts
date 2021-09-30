@@ -8,26 +8,13 @@ import { APIGatewayProxyHandler } from 'aws-lambda';
 import { success, failure } from "../../libs/response-lib";
 
 export const handler:APIGatewayProxyHandler  = async (_event, _context) => {
-    const makeHour = (hour: Number) => {
+    const makeHour = (hour: number) => {
         let standardHour = null;
-        
-        if (3 <= hour && hour < 9) {
-            standardHour = "03:00";
-        }
-        
-        else if (9 <= hour && hour < 15) {
-            standardHour = "09:00";
-        }
-        
-        else if (15 <= hour && hour <= 21) {
-            standardHour = "15:00";
-        }
-
-        else {
-            standardHour = "21:00";
-        }
-
-        return standardHour;
+        return standardHour = 
+                (3 <= hour && hour < 9) ? "03:00"
+            :   (9 <= hour && hour < 15) ? "09:00"
+            :   (15 <= hour && hour < 21) ? "15:00"
+            :   "21:00"
     }
 
     const setTime = () => {
@@ -38,60 +25,35 @@ export const handler:APIGatewayProxyHandler  = async (_event, _context) => {
             standardDate : null
         }
 
-        const currentTime = moment().utc();
-        time.currentHour = makeHour(currentTime.hours())
-        time.currentDate = currentTime.format("YYYY-MM-DD")
+        const currentTime = moment();
+        time.currentHour = makeHour(currentTime.hours());
+        time.currentDate = currentTime.format("YYYY-MM-DD");
 
         let standardTime = currentTime.subtract(6, "hours");
         time.standardHour = makeHour(standardTime.hours());
+        time.standardDate = standardTime.format("YYYY-MM-DD") ;
 
-        if(time.standardHour == "21:00") {
-            standardTime = currentTime.subtract(1, "days");
-        }
-
-        time.standardDate = standardTime.format("YYYY-MM-DD");
-        return time
+        return time;
     }
 
     try {
+        const subpingDDB = new SubpingDDB(process.env.subpingTable);
+        const controller = subpingDDB.getController();
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
 
-        const time = setTime()
+        const time = setTime();
 
-        const eventRepository = connection.getCustomRepository(Repository.ServiceEvent);
+        const serviceEventRepository = connection.getCustomRepository(Repository.ServiceEvent);
+        const servicesWithEvent = await serviceEventRepository.queryServiceEvents(time.standardDate, time.standardHour);
+        const serviceEventModel = new Entity.ServiceEvent();
+        const serviceRankModel = new Entity.ServiceRank();
 
-        // service와 serviceEvent를 조인하고 정보를 읽어 rating을 생성
-        const rankRepository = connection.getRepository(Entity.ServiceRank);
+        serviceEventModel.date = time.currentDate;
+        serviceEventModel.time = time.currentHour;
 
-        const eventModelForRank = await eventRepository.getServiceEvents(time.standardDate, time.standardHour);
-        for (const [index, element] of eventModelForRank.entries()) {
-            const serviceRankModel = new Entity.ServiceRank();
-            serviceRankModel.service = element.serviceId;
-            serviceRankModel.date = time.currentDate;
-            serviceRankModel.time = time.currentHour;
-            serviceRankModel.rank = index+1;
-            await rankRepository.save(serviceRankModel);
-        }
-
-        // 매 standardHour마다 serviceEvent 생성
-        const serviceRepository = connection.getCustomRepository(Repository.Service);
-        const allServices = await serviceRepository.findAllService();
-
-        for (const element of allServices){
-            const serviceEventModel = new Entity.ServiceEvent;
-            serviceEventModel.service = element.id;
-            serviceEventModel.date = time.currentDate;
-            serviceEventModel.time = time.currentHour;
-            serviceEventModel.subscribe = 0;
-            serviceEventModel.review = 0;
-            serviceEventModel.view = 0;
-            await eventRepository.saveServiceEvent(serviceEventModel);
-        };
-
-        //핫차트 기준시간 모델 생성
-        const subpingDDB = new SubpingDDB(process.env.subpingTable);
-        const controller = subpingDDB.getController();
+        serviceRankModel.date = time.currentDate;
+        serviceRankModel.time = time.currentHour;
 
         const HotChartTimeModel: HotChartTimeModel = {
             PK: "hotChartTime",
@@ -102,11 +64,39 @@ export const handler:APIGatewayProxyHandler  = async (_event, _context) => {
             date: time.currentDate,
             time: time.currentHour
         };
-        await controller.create<HotChartTimeModel>(HotChartTimeModel);
+
+        const queryRunner = connection.createQueryRunner();
+
+        try {
+            await queryRunner.startTransaction();
+
+            for (const [index, element] of servicesWithEvent.entries()) {
+                serviceRankModel.service = element.serviceId;
+                serviceRankModel.rank = index+1;
+                await queryRunner.manager.save(serviceRankModel);
+            }
+
+            for (const element of servicesWithEvent){
+                serviceEventModel.service = element.serviceId;
+                await queryRunner.manager.save(serviceEventModel);
+            };
+
+            await controller.create<HotChartTimeModel>(HotChartTimeModel);
+
+            
+            await queryRunner.commitTransaction();
+        }
+        catch(e) {
+            console.log(e);
+            await queryRunner.rollbackTransaction();
+        }
+        finally {
+            await queryRunner.release();
+        }
 
         return success({
             success: true,
-            message: 'All MakeRank is successfully updated'
+            message: "cronMakeRankSuccess"
         });
     }
 

@@ -5,25 +5,12 @@ import { APIGatewayProxyHandler } from 'aws-lambda';
 import { success, failure } from "../../libs/response-lib";
 
 const makeHour = (hour: Number) => {
-    let standardHour = null;
-    
-    if (3 <= hour && hour < 9) {
-        standardHour = "03:00";
-    }
-    
-    else if (9 <= hour && hour < 15) {
-        standardHour = "09:00";
-    }
-    
-    else if (15 <= hour && hour <= 21) {
-        standardHour = "15:00";
-    }
-
-    else {
-        standardHour = "21:00";
-    }
-
-    return standardHour;
+    let standardHour:string;
+    return standardHour = 
+            (3 <= hour && hour < 9) ? "03:00"
+        :   (9 <= hour && hour < 15) ? "09:00"
+        :   (15 <= hour && hour < 21) ? "15:00"
+        :   "21:00"
 }
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
@@ -45,7 +32,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         serviceModel.serviceLogoUrl = serviceLogoUrl;
         serviceModel.summary = summary;
 
-        const currentTime = moment().utc();
+        const currentTime = moment();
         const currentHour = makeHour(currentTime.hours());
 
         serviceEventModel.date = currentTime.format("YYYY-MM-DD");
@@ -57,11 +44,11 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
             await queryRunner.startTransaction();
 
             await queryRunner.manager.save(serviceModel);
-            
+
             serviceEventModel.service = serviceModel.id;
 
             await queryRunner.manager.save(serviceEventModel);
-            
+
             for(const category of categories) {
                 serviceCategoryModel.service = serviceModel.id;
                 serviceCategoryModel.category = category;

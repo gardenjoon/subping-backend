@@ -5,22 +5,18 @@ import { success, failure } from "../../libs/response-lib";
 
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
-        let response = [];
-
         const userId = event.headers.id;
 
         const subpingRDB = new SubpingRDB();
-        const coneection = await subpingRDB.getConnection("dev");
+        const connection = await subpingRDB.getConnection("dev");
 
-        const userLikeRepository = coneection.getCustomRepository(Repository.UserLike)
+        const userLikeRepository = connection.getCustomRepository(Repository.UserLike)
 
-        const existUserLike = await userLikeRepository.getUserLikes(userId);
-        
-        response = existUserLike;
+        const existUserLike = await userLikeRepository.queryUserLikes(userId);
 
         return success({
             success: true,
-            message: response
+            message: existUserLike
         });
     }
 

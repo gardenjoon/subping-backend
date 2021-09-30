@@ -3,27 +3,36 @@ import { Service } from "../entity/Service";
 
 @EntityRepository(Service)
 export class ServiceRepository extends Repository<Service> {
-    findAllService(): Promise<Service[]> {
+    // 서비스 생성
+    async createService(serviceModel: Service): Promise<void> {
+        await this.save(serviceModel);
+    }
+
+    // 이름으로 해당 서비스 삭제
+    async deleteService(serviceName: string): Promise<void> {
+        await this.delete({ name: serviceName });
+    }
+
+    // 모든 서비스 반환
+    queryAllServices(): Promise<Service[]> {
         return this.find();
     }
-    findOneService(name: string): Promise<Service> {
-        return this.findOne(name);
-    }
-    async saveService(Service: Service): Promise<void> {
-        await this.save(Service);
+
+    // 해당 이름의 서비스 반환
+    queryService(serviceName: string): Promise<Service> {
+        return this.findOne(serviceName);
     }
 
-    async deleteService(name: string): Promise<void> {
-        await this.delete({ name: name });
-    }
-
-    async findByName(name: string) {
-        return await this.createQueryBuilder("name")
-            .where("Service.name = :name", { name })
-            .getMany();
-    }
-
-    async getServices(options?: {
+    /*
+        옵션에 해당하는 모든 서비스 반환
+        필요 인자
+            rank : 기준날짜, 기준시간
+            like : 유저 Id
+            pagination : 갯수, 페이지번호, 기준시간
+            filter : 카테고리 이름 or 서비스 Id
+        카테고리, 태그, 주기는 리스트 형식으로 반환
+    */
+    async queryServices(options?: {
         category?: boolean,
         tag?: boolean,
         period?: boolean,
@@ -43,7 +52,6 @@ export class ServiceRepository extends Repository<Service> {
             categoryName?: string,
             serviceId?: string,
         }
-
     }) {
         const { category, tag, period, rank, like, pagination, filter } = options;
 
@@ -147,7 +155,8 @@ export class ServiceRepository extends Repository<Service> {
         return result;
     }
 
-    async searchService(requestWord: string){
+    // 검색어와 이름, 설명이 일치하는 모든 서비스 반환
+    async searchServices(requestWord: string){
         const services = await this.createQueryBuilder("service")
             .select("service.*")
             .addSelect("GROUP_CONCAT(DISTINCT serviceTag.tag)", "tag")

@@ -3,24 +3,28 @@ import { UserLike } from "../entity/UserLike";
 
 @EntityRepository(UserLike)
 export class UserLikeRepository extends Repository<UserLike> {
-    async makeUserLike(userLike: UserLike) {
-        await this.save(userLike);
+    // 좋아요 생성
+    async createUserLike(userLikeModel: UserLike) {
+        await this.save(userLikeModel);
     }
 
-    async removeUserLike(userId: string, serviceId: string) {
+    // 해당 유저의 해당 서비스에 대한 좋아요 제거
+    async deleteUserLike(userId: string, serviceId: string) {
         await this.delete({
             user: userId,
             service: serviceId
         });
     }
 
-    async getUserLike(userId: string, serviceId: string) {
+    // 해당 유저와 해당 서비스의 좋아요 반환
+    async queryUserLike(userId: string, serviceId: string) {
         return await this.createQueryBuilder("userLike")
             .where(`userLike.user = "${userId}" AND userLike.service = "${serviceId}"`)
             .getOne();
     }
 
-    async getUserLikes(userId: string) {
+    // 해당 유저가 좋아요한 모든 서비스 반환
+    async queryUserLikes(userId: string) {
         const result = await this.createQueryBuilder("userLike")
             .select("service.*")
             .addSelect("IF(userLike.createdAt IS NULL, False, True)", "like")

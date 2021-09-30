@@ -21,12 +21,11 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         userCard.cardVendor = cardVendor;
         userCard.method = method;
         userCard.pg = pg;
-
         await userCardRepository.save(userCard);
 
         return success({
             success: true,
-            message: userCard.id
+            message: "makeUserCardSuccess"
         });
     }
 
@@ -34,7 +33,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         console.log(e)
         return failure({
             success: false,
-            message: "CreateUserCardException"
+            message: "MakeUserCardException"
         });
     }
 }

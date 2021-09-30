@@ -1,7 +1,7 @@
 import { Entity, Column, CreateDateColumn, UpdateDateColumn, PrimaryColumn, ManyToOne } from "typeorm";
 import { Service } from "./Service";
 
-type RankTime = "06:00" | "12:00" | "18:00" | "24:00";
+type RankTime = "03:00" | "09:00" | "15:00" | "21:00";
 
 @Entity()
 export class ServiceEvent {

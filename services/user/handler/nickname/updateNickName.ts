@@ -5,10 +5,9 @@ import { success, failure } from "../../libs/response-lib";
 
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
-        const body = JSON.parse(event.body || "");
-        const nickName =  body.nickName;
-
         const userId = event.headers.id;
+        const body = JSON.parse(event.body || "");
+        const { nickName } = body;
 
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
@@ -17,7 +16,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const regExp = /^[ㄱ-ㅎ|가-힣|a-z|A-Z|0-9]+$/;
 
         if(regExp.test(nickName)) {
-            await UserRepository.updateNickName(userId, nickName)
+            await UserRepository.updateUserNickName(userId, nickName)
 
             return success({
                 success: true,
@@ -31,9 +30,8 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
                 message: "NickNameInvalidException"
             })
         }
-
     }
-    
+
     catch (e) {
         console.log(e);
         return failure({

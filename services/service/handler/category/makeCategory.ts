@@ -11,15 +11,13 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
 
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
-        const repository = connection.getCustomRepository(Repository.Category);
+        const categoryRepository = connection.getCustomRepository(Repository.Category);
 
         const categoryModel = new Entity.Category();
-
         categoryModel.name = name;
         categoryModel.summary = summary;
         categoryModel.categoryLogoUrl = categoryLogoUrl;
-
-        await repository.save(categoryModel);
+        await categoryRepository.createCategory(categoryModel);
 
         return success({
             success: true,

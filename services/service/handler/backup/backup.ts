@@ -36,7 +36,7 @@ export const handler = async (event, _context) => {
     const deleteTable = async () => {
         await connection.query(`delete from service;`)
         await connection.query(`delete from user;`)
-        console.log("deleteTableComplete")
+        console.log("deleted service, user Table")
     }
     const makeCategory = async() => {
         const repository = connection.getCustomRepository(Repository.Category);
@@ -45,7 +45,7 @@ export const handler = async (event, _context) => {
             categoryModel.name = element;
             categoryModel.summary = category[element];
             categoryModel.categoryLogoUrl = null;
-            await repository.saveCategory(categoryModel);
+            await repository.createCategory(categoryModel);
         }
         console.log("makeCategoryComplete");
     }
@@ -57,7 +57,7 @@ export const handler = async (event, _context) => {
             sellerModel.id = seller[element][0]
             sellerModel.name = element;
             sellerModel.email = seller[element][1];
-            await repository.saveSeller(sellerModel);
+            await repository.createSeller(sellerModel);
         }
         console.log("makeSellerComplete")
     }
@@ -161,7 +161,7 @@ export const handler = async (event, _context) => {
             productModel.productLogoUrl = logourl;
             productModel.available = product[element][3];
             productModel.service = product[element][4];
-            await repository.saveProduct(productModel);
+            await repository.createProduct(productModel);
         };
 
         console.log("makeProductComplete");
@@ -181,7 +181,7 @@ export const handler = async (event, _context) => {
             userModel.ci = user[element][5];
             userModel.carrier = user[element][6];
             userModel.phoneNumber = user[element][7];
-            await repository.saveUser(userModel);
+            await repository.createUser(userModel);
         }
         console.log("makeUserComplete");
     }
@@ -242,7 +242,7 @@ export const handler = async (event, _context) => {
             alarmModel.content = alarm[element][2];
             alarmModel.read = false;
             alarmModel.user = alarm[element][3];
-            await repository.saveAlarm(alarmModel);
+            await repository.createAlarm(alarmModel);
         }
         console.log("makeAlarmComplete");
     }
@@ -253,7 +253,7 @@ export const handler = async (event, _context) => {
             const userLikeEntity = new Entity.UserLike();
             userLikeEntity.service = element;
             userLikeEntity.user = like[element];
-            await userLikeRepository.makeUserLike(userLikeEntity);
+            await userLikeRepository.createUserLike(userLikeEntity);
         };
 
         console.log("makeUserLikeComplete");
@@ -268,7 +268,7 @@ export const handler = async (event, _context) => {
             reviewModel.rating = review[element][2];
             reviewModel.user = review[element][3];
             reviewModel.service = review[element][4];
-            await reviewRepository.saveReview(reviewModel);
+            await reviewRepository.createReview(reviewModel);
         };
         
         const reviewImageRepository = connection.getRepository(Entity.ReviewImage);
@@ -297,20 +297,20 @@ export const handler = async (event, _context) => {
         console.log("makeUserCardComplete")
     }
     try {
-        await deleteTable();
-        await connection.synchronize();
-        await makeCategory();
-        await makeSeller();
-        await makeService();
-        await makeServicePeriod();
-        await makeProduct();
-        // await makeSubscribe();
-        await makeUser();
-        await makeUserAddress();
-        await makeAlarm();
-        await userLike();
-        await makeReview();
-        await makeUserCard();
+        // await deleteTable();
+        // await connection.synchronize();
+        // await makeCategory();
+        // await makeSeller();
+        // await makeService();
+        // await makeServicePeriod();
+        // await makeProduct();
+        // // await makeSubscribe();
+        // await makeUser();
+        // await makeUserAddress();
+        // await makeAlarm();
+        // await userLike();
+        // await makeReview();
+        // await makeUserCard();
 
         return console.log("BackupSuccess!!!!!!!!")
     } 

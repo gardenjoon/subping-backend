@@ -24,10 +24,9 @@ import { UserRepository } from "./repository/User";
 import { CategoryRepository } from "./repository/Category";
 import { ServiceRepository } from "./repository/Service";
 import { SellerRepository } from "./repository/Seller";
-import { ServiceCategoryRepository } from "./repository/ServiceCategory";
 import { AlarmRepository } from "./repository/Alarm";
 import { ServiceEventRepository } from "./repository/ServiceEvent";
-import { ServiceTagRespository } from "./repository/ServiceTags";
+import { ServiceTagRepository } from "./repository/ServiceTags";
 import { ProductRepository } from "./repository/Product";
 import { SubscribeRepository } from "./repository/Subscribe";
 import { UserLikeRepository } from "./repository/UserLike";
@@ -69,9 +68,8 @@ export const Repository = {
     Category: CategoryRepository,
     Service: ServiceRepository,
     Seller: SellerRepository,
-    ServiceCategory: ServiceCategoryRepository,
     ServiceEvent: ServiceEventRepository,
-    ServiceTag: ServiceTagRespository,
+    ServiceTag: ServiceTagRepository,
     Alarm: AlarmRepository,
     Product: ProductRepository,
     Subscribe: SubscribeRepository,

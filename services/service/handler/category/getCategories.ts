@@ -9,7 +9,7 @@ export const handler: APIGatewayProxyHandler = async (_event, _context) => {
         const connection = await subpingRDB.getConnection("dev");
         const categoryRepository = connection.getCustomRepository(Repository.Category);
 
-        const response = await categoryRepository.findAllCategory();
+        const response = await categoryRepository.queryAllCategories();
 
         return success({
             success: true,
@@ -21,7 +21,7 @@ export const handler: APIGatewayProxyHandler = async (_event, _context) => {
         console.log(e);
         return failure({
             success: false,
-            message: "GetServicesException"
+            message: "GetCategoriesException"
         });
     }
 }

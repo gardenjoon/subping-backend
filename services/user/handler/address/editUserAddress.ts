@@ -14,18 +14,18 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const connection = await subpingRDB.getConnection("dev");
 
         const userAddressRepository = connection.getCustomRepository(Repository.UserAddress);
-        const defaultAddress = await userAddressRepository.getUserDefaultAddress(userId);
-        const targetAddress = await userAddressRepository.getAddress(addressId);
+        const defaultAddress = await userAddressRepository.queryUserDefaultAddress(userId);
+        const targetAddress = await userAddressRepository.queryUserAddress(addressId);
 
         if(targetAddress.userId != userId) {
             return failure({
                 success: false,
-                message: "EditAddresUserException"
+                message: "EditUserAddressException"
             });
         }
 
         if (defaultAddress && defaultAddress.id != addressId && isDefault){
-            await userAddressRepository.updateAddressDefault(defaultAddress.id, false);
+            await userAddressRepository.updateUserDefaultAddress(defaultAddress.id, false);
         };
 
         await userAddressRepository.updateUserAddress(addressId, {
