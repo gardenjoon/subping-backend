@@ -18,11 +18,11 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const subscribeRepository = connection.getCustomRepository(Repository.Subscribe);
 
         if (productId) {
-            response = await subscribeRepository.getOneSubscribe(userId, productId);
+            response = await subscribeRepository.querySubscribeByProductId(userId, productId);
         }
 
         else {
-            response = await subscribeRepository.getSubscribes(userId);
+            response = await subscribeRepository.querySubscribes(userId);
         }
         
         return success({

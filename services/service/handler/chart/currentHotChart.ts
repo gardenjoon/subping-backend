@@ -8,7 +8,6 @@ import { success, failure } from "../../libs/response-lib";
 
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
-        // const userId = event.headers.id;
         const body = JSON.parse(event.body || "");
         
         const { limit, page } = body;
@@ -16,13 +15,13 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
 
-        const currentTime = moment().utc();
+        const currentTime = moment();
 
         const subpingDDB = new SubpingDDB(process.env.subpingTable);
         const controller = subpingDDB.getController();
         const hotChartTime = (await controller.read("PK-SK-Index", "hotChartTime")).Items[0]
         const serviceRepository = connection.getCustomRepository(Repository.Service)
-        const serviceRank = await serviceRepository.getServices({
+        const serviceRank = await serviceRepository.queryServices({
             tag: true,
             rank: {
                 standardDate: hotChartTime.date,

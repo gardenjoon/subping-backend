@@ -11,14 +11,16 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const connection = await subpingRDB.getConnection("dev");
         const UserRepository = connection.getCustomRepository(Repository.User);
 
-        const user = await UserRepository.findOneUser(userId);
+        const user = await UserRepository.queryUser(userId);
 
-        if(user) {
+        if (user) {
             return success({
                 success: true,
                 message: user
             });
-        } else {
+        }
+
+        else {
             return failure({
                 success: false,
                 message: "NoUserExistException"

@@ -3,35 +3,35 @@ import { User } from "../entity/User";
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
-    findAllUser(): Promise<User[]> {
-        return this.find();
+    // 유저 생성
+    async createUser(userModel: User): Promise<void> {
+        await this.save(userModel);
     }
 
-    findOneUser(userId: string): Promise<User> {
-        return this.findOne(userId);
-    }
-
-    async updateNickName(userId: string, nickName: string): Promise<void> {
+    // 해당 유저의 닉네임 업데이트
+    async updateUserNickName(userId: string, nickName: string): Promise<void> {
         await this.update(userId, { nickName: nickName})
     }
 
-    async saveUser(User: User): Promise<void> {
-        await this.save(User);
-    }
-
+    // 해당 유저 제거
     async deleteUser(userId: string): Promise<void> {
         await this.delete({ id: userId });
     }
 
-    async findByName(userName: string) {
-        return this.createQueryBuilder("user")
-            .where(`user.userName = ${userName}`)
-            .getMany()
+    // 모든 유저 반환
+    queryAllUsers(): Promise<User[]> {
+        return this.find();
     }
 
-    async findByNickName(nickName: string): Promise<Object> {
+    // 해당 유저 반환
+    queryUser(userId: string): Promise<User> {
+        return this.findOne(userId);
+    }
+
+    // 해당 닉네임의 유저 반환
+    async queryUserByNickName(nickName: string): Promise<Object> {
         return await this.createQueryBuilder("user")
-            .where(`user.nickName = "${nickName}"`)
-            .getRawOne();
+            .where(`nickName = "${nickName}"`)
+            .getOne();
     }
 }

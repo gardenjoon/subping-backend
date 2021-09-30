@@ -15,7 +15,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const serviceRepository = connection.getCustomRepository(Repository.Service);
 
         if(requestedService) {
-            response = await serviceRepository.getServices({
+            response = await serviceRepository.queryServices({
                 category: true,
                 like: {
                     userId: userId

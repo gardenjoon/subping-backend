@@ -14,15 +14,15 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const connection = await subpingRDB.getConnection("dev");
 
         const userLikeRepository = connection.getCustomRepository(Repository.UserLike);
-        const existUserLike = await userLikeRepository.getUserLike(userId, serviceId);
+        const existUserLike = await userLikeRepository.queryUserLike(userId, serviceId);
         
-        const userLikeEntity = new Entity.UserLike();
-        userLikeEntity.user = userId;
-        userLikeEntity.service = serviceId;
+        const userLikeModel = new Entity.UserLike();
+        userLikeModel.user = userId;
+        userLikeModel.service = serviceId;
 
-        // 만약 토글이 true이고 이미 유저 라이크가 없으면, 생성
+        // 만약 토글이 true이고 존재하는 좋아요가 없으면, 생성
         if(toggle && !existUserLike) {
-            await userLikeRepository.makeUserLike(userLikeEntity);
+            await userLikeRepository.createUserLike(userLikeModel);
 
             return success({
                 success: true,
@@ -30,10 +30,10 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
             });
         }
 
-        // 만약 토글이 false이고 이미 유저 라이크가 있으면, 제거
+        // 만약 토글이 false이고 존재하는 좋아요가 있으면, 제거
         else if(!toggle && existUserLike) {
-            await userLikeRepository.removeUserLike(userId, serviceId);
-    
+            await userLikeRepository.deleteUserLike(userId, serviceId);
+
             return success({
                 success: true,
                 message: false

@@ -11,7 +11,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const connection = await subpingRDB.getConnection("dev");
         const userCardRepository = connection.getCustomRepository(Repository.UserCard);
 
-        const userCards = await userCardRepository.getUserCards(userId, false);
+        const userCards = await userCardRepository.queryUserCards(userId, false);
 
         return success({
             success: true,

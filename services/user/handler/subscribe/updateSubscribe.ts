@@ -1,7 +1,5 @@
 import SubpingRDB, { Repository } from "subpingrdb";
 
-import * as moment from "moment-timezone";
-
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import { success, failure } from "../../libs/response-lib";
 
@@ -16,11 +14,11 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const connection = await subpingRDB.getConnection("dev");
         const repository = connection.getCustomRepository(Repository.Subscribe);
 
-        const userSubscribeProduct = await repository.getOneSubscribe(userId, productId);
+        const userSubscribeProduct = await repository.querySubscribeByProductId(userId, productId);
 
         const currentDate = new Date();
 
-        await repository.updateSubscribe(userSubscribeProduct[0].id, currentDate);
+        await repository.updateExpiredDate(userSubscribeProduct[0].id, currentDate);
 
         return success({
             success: true,

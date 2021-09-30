@@ -3,19 +3,16 @@ import { UserCard } from "../entity/UserCard";
 
 @EntityRepository(UserCard)
 export class UserCardRepository extends Repository<UserCard> {
-    async getUserCards(userId: string, sensitive?: boolean) {
+    // 해당 유저의 카드정보 반환
+    async queryUserCards(userId: string, sensitive?: boolean) {
         let query = this.createQueryBuilder("userCard");
 
         if(sensitive) {
             query = query.select("userCard.*");
-        } 
+        }
 
         else {
-            query = query.select("userCard.id", "id")
-                .addSelect("userCard.user", "user")
-                .addSelect("userCard.cardName", "cardName")
-                .addSelect("userCard.cardVendor", "cardVendor")
-                .addSelect("userCard.method", "method");
+            query = query.select("userCard.id, userCard.user, userCard.cardName, userCard.cardVendor, userCard.method");
         }
 
         query = query.where(`userCard.user = "${userId}"`);
@@ -23,11 +20,11 @@ export class UserCardRepository extends Repository<UserCard> {
         return await query.getRawMany();
     }
 
-    async getCard(cardId: string) {
-        const query = this.createQueryBuilder("userCard")
+    // 해당 카드 반환
+    async queryUserCard(cardId: string) {
+        return this.createQueryBuilder("userCard")
             .select("userCard.*")
             .where(`userCard.id = "${cardId}"`)
-        
-        return query.getRawOne();
+            .getRawOne();
     }
 }

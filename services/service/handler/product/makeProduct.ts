@@ -21,11 +21,11 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         productModel.summary = summary;
         productModel.productLogoUrl = productLogoUrl;
         productModel.available = available;
-        await productRepository.saveProduct(productModel);
+        await productRepository.createProduct(productModel);
 
         return success({
             success: true,
-            message: "makeCategorySuccess"
+            message: "makeProductSuccess"
         });
     }
 
@@ -33,7 +33,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         console.log(e);
         return failure({
             success: false,
-            message: "makeCategoryException"
+            message: "makeProductException"
         });
     }
 }

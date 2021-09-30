@@ -11,10 +11,10 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const connection = await subpingRDB.getConnection("dev");
         const alarmRepository = connection.getCustomRepository(Repository.Alarm);
 
-        const unReadAlarms = await alarmRepository.findUserUnreadAlarms(userId)
+        const unReadAlarms = await alarmRepository.queryUnreadAlarms(userId)
 
         for (const unReadAlarm of unReadAlarms){
-            await alarmRepository.updateAlarmRead(unReadAlarm.id, true);
+            await alarmRepository.updateAlarmToRead(unReadAlarm.id);
         }
 
         return success({

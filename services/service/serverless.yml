@@ -121,6 +121,21 @@ functions:
           method: post
           cors: true
           authorizer: aws_iam
-  
+
+  makeReview:
+    handler: ./handler/review/makeReview.handler
+
+  getReviews:
+    handler: ./handler/review/getReviews.handler
+    events:
+      - http:
+          path: getReviews
+          method: get
+          cors: true
+          authorizer: aws_iam
+
+  editReview:
+    handler: ./handler/review/editReview.handler
+
   backup:
     handler: ./handler/backup/backup.handler

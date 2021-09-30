@@ -3,23 +3,28 @@ import { Product } from "../entity/Product";
 
 @EntityRepository(Product)
 export class ProductRepository extends Repository<Product> {
-    findAllProduct(): Promise<Product[]> {
+    // 상품 저장
+    async createProduct(productModel: Product): Promise<void> {
+        await this.save(productModel);
+    }
+
+    // 상품 삭제
+    async deleteProduct(productId: string): Promise<void> {
+        await this.delete({ id : productId });
+    }
+
+    //모든 상품 반환
+    queryAllProducts(): Promise<Product[]> {
         return this.find();
     }
 
-    findOneProduct(id: string): Promise<Product> {
-        return this.findOne(id);
+    //해당 상품 반환
+    queryProduct(productId: string): Promise<Product> {
+        return this.findOne(productId);
     }
 
-    async saveProduct(Product: Product): Promise<void> {
-        await this.save(Product);
-    }
-
-    async deleteProduct(id: string): Promise<void> {
-        await this.delete({ id : id });
-    }
-
-    async getProducts(serviceId: string) {
+    //해당 서비스의 모든 상품 반환
+    async queryProducts(serviceId: string) {
         return await this.createQueryBuilder("product")
             .select("product.*")
             .where(`product.service = "${serviceId}"`)
