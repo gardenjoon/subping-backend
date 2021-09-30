@@ -18,13 +18,12 @@ export class SubscribeRepository extends Repository<Subscribe> {
 
     async getSubscribes(userId: string) {
         return await this.createQueryBuilder("subscribe")
-            .select("user.id", "user")
-            .addSelect("product.*")
-            .addSelect("subscribe.*")
+            .select(["subscribe", "subscribe.user", "subscribeItems.amount", "product"])
             .where(`subscribe.user = "${userId}"`)
             .innerJoin("subscribe.user", "user")
-            .innerJoin("subscribe.product", "product")
-            .getRawMany();
+            .innerJoin("subscribe.subscribeItems", "subscribeItems")
+            .innerJoin("subscribeItems.product", "product")
+            .getMany();
     }
 
     async getSubscribesByServiceId(userId: string, serviceId: string) {

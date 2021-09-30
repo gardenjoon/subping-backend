@@ -110,7 +110,9 @@ functions:
   
   cronSubscribe:
     handler: ./handler/subscribe/cronSubscribe.handler
-    
+    events:
+      - schedule: cron(0 1 * * ? *)
+  
   duplicateNickName:
     handler: ./handler/nickname/duplicateNickName.handler
     events:

@@ -1,4 +1,4 @@
-import { Entity, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, PrimaryGeneratedColumn, OneToMany } from "typeorm";
+import { Entity, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, PrimaryGeneratedColumn, OneToMany, RelationId } from "typeorm";
 import { Service } from "./Service";
 import { SubscribeItem } from "./SubscribeItem";
 
@@ -10,6 +10,9 @@ export class Product {
     @ManyToOne(type => Service, service => service.products, 
         { onDelete: "CASCADE", onUpdate:  "CASCADE" })
     service: string;
+
+    @RelationId((product: Product) => product.service)
+    serviceId: string;
 
     @Column({ nullable: false })
     price: number;

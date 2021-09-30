@@ -1,4 +1,4 @@
-import { Entity, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, PrimaryGeneratedColumn, OneToMany } from "typeorm";
+import { Entity, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, PrimaryGeneratedColumn, OneToMany, RelationId } from "typeorm";
 import { Payment } from "./Payment";
 import { SubscribeItem } from "./SubscribeItem";
 import { User } from "./User";
@@ -16,13 +16,22 @@ export class Subscribe {
         { onDelete: "CASCADE", onUpdate:  "CASCADE" })
     user: User;
 
+    @RelationId((subscribe: Subscribe) => subscribe.user)
+    userId: string;
+
     @ManyToOne(type => UserCard, userCard => userCard.subscribes,
         { nullable: false, onDelete: "CASCADE", onUpdate:  "CASCADE" })
     userCard: UserCard;
     
+    @RelationId((subscribe: Subscribe) => subscribe.userCard)
+    userCardId: string;
+
     @ManyToOne(type => UserAddress, userAddress => userAddress.subscribes, 
         { nullable: false })
     address: UserAddress;
+
+    @RelationId((subscribe: Subscribe) => subscribe.address)
+    addressId: string;
 
     @OneToMany(type => SubscribeItem, subscribeItem => subscribeItem.subscribe, 
         { cascade: true })
