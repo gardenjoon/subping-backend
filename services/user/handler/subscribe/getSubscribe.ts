@@ -10,25 +10,35 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const userId = event.headers.id;
         const body = JSON.parse(event.body || "");
         
-        const { productId } = body;
+        const { serviceId } = body;
 
         const subpingRDB = new SubpingRDB()
         const connection = await subpingRDB.getConnection("dev");
 
         const subscribeRepository = connection.getCustomRepository(Repository.Subscribe);
 
-        if (productId) {
-            response = await subscribeRepository.querySubscribeByProductId(userId, productId);
+        if (serviceId) {
+            const subscribe = await subscribeRepository.querySubscribesByServiceId(userId, serviceId);
+            if(subscribe) {
+                response = [subscribe];
+            }
         }
 
         else {
             response = await subscribeRepository.querySubscribes(userId);
         }
         
-        return success({
-            success: true,
-            message: response  
-        });
+        if(response.length != 0) {
+            return success({
+                success: true,
+                message: response  
+            });
+        } else {
+            return failure({
+                success: false,
+                message: "NoUserSubscribesException"
+            })
+        }
     }
 
     catch (e) {

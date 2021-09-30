@@ -15,7 +15,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const connection = await subpingRDB.getConnection("dev");
         const paymentRepository = connection.getCustomRepository(Repository.Payment);
 
-        const paymentListOfDate = await paymentRepository.findPaymentListOfDate(today);
+        const paymentListOfDate = await paymentRepository.queryPaymentListOfDate(today);
 
         for (const payment of paymentListOfDate) {
             try {

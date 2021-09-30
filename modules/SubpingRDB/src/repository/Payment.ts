@@ -3,7 +3,7 @@ import { Payment } from "../entity/Payment";
 
 @EntityRepository(Payment)
 export class PaymentRepository extends Repository<Payment> {
-    async findPaymentListOfDate(targetDate: string) {
+    async queryPaymentListOfDate(targetDate: string) {
         return await this.createQueryBuilder("payment")
             .where("payment.paymentComplete = False")
             .andWhere(`payment.paymentDate = "${targetDate}"`)

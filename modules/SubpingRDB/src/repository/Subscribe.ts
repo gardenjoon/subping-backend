@@ -9,12 +9,12 @@ export class SubscribeRepository extends Repository<Subscribe> {
     }
 
     async updateSubscribe(subscribeId: string, date: Date): Promise<void> {
-        await this.update(subscribeId, { expiredDate : date });
+        await this.update(subscribeId, { expiredDate: date });
     }
 
     // 해당 구독의 만료일자 업데이트
     async updateExpiredDate(subscribeId: string, date: Date): Promise<void> {
-        await this.update(subscribeId, { expiredDate : date });
+        await this.update(subscribeId, { expiredDate: date });
     }
 
     // 해당 유저의 모든 구독 반환
@@ -28,14 +28,15 @@ export class SubscribeRepository extends Repository<Subscribe> {
             .getMany();
     }
 
-    // 해당 서비스의 모든 구독 반환
+    // 해당 서비스에 대한 구독만 반환
     async querySubscribesByServiceId(userId: string, serviceId: string) {
         return await this.createQueryBuilder("subscribe")
-            .select("subscribe.*")
+            .select(["subscribe", "subscribe.user", "subscribeItems.amount", "product"])
             .where(`subscribe.user = "${userId}"`)
+            .innerJoin("subscribe.user", "user")
             .innerJoin("subscribe.subscribeItems", "subscribeItems")
             .innerJoin("subscribeItems.product", "product", `product.serviceId = "${serviceId}"`)
-            .getRawMany();
+            .getOne();
     }
 
     // 해당 상품의 모든 구독 반환 (구버전)
