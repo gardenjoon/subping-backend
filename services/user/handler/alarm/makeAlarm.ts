@@ -13,9 +13,12 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
         const alarmRepository = connection.getCustomRepository(Repository.Alarm);
+
+        const userModel = new Entity.User();
+        userModel.id = userId
         
         const alarmModel = new Entity.Alarm();
-        alarmModel.user = userId;
+        alarmModel.user = userModel;
         alarmModel.type = type;
         alarmModel.title = title;
         alarmModel.content = content;

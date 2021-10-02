@@ -9,7 +9,7 @@ export class Product {
 
     @ManyToOne(type => Service, service => service.products, 
         { onDelete: "CASCADE", onUpdate:  "CASCADE" })
-    service: string;
+    service: Service;
 
     @RelationId((product: Product) => product.service)
     serviceId: string;

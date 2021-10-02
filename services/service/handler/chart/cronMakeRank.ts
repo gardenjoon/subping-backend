@@ -70,20 +70,21 @@ export const handler:APIGatewayProxyHandler  = async (_event, _context) => {
         try {
             await queryRunner.startTransaction();
 
-            for (const [index, element] of servicesWithEvent.entries()) {
-                serviceRankModel.service = element.serviceId;
+            for (const [index, service] of servicesWithEvent.entries()) {
+                serviceRankModel.service = service;
                 serviceRankModel.rank = index+1;
+
                 await queryRunner.manager.save(serviceRankModel);
             }
 
-            for (const element of servicesWithEvent){
-                serviceEventModel.service = element.serviceId;
+            for (const service of servicesWithEvent){
+                serviceEventModel.service = service;
+
                 await queryRunner.manager.save(serviceEventModel);
             };
 
             await controller.create<HotChartTimeModel>(HotChartTimeModel);
 
-            
             await queryRunner.commitTransaction();
         }
         catch(e) {

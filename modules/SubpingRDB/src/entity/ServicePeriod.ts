@@ -10,7 +10,7 @@ export class ServicePeriod {
 
     @ManyToOne(type => Service, service => service.periods, 
         { onDelete: "CASCADE", onUpdate:  "CASCADE" })
-    service: string;
+    service: Service;
 
     @Column({ length: 50, nullable: false })
     period: Period;

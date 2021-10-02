@@ -10,7 +10,7 @@ export class Review {
 
     @ManyToOne(type => User, user => user.reviews, 
         { onDelete: "CASCADE", onUpdate:  "CASCADE" })
-    user: string;
+    user: User;
 
     @ManyToOne(type => Service, service => service.reviews, 
         { onDelete: "CASCADE", onUpdate:  "CASCADE" })

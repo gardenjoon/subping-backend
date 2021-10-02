@@ -14,8 +14,11 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const connection = await subpingRDB.getConnection("dev");
         const reviewRepository = connection.getCustomRepository(Repository.Review);
 
+        const userModel = new Entity.User();
+        userModel.id = userId
+
         const reviewModel = new Entity.Review();
-        reviewModel.user = userId;
+        reviewModel.user = userModel;
         reviewModel.service = serviceId;
         reviewModel.title = title;
         reviewModel.content = content;

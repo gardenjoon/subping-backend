@@ -6,11 +6,11 @@ import { User } from "./User";
 export class UserLike {
     @ManyToOne(type => User, user => user.userLikes, 
         { onDelete: "CASCADE", onUpdate:  "CASCADE", primary: true })
-    user: string;
+    user: User;
 
     @ManyToOne(type => Service, service => service.userLikes, 
         { onDelete: "CASCADE", onUpdate:  "CASCADE", primary: true })
-    service: string;
+    service: Service;
 
     @CreateDateColumn({ nullable: false })
     createdAt: Date;

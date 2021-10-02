@@ -11,11 +11,13 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
 
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
-
         const productRepository = connection.getCustomRepository(Repository.Product);
 
+        const serviceModel = new Entity.Service();
+        serviceModel.id = serviceId
+
         const productModel = new Entity.Product();
-        productModel.service = serviceId;
+        productModel.service = serviceModel
         productModel.name = name;
         productModel.price = price;
         productModel.summary = summary;
