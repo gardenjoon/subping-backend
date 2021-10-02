@@ -25,6 +25,12 @@ export class Payment {
     @Column({ nullable: false, default: false })
     rewardComplete: Boolean;
 
+    @Column({ nullable: false, default: false })
+    paymentFailure: Boolean;
+    
+    @Column({ type: "text", nullable: true })
+    failureReason: String;
+
     @CreateDateColumn({ nullable: false })
     createdAt: Date;
 
