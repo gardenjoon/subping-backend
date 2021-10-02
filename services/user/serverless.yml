@@ -87,9 +87,6 @@ functions:
           cors: true
           authorizer: aws_iam
 
-  getSchedule:
-    handler: ./handler/calendar/getSchedule.handler
-     
   makeAlarm:
     handler: ./handler/alarm/makeAlarm.handler
 
@@ -185,3 +182,6 @@ functions:
           method: get
           cors: true
           authorizer: aws_iam
+  
+  getSchedule:
+    handler: ./handler/schedule/getSchedule.handler

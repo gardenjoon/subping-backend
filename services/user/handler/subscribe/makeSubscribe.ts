@@ -27,7 +27,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         // 해당 유저가 이미 해당 서비스를 구독하고 있는지 검증합니다.
         const userExistSubscribe = await subscribeRepository.querySubscribesByServiceId(userId, serviceId);
 
-        if (userExistSubscribe.length > 0) {
+        if (userExistSubscribe) {
             return failure({
                 success: false,
                 message: "UserHasSameServiceSubscribeException"

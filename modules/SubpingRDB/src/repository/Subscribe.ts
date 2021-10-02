@@ -18,14 +18,37 @@ export class SubscribeRepository extends Repository<Subscribe> {
     }
 
     // 해당 유저의 모든 구독 반환
-    async querySubscribes(userId: string) {
-        return await this.createQueryBuilder("subscribe")
+    async querySubscribes(userId: string, options?: {
+        payment?: {
+            startDate: Date;
+            endDate: Date;
+        },
+        service?: boolean;
+    }) {
+        let query = this.createQueryBuilder("subscribe")
             .select(["subscribe", "subscribe.user", "subscribeItems.amount", "product"])
             .where(`subscribe.user = "${userId}"`)
             .innerJoin("subscribe.user", "user")
             .innerJoin("subscribe.subscribeItems", "subscribeItems")
             .innerJoin("subscribeItems.product", "product")
-            .getMany();
+
+        if (options) {
+            if (options.payment) {
+                if (options.payment.endDate && options.payment.startDate) {
+                    query = query.innerJoinAndSelect('subscribe.payments', "payment", 
+                    `payment.paymentDate <= "${options.payment.endDate.toISOString()}"
+                    AND payment.paymentDate >= "${options.payment.startDate.toISOString()}"`);
+                } else {
+                    throw new Error("[SubpingRDB] payment가 정의되었지만 startDate, endDate가 옳바르지 않습니다.")
+                }
+            }
+
+            if(options.service) {
+                query = query.innerJoinAndSelect("product.service", "service");
+            }
+        }
+
+        return await query.getMany()
     }
 
     // 해당 서비스에 대한 구독만 반환
@@ -37,18 +60,5 @@ export class SubscribeRepository extends Repository<Subscribe> {
             .innerJoin("subscribe.subscribeItems", "subscribeItems")
             .innerJoin("subscribeItems.product", "product", `product.serviceId = "${serviceId}"`)
             .getOne();
-    }
-
-    // 해당 상품의 모든 구독 반환 (구버전)
-    async querySubscribeByProductId(userId: string, productId: string) {
-        return await this.createQueryBuilder("subscribe")
-            .select("user.id", "user")
-            .addSelect("product.*")
-            .addSelect("subscribe.*")
-            .where(`subscribe.user = "${userId}"`)
-            .andWhere(`subscribe.product = "${productId}"`)
-            .innerJoin("subscribe.user", "user")
-            .innerJoin("subscribe.product", "product")
-            .getRawMany();
     }
 }

@@ -10,8 +10,8 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const userId = event.headers.id;
         const body = JSON.parse(event.body || "");
         
-        const { serviceId } = body;
-
+        const serviceId = body?.serviceId;
+        
         const subpingRDB = new SubpingRDB()
         const connection = await subpingRDB.getConnection("dev");
 
