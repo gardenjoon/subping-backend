@@ -5,7 +5,7 @@ import { APIGatewayProxyHandler } from 'aws-lambda';
 import { success, failure } from "../../libs/response-lib";
 
 const makeHour = (hour: Number) => {
-    let standardHour:string;
+    let standardHour: string;
     return standardHour = 
             (3 <= hour && hour < 9) ? "03:00"
         :   (9 <= hour && hour < 15) ? "09:00"
@@ -16,7 +16,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
         const body = JSON.parse(event.body || "");
 
-        const { categories, tags, seller, name, type, serviceLogoUrl, summary } = body;
+        const { categories, tags, periods, seller, name, type, serviceLogoUrl, summary } = body;
 
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
@@ -25,12 +25,17 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const serviceEventModel = new Entity.ServiceEvent();
         const serviceCategoryModel = new Entity.ServiceCategory();
         const serviceTagModel = new Entity.ServiceTag();
+        const sellerModel = new Entity.Seller();
+        const servicePeriodModel = new Entity.ServicePeriod();
 
-        serviceModel.seller = seller;
+        sellerModel.id = seller;
+
+        serviceModel.seller = sellerModel;
         serviceModel.name = name;
         serviceModel.type = type;
         serviceModel.serviceLogoUrl = serviceLogoUrl;
         serviceModel.summary = summary;
+        serviceModel.customizable = true;
 
         const currentTime = moment();
         const currentHour = makeHour(currentTime.hours());
@@ -45,30 +50,41 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
 
             await queryRunner.manager.save(serviceModel);
 
-            serviceEventModel.service = serviceModel.id;
+            serviceEventModel.service = serviceModel;
 
             await queryRunner.manager.save(serviceEventModel);
 
             for(const category of categories) {
-                serviceCategoryModel.service = serviceModel.id;
-                serviceCategoryModel.category = category;
+                const categoryModel = new Entity.Category();
+                categoryModel.name = category
+                serviceCategoryModel.service = serviceModel;
+                serviceCategoryModel.category = categoryModel;
 
                 await queryRunner.manager.save(serviceCategoryModel);
             }
 
             for(const tag of tags) {
-                serviceTagModel.service = serviceModel.id;
+                serviceTagModel.service = serviceModel;
                 serviceTagModel.tag = tag;
 
                 await queryRunner.manager.save(serviceTagModel);
             }
 
+            for (const period of periods) {
+                servicePeriodModel.service = serviceModel;
+                servicePeriodModel.period = period;
+
+                await queryRunner.manager.save(servicePeriodModel)
+            }
+
             await queryRunner.commitTransaction();
         }
+
         catch(e) {
             console.log(e);
             await queryRunner.rollbackTransaction();
         }
+
         finally {
             await queryRunner.release();
         }

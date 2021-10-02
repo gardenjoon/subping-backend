@@ -16,8 +16,11 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const userLikeRepository = connection.getCustomRepository(Repository.UserLike);
         const existUserLike = await userLikeRepository.queryUserLike(userId, serviceId);
         
+        const userModel = new Entity.User();
+        userModel.id = userId;
+        
         const userLikeModel = new Entity.UserLike();
-        userLikeModel.user = userId;
+        userLikeModel.user = userModel;
         userLikeModel.service = serviceId;
 
         // 만약 토글이 true이고 존재하는 좋아요가 없으면, 생성

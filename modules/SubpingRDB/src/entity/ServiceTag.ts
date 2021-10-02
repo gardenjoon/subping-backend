@@ -5,7 +5,7 @@ import { Service } from "./Service";
 export class ServiceTag {
     @ManyToOne(type => Service, service => service.serviceTags,
         { onDelete: "CASCADE", onUpdate:  "CASCADE", primary: true })
-    service: string;
+    service: Service;
 
     @PrimaryColumn({ length: 100 })
     tag: string;

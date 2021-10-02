@@ -38,8 +38,11 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
             })
         }
 
+        const userModel = new Entity.User();
+        userModel.id = userId;
+
         const newAddress = new Entity.UserAddress();
-        newAddress.user = userId;
+        newAddress.user = userModel;
         newAddress.postCode = postCode;
         newAddress.address = address;
         newAddress.detailedAddress = detailedAddress;

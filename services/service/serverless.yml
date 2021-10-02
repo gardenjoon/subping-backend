@@ -102,7 +102,7 @@ functions:
     handler: ./handler/service/makeServiceCategory.handler
 
   makeProduct:
-    handler: ./handler/product/product.handler
+    handler: ./handler/product/makeProduct.handler
 
   autoComplete:
     handler: ./handler/search/autoComplete.handler

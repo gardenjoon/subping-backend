@@ -18,7 +18,7 @@ export class Service {
 
     @ManyToOne(type => Seller, seller => seller.services, 
         { nullable: false, onDelete: "CASCADE", onUpdate:  "CASCADE" })
-    seller: string;
+    seller: Seller;
 
     @Column({ nullable: false })
     name: string;

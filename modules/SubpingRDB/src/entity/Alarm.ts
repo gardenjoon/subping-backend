@@ -10,7 +10,7 @@ export class Alarm {
 
     @ManyToOne(type => User, user => user.alarms, 
         { nullable: false, onDelete: "CASCADE", onUpdate:  "CASCADE" })
-    user: string;
+    user: User;
 
     @Column({ nullable: false })
     type: AlarmType;

@@ -9,7 +9,7 @@ export class UserAddress {
 
     @ManyToOne(type => User, user => user.addresses, 
         { nullable: false, onDelete: "CASCADE", onUpdate:  "CASCADE" })
-    user: string;
+    user: User;
     
     @Column({ nullable: false })
     userName: string;
