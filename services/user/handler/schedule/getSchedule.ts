@@ -42,9 +42,11 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         for (const subscribe of subscribes) {
             const { payments, expiredDate, reSubscribeDate, period, subscribeItems } = subscribe;
             const productName = [];
-
+            let totalPrice = 0;
+            
             subscribeItems.forEach(item => {
                 productName.push(item.product.name);
+                totalPrice += item.product.price * item.amount;
             })
 
             for (const payment of payments) {
@@ -58,6 +60,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
                     "serviceId": subscribeItems[0].product.serviceId,
                     "serviceName": subscribeItems[0].product.service.name,
                     "productName": productName,
+                    "totalPrice": totalPrice,
                     "serviceLogoUrl": subscribeItems[0].product.service.serviceLogoUrl,
                     "status": paymentFailure ? "결제 실패" : paymentComplete ? "결제 완료" : "결제 예정"
                 }
@@ -80,6 +83,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
                             "serviceId": subscribeItems[0].product.serviceId,
                             "serviceName": subscribeItems[0].product.service.name,
                             "productName": productName,
+                            "totalPrice": totalPrice,
                             "serviceLogoUrl": subscribeItems[0].product.service.serviceLogoUrl,
                             "status": "결제 예정"
                         }

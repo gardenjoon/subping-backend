@@ -13,7 +13,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const header = event.headers;
         const userId = header.id;
         const body = JSON.parse(event.body || "");
-        console.log(`[makeSubscribe] 구독 요청 시작\nheader: ${header}\nbody: ${body}`);
+        console.log(`[makeSubscribe] 구독 요청 시작\nheader: ${JSON.stringify(header)}\nbody: ${JSON.stringify(body)}`);
 
         const { subscribeProducts, period, subscribeDate, card, address, serviceId } = body;
 
@@ -96,12 +96,12 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
             // 트랜젝션을 시작합니다.
             await queryRunner.startTransaction();
 
-            const savedSubscribe = await queryRunner.manager.save(subscribe);
+            await queryRunner.manager.save(subscribe);
 
             // subscribe_items를 생성합니다.
             for (const subscribeProduct of subscribeProducts) {
                 const subscribeItem = new Entity.SubscribeItem();
-                subscribeItem.subscribe = savedSubscribe;
+                subscribeItem.subscribe = subscribe;
                 subscribeItem.amount = subscribeProduct.amount;
                 subscribeItem.product = subscribeProduct.id;
 
@@ -113,8 +113,9 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
             payment.paymentDate = subscribeDate;
             payment.paymentComplete = false;
             payment.rewardComplete = false;
-            payment.subscribe = savedSubscribe;
-
+            payment.paymentFailure = false;
+            payment.subscribe = subscribe;
+            
             await queryRunner.manager.save(payment);
             await queryRunner.commitTransaction();
         }
@@ -138,7 +139,12 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
             const subpingPayment = new SubpingPayment();
             await subpingPayment.pay(payment);
         } catch(e) {
-            throw e;
+            await subscribeRepository.delete({ id: subscribe.id });
+            
+            return failure({
+                success: false,
+                message: "PaymentException"
+            })
         }
 
         return success({

@@ -72,7 +72,7 @@ class SubpingPayment {
                     amount: totalPrice
                 });
     
-                const { imp_uid, status } = paymentResult;
+                const { imp_uid, status, fail_reason } = paymentResult;
     
                 if (status === "paid") {
                     await queryRunner.startTransaction();
@@ -104,10 +104,24 @@ status: ${status}`);
                     } catch (e) {
                         console.log(`[SubpingPayment] DB Error: ${e.message}`)
                         await queryRunner.rollbackTransaction()
-                        throw new Error("SubpingPaymentPayError");
                     } finally {
                         await queryRunner.release();
                     }
+                } else if(status == "failed") {
+                    await paymentRepository.update({
+                        id: payment.id,
+                    }, {
+                        failureReason: fail_reason,
+                        paymentFailure: true
+                    });
+                                    //로그 코드 정렬 금지
+                console.log(
+                    `[SubpingPayment] 결제 실패
+price: ${totalPrice}
+userCard: ${subscribe.userCard.id}
+subscribeId: ${subscribe.id}
+paymentId: ${targetPayment.id}
+error: ${fail_reason}`);
                 }
             }
             catch (e) {
@@ -119,6 +133,13 @@ userCard: ${subscribe.userCard.id}
 subscribeId: ${subscribe.id}
 paymentId: ${targetPayment.id}
 error: ${e.message}`);
+                
+                await paymentRepository.update({
+                    id: payment.id
+                }, {
+                    failureReason: e.message,
+                    paymentFailure: true
+                });
 
                 throw new Error("SubpingPaymentPayError");
             }

@@ -1,4 +1,4 @@
-import { Entity, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, PrimaryGeneratedColumn, OneToMany } from "typeorm";
+import { Entity, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, PrimaryGeneratedColumn, OneToMany, RelationId } from "typeorm";
 import { Subscribe } from "./Subscribe";
 import { User } from "./User";
 
@@ -10,6 +10,9 @@ export class UserCard {
     @ManyToOne(type => User, user => user.userCards, 
         { nullable: false, onDelete: "CASCADE", onUpdate:  "CASCADE" })
     user: User;
+    
+    @RelationId((card: UserCard) => card.user)
+    userId: string;
 
     @Column({ nullable: false })
     cardVendor: string;
