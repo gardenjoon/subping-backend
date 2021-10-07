@@ -8,44 +8,35 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const body = JSON.parse(event.body || "");
         const userId = event.headers.id;
 
-        const { serviceId } = body;
-        const take = body.take || 100;
-        const skip = body.skip || 1;
-        const currentTime = new Date().toISOString();
+        const { reviewId } = body;
 
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
         const reviewRepository = connection.getCustomRepository(Repository.Review);
+        const targetReview = await reviewRepository.queryReview(reviewId)
 
-        const reviews = await reviewRepository.queryReviews({
-            serviceId: serviceId,
-            userId: userId,
-            pagination: {
-                take : take,
-                skip: skip,
-                standardTime: currentTime
-            }
-        });
+        if (targetReview.userId === userId) {
+            await reviewRepository.deleteReview(reviewId)
 
-        if (reviews.length === 0) {
-            return failure({
-                success: false,
-                message: "NoReviewsException"
-            })
+            return success({
+                success: true,
+                message: "deleteReviewSuccess"
+            });
         }
 
         else {
-            return success({
-                success: true,
-                message: reviews
-            });
+            return failure({
+                success: false,
+                message: "InvalidUserException"
+            })
         }
+
     }
     catch (e) {
         console.log(e);
         return failure({
             success: false,
-            message: "getReviewsException"
+            message: "deleteReviewException"
         });
     }
 }

@@ -19,23 +19,25 @@ export class ReviewRepository extends Repository<Review> {
     }
 
     // 해당 리뷰 반환
-    queryReview(reviewId: string): Promise<Review> {
-        return this.findOne(reviewId);
+    queryReview(reviewId: string) {
+        return this.createQueryBuilder("review")
+            .select("review.*")
+            .where(`id = "${reviewId}"`)
+            .getRawOne();
     }
 
     // 해당 리뷰 업데이트
-    async updateReview(reviewId: string, title?: string, content?: string): Promise<void> {
-        if(title){
-            await this.update(reviewId, { title: title});
-        };
+    async updateReview(reviewId: string, options?: {
+        content?: string,
+        rating?: number,
+        reviewImageUrl?: string
+    }): Promise<void> {
+        const review = await this.findOne(reviewId);
 
-        if(content){
-            await this.update(reviewId, { content: content});
-        };
-
-        if(!title && !content){
-            throw console.log("[Subping] Review 수정할 데이터가 없습니다.");
-        };
+        await this.update(reviewId, {
+            content: options.content || review.content,
+            rating: options.rating || review.rating
+        })
     }
 
     /* 
@@ -48,9 +50,9 @@ export class ReviewRepository extends Repository<Review> {
             serviceId?: string,
             userId?: string,
             pagination?: {
-                limit: number,
-                page: number,
-                standardTime: string
+                take: number,
+                skip: number,
+                standardTime: string,
             }
         }) {
         const { serviceId , userId, pagination } = options;
@@ -61,22 +63,23 @@ export class ReviewRepository extends Repository<Review> {
             .addSelect("GROUP_CONCAT(DISTINCT reviewImage.imageUrl)", "reviewImage")
             .innerJoin("review.user", "user")
             .leftJoin("review.images", "reviewImage")
-            .groupBy("review.user")
+            .orderBy("review.updatedAt", "DESC")
+            .groupBy("review.id")
 
         if (serviceId){
-            reviews = reviews.where(`review.service = "${serviceId}"`);
+            reviews = reviews.andWhere(`review.service = "${serviceId}"`);
         }
 
         if (userId){
-            reviews = reviews.where(`review.user = "${userId}"`);
+            reviews = reviews.andWhere(`review.user = "${userId}"`);
         }
 
         if (pagination) {
-            if (pagination.limit && pagination.page && pagination.standardTime) {
+            if (pagination.take && pagination.skip && pagination.standardTime) {
                 reviews = reviews
                     .andWhere(`review.createdAt < "${pagination.standardTime}"`)
-                    .offset(pagination.limit * (pagination.page - 1))
-                    .limit(pagination.limit)
+                    .skip(pagination.take * (pagination.skip - 1))
+                    .take(pagination.take)
             }
 
             else {
@@ -100,8 +103,7 @@ export class ReviewRepository extends Repository<Review> {
         const reviews = await this.createQueryBuilder("review")
             .select("review.*")
             .addSelect("GROUP_CONCAT(DISTINCT reviewImage.imageUrl)", "reviewImage")
-            .where(`title LIKE "%${requestWord}%"`)
-            .orWhere(`content LIKE "%${requestWord}%"`)
+            .where(`content LIKE "%${requestWord}%"`)
             .leftJoin("review.images", "reviewImage")
             .groupBy("review.user")
             .getRawMany();

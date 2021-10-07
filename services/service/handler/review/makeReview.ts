@@ -8,11 +8,12 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const body = JSON.parse(event.body || "");
         const userId = event.headers.id;
 
-        const { serviceId, title, content, rating } = body;
+        const { serviceId, content, rating, imageUrl } = body;
 
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
         const reviewRepository = connection.getCustomRepository(Repository.Review);
+        const reviewImageRepository = connection.getCustomRepository(Repository.ReviewImage);
 
         const userModel = new Entity.User();
         userModel.id = userId
@@ -20,10 +21,13 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const reviewModel = new Entity.Review();
         reviewModel.user = userModel;
         reviewModel.service = serviceId;
-        reviewModel.title = title;
         reviewModel.content = content;
         reviewModel.rating = rating;
         await reviewRepository.createReview(reviewModel);
+
+        for (const newImageUrl of imageUrl) {
+            await reviewImageRepository.createReviewImage(reviewModel.id, newImageUrl)
+        }
 
         return success({
             success: true,

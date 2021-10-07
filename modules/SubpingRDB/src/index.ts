@@ -31,6 +31,7 @@ import { ProductRepository } from "./repository/Product";
 import { SubscribeRepository } from "./repository/Subscribe";
 import { UserLikeRepository } from "./repository/UserLike";
 import { ReviewRepository } from "./repository/Review";
+import { ReviewImageRepository } from "./repository/ReviewImage";
 import { UserAddressRepository } from "./repository/UserAddress";
 import { UserCardRepository } from "./repository/UserCard";
 import { PaymentRepository } from "./repository/Payment";
@@ -74,6 +75,7 @@ export const Repository = {
     Product: ProductRepository,
     Subscribe: SubscribeRepository,
     Review: ReviewRepository,
+    ReviewImage: ReviewImageRepository,
     UserAddress: UserAddressRepository,
     Payment: PaymentRepository
 }

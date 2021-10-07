@@ -137,5 +137,17 @@ functions:
   editReview:
     handler: ./handler/review/editReview.handler
 
+  deleteReview:
+    handler: ./handler/review/deleteReview.handler
+
+  getRecentReviews:
+    handler: ./handler/review/getRecentReviews.handler
+    events:
+      - http:
+        path: getRecentReviews
+        method: get
+        cors: true
+        authorizer: aws_iam
+
   backup:
     handler: ./handler/backup/backup.handler

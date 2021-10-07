@@ -16,14 +16,11 @@ export class Review {
         { onDelete: "CASCADE", onUpdate:  "CASCADE" })
     service: string;
 
-    @Column({ nullable: true })
-    title: string;
-
     @Column({ type: "text", nullable: true })
     content: string;
 
     @Column({ nullable: false })
-    rating: Number;
+    rating: number;
     
     @CreateDateColumn({ nullable: false })
     createdAt: Date;
