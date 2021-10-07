@@ -15,7 +15,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const body = JSON.parse(event.body || "");
         console.log(`[makeSubscribe] 구독 요청 시작\nheader: ${JSON.stringify(header)}\nbody: ${JSON.stringify(body)}`);
 
-        const { subscribeProducts, period, subscribeDate, card, address, serviceId } = body;
+        const { subscribeProducts, period, subscribeDate, card, address, serviceId, deliveryMemo } = body;
 
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
@@ -92,6 +92,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
             subscribe.period = period;
             subscribe.userCard = card;
             subscribe.address = address ? userAddress : null;
+            subscribe.deliveryMemo = deliveryMemo;
 
             // 트랜젝션을 시작합니다.
             await queryRunner.startTransaction();
