@@ -49,6 +49,9 @@ export class Subscribe {
     @Column({ length: 50, nullable: false })
     period: Period;
 
+    @Column({ length: 100, nullable: true })
+    deliveryMemo: string;
+
     @CreateDateColumn({ nullable: false })
     createdAt: Date;
 
