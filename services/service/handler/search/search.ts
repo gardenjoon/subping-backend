@@ -12,14 +12,14 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
         const serviceRepository = connection.getCustomRepository(Repository.Service);
-        const reviewRepository = connection.getCustomRepository(Repository.Review);
 
-        const searchService = await serviceRepository.searchServices(requestWord);
-        const searchReview = await reviewRepository.searchReviews(requestWord);
+        const searchService = await serviceRepository.searchServices({
+            requestWord: requestWord, 
+            autoComplete: false, 
+        });
 
         const result = {
-            "serviceResult": [...new Set(searchService)],
-            "reviewResult": [...new Set(searchReview)]
+            "serviceResult": [...new Set(searchService)]
         };
 
         return success({

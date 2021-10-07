@@ -156,18 +156,42 @@ export class ServiceRepository extends Repository<Service> {
     }
 
     // 검색어와 이름, 설명이 일치하는 모든 서비스 반환
-    async searchServices(requestWord: string){
-        const services = await this.createQueryBuilder("service")
-            .select("service.*")
-            .addSelect("GROUP_CONCAT(DISTINCT serviceTag.tag)", "tag")
+    async searchServices(option: {
+        requestWord: string, 
+        autoComplete: boolean, 
+        pagination?: {
+            take: number,
+            skip: number,
+            standardTime: string
+        }
+    }) {
+        const { requestWord, autoComplete, pagination } = option;
+
+        let query = this.createQueryBuilder("service")
             .where(`name LIKE "%${requestWord}%"`)
             .orWhere(`summary LIKE "%${requestWord}%"`)
-            .innerJoin("service.serviceTags", "serviceTag")
-            .groupBy("service.id")
-            .getRawMany();
+            .andWhere(`service.createdAt < "${pagination.standardTime}"`)
+            .skip(pagination.take * (pagination.skip - 1))
+            .take(pagination.take)
+
+        if (autoComplete) {
+            query = query.select("service.name, service.id, service.serviceLogoUrl")
+        }
+
+        else {
+            query = query
+                .select("service.*")
+                .addSelect("GROUP_CONCAT(DISTINCT serviceTag.tag)", "tag")
+                .innerJoin("service.serviceTags", "serviceTag")
+                .groupBy("service.id")
+        }
+
+        const services = await query.getRawMany();
 
         services.map(service => {
-            service.tag = service.tag.split(",");
+            if (service.tag) {
+                service.tag = service.tag.split(",");
+            }
         });
 
         return services
