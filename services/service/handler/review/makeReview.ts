@@ -25,8 +25,10 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         reviewModel.rating = rating;
         await reviewRepository.createReview(reviewModel);
 
-        for (const newImageUrl of imageUrl) {
-            await reviewImageRepository.createReviewImage(reviewModel.id, newImageUrl)
+        if (imageUrl){
+            for (const [index, newImageUrl] of imageUrl.entries()) {
+                await reviewImageRepository.createReviewImage(reviewModel.id, newImageUrl, index+1)
+            }
         }
 
         return success({

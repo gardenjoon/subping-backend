@@ -13,6 +13,9 @@ export class ReviewImage {
     @Column({ length: 1000, nullable: false})
     imageUrl: string;
 
+    @Column({ nullable: false })
+    imageIndex: number;
+
     @CreateDateColumn({ nullable: false })
     createdAt: Date;
 
