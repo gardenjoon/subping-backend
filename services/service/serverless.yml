@@ -124,28 +124,46 @@ functions:
 
   makeReview:
     handler: ./handler/review/makeReview.handler
+    events:
+      - http:
+          path: makeReview
+          method: post
+          cors: true
+          authorizer: aws_iam
 
   getReviews:
     handler: ./handler/review/getReviews.handler
     events:
       - http:
           path: getReviews
-          method: get
+          method: post
           cors: true
           authorizer: aws_iam
 
   editReview:
     handler: ./handler/review/editReview.handler
+    events:
+      - http:
+          path: editReview
+          method: post
+          cors: true
+          authorizer: aws_iam
 
   deleteReview:
     handler: ./handler/review/deleteReview.handler
+    events:
+      - http:
+          path: deleteReview
+          method: post
+          cors: true
+          authorizer: aws_iam
 
   getRecentReviews:
     handler: ./handler/review/getRecentReviews.handler
     events:
       - http:
         path: getRecentReviews
-        method: get
+        method: post
         cors: true
         authorizer: aws_iam
 
