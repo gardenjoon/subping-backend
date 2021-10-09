@@ -17,7 +17,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const reviewImageRepository = connection.getCustomRepository(Repository.ReviewImage)
 
         const targetReview = await reviewRepository.queryReview(reviewId);
-        const targetReviewImages = await reviewImageRepository.queryReviewImage(reviewId)
+        const targetReviewImages = await reviewImageRepository.queryReviewImages(reviewId)
 
         if (targetReview.userId === userId) {
             await reviewRepository.updateReview(reviewId, {
@@ -25,13 +25,15 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
                 rating: rating
             });
 
-            if (reviewImageUrl.length > 0) {
-                for (const oldImageUrl of targetReviewImages) {
-                    await reviewImageRepository.delete({id : oldImageUrl.id})
+            for (let i = 0; i < 5; i++) {
+                if (targetReviewImages[i] && reviewImageUrl[i] && (reviewImageUrl[i] !== targetReviewImages[i].imageUrl)){
+                    await reviewImageRepository.updateReviewImage(targetReviewImages[i].id, reviewImageUrl[i], i+1)
                 }
-
-                for (const newImageUrl of reviewImageUrl) {
-                    await reviewImageRepository.createReviewImage(reviewId, newImageUrl)
+                else if (!targetReviewImages[i] && reviewImageUrl[i]) {
+                    await reviewImageRepository.createReviewImage(reviewId, reviewImageUrl[i], i+1)
+                }
+                else if (targetReviewImages[i] && !reviewImageUrl[i]) {
+                    await reviewImageRepository.delete({ id : targetReviewImages[i].id})
                 }
             }
 
