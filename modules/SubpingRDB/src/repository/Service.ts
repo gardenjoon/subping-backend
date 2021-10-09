@@ -170,9 +170,10 @@ export class ServiceRepository extends Repository<Service> {
         let query = this.createQueryBuilder("service")
             .where(`name LIKE "%${requestWord}%"`)
             .orWhere(`summary LIKE "%${requestWord}%"`)
-            .andWhere(`service.createdAt < "${pagination.standardTime}"`)
-            .skip(pagination.take * (pagination.skip - 1))
-            .take(pagination.take)
+
+            // .andWhere(`service.createdAt < "${pagination.standardTime}"`)
+            // .skip(pagination.take * (pagination.skip - 1))
+            // .take(pagination.take)
 
         if (autoComplete) {
             query = query.select("service.name, service.id, service.serviceLogoUrl")
@@ -183,6 +184,7 @@ export class ServiceRepository extends Repository<Service> {
                 .select("service.*")
                 .addSelect("GROUP_CONCAT(DISTINCT serviceTag.tag)", "tag")
                 .innerJoin("service.serviceTags", "serviceTag")
+                .orWhere(`serviceTag.tag LIKE "%${requestWord}%"`)
                 .groupBy("service.id")
         }
 

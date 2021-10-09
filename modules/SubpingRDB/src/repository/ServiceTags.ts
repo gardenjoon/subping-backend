@@ -7,9 +7,9 @@ export class ServiceTagRepository extends Repository<ServiceTag> {
     async searchTags(option: {
         requestWord: string,
         pagination?: {
-        take: number,
-        skip: number,
-        standardTime: string
+            take: number,
+            skip: number,
+            standardTime: string
         }
     }) {
         const { requestWord, pagination } = option;
@@ -19,9 +19,9 @@ export class ServiceTagRepository extends Repository<ServiceTag> {
         .innerJoin("serviceTag.service", "service")
         .where(`tag LIKE "%${requestWord}%"`)
         .orWhere(`service.name LIKE "%${requestWord}%"`)
-        .andWhere(`serviceTag.createdAt < "${pagination.standardTime}"`)
-        .skip(pagination.take * (pagination.skip - 1))
-        .take(pagination.take)
+        // .andWhere(`serviceTag.createdAt < "${pagination.standardTime}"`)
+        // .skip(pagination.take * (pagination.skip - 1))
+        // .take(pagination.take)
         .getRawMany();
     }
 }
