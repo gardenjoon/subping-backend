@@ -25,7 +25,9 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         }
 
         else {
-            response = await subscribeRepository.querySubscribes(userId);
+            response = await subscribeRepository.querySubscribes(userId, {
+                service: true
+            });
         }
         
         if(response.length != 0) {
