@@ -8,8 +8,8 @@ import SubpingPayment from "../../libs/subpingPayment";
 
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
-        // const today = moment.tz("Asia/Seoul").format("YYYY-MM-DD");
-        const today = "2021-10-26";
+        const today = moment.tz("Asia/Seoul").format("YYYY-MM-DD");
+        // const today = "2021-10-26";
 
         const subpingPayment = new SubpingPayment();
         const subpingRDB = new SubpingRDB();
