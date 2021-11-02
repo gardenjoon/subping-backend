@@ -78,7 +78,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
                     let estimatedPaymentMoment = moment(estimatedPaymentString);
                     let estimatedPaymentMonth = estimatedPaymentMoment.format("MM");
 
-                    while(estimatedPaymentMonth <= nextMonth) {
+                    while(estimatedPaymentMoment <= endMoment) {
                         const schedule = {
                             "serviceId": subscribeItems[0].product.serviceId,
                             "serviceName": subscribeItems[0].product.service.name,
