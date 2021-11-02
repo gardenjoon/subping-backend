@@ -38,7 +38,6 @@ export class UserCard {
     @UpdateDateColumn({ nullable: false })
     updatedAt: Date;
 
-    @OneToMany(type => Subscribe, subscribe => subscribe.userCard, 
-        { cascade: true })
+    @OneToMany(type => Subscribe, subscribe => subscribe.userCard)
     subscribes: Subscribe[]
 }

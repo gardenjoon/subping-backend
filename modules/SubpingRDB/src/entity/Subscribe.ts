@@ -20,7 +20,7 @@ export class Subscribe {
     userId: string;
 
     @ManyToOne(type => UserCard, userCard => userCard.subscribes,
-        { nullable: false, onDelete: "CASCADE", onUpdate:  "CASCADE" })
+        { nullable: false })
     userCard: UserCard;
     
     @RelationId((subscribe: Subscribe) => subscribe.userCard)
