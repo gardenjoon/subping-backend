@@ -9,7 +9,8 @@ import SubpingPayment from "../../libs/subpingPayment";
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
         const response = {}
-        const userId = "5c1547f2-1049-4d64-8a0a-3140931127e9";
+        // const userId = "5c1547f2-1049-4d64-8a0a-3140931127e9";
+        const userId = event.headers.id;
 
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
