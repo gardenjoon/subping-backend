@@ -10,7 +10,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
         const body = JSON.parse(event.body || "");
         
-        const { limit, page } = body;
+        const { skip, take } = body;
 
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
@@ -28,8 +28,8 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
                 standardTime: hotChartTime.time,
             },
             pagination: {
-                limit: limit,
-                page: page,
+                skip: skip,
+                take: take,
                 standardTime: currentTime.toISOString()
             }
         });

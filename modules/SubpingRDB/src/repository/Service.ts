@@ -44,8 +44,8 @@ export class ServiceRepository extends Repository<Service> {
             userId: string,
         },
         pagination?: {
-            limit: number,
-            page: number,
+            skip: number,
+            take: number,
             standardTime: string
         }
         filter?: {
@@ -112,11 +112,11 @@ export class ServiceRepository extends Repository<Service> {
         }
 
         if (pagination) {
-            if (pagination.limit && pagination.page && pagination.standardTime) {
+            if (pagination.skip && pagination.take && pagination.standardTime) {
                 query = query
                     .andWhere(`service.createdAt < "${pagination.standardTime}"`)
-                    .offset(pagination.limit * (pagination.page - 1))
-                    .limit(pagination.limit)
+                    .skip(pagination.take * (pagination.skip - 1))
+                    .take(pagination.take)
             }
             if (!rank) {
                     query = query.orderBy("service.createdAt", "ASC")
