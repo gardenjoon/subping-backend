@@ -43,7 +43,7 @@ export const handler:APIGatewayProxyHandler  = async (_event, _context) => {
         const connection = await subpingRDB.getConnection("dev");
 
         const time = setTime();
-
+        
         const serviceEventRepository = connection.getCustomRepository(Repository.ServiceEvent);
         const servicesWithEvent = await serviceEventRepository.queryServiceEvents(time.standardDate, time.standardHour);
         const serviceEventModel = new Entity.ServiceEvent();
@@ -71,15 +71,20 @@ export const handler:APIGatewayProxyHandler  = async (_event, _context) => {
             await queryRunner.startTransaction();
 
             for (const [index, service] of servicesWithEvent.entries()) {
-                serviceRankModel.service = service;
+                const serviceModel = new Entity.Service();
+                serviceModel.id = service.serviceId
+
+                serviceRankModel.service = serviceModel;
                 serviceRankModel.rank = index+1;
 
                 await queryRunner.manager.save(serviceRankModel);
             }
 
             for (const service of servicesWithEvent){
-                serviceEventModel.service = service;
+                const serviceModel = new Entity.Service();
+                serviceModel.id = service.serviceId
 
+                serviceEventModel.service = serviceModel;
                 await queryRunner.manager.save(serviceEventModel);
             };
 
