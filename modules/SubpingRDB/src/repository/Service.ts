@@ -169,7 +169,6 @@ export class ServiceRepository extends Repository<Service> {
 
         let query = this.createQueryBuilder("service")
             .where(`name LIKE "%${requestWord}%"`)
-            .orWhere(`summary LIKE "%${requestWord}%"`)
 
             // .andWhere(`service.createdAt < "${pagination.standardTime}"`)
             // .skip(pagination.take * (pagination.skip - 1))

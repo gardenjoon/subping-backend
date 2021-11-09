@@ -18,10 +18,6 @@ export class ServiceTagRepository extends Repository<ServiceTag> {
         .select("DISTINCT serviceTag.tag", "tag")
         .innerJoin("serviceTag.service", "service")
         .where(`tag LIKE "%${requestWord}%"`)
-        .orWhere(`service.name LIKE "%${requestWord}%"`)
-        // .andWhere(`serviceTag.createdAt < "${pagination.standardTime}"`)
-        // .skip(pagination.take * (pagination.skip - 1))
-        // .take(pagination.take)
         .getRawMany();
     }
 }
