@@ -39,7 +39,7 @@ export class SubscribeRepository extends Repository<Subscribe> {
                     `payment.paymentDate <= "${options.payment.endDate.toISOString()}"
                     AND payment.paymentDate >= "${options.payment.startDate.toISOString()}"`);
                 } else {
-                    throw new Error("[SubpingRDB] payment가 정의되었지만 startDate, endDate가 옳바르지 않습니다.")
+                    query = query.innerJoinAndSelect('subscribe.payments', "payment");
                 }
             }
 
@@ -59,6 +59,7 @@ export class SubscribeRepository extends Repository<Subscribe> {
             .innerJoin("subscribe.user", "user")
             .innerJoin("subscribe.subscribeItems", "subscribeItems")
             .innerJoin("subscribeItems.product", "product", `product.serviceId = "${serviceId}"`)
+            .innerJoin('subscribe.payments', "payment")
             .getOne();
     }
 }
