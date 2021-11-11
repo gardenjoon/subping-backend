@@ -26,7 +26,22 @@ export class SubscribeRepository extends Repository<Subscribe> {
         service?: boolean;
     }) {
         let query = this.createQueryBuilder("subscribe")
-            .select(["subscribe", "subscribe.user", "subscribeItems.amount", "product", "payment.id", "payment.amount", "payment.paymentDate", "payment.paymentComplete", "payment.rewardComplete", "payment.paymentFailure", "payment.failureReason", "payment.createdAt", "payment.updatedAt"])
+            .select([
+                "subscribe", 
+                "subscribe.user",
+                "subscribeItems.amount",
+                "product", 
+                "payment.id", 
+                "payment.amount", 
+                "payment.paymentDate", 
+                "payment.paymentComplete", 
+                "payment.rewardComplete", 
+                "payment.paymentFailure", 
+                "payment.failureReason", 
+                "payment.paidCardVendor",
+                "payment.paidCardNumber",
+                "payment.createdAt", 
+                "payment.updatedAt"])
             .where(`subscribe.user = "${userId}"`)
             .innerJoin("subscribe.user", "user")
             .innerJoin("subscribe.subscribeItems", "subscribeItems")
@@ -54,7 +69,22 @@ export class SubscribeRepository extends Repository<Subscribe> {
     // 해당 서비스에 대한 구독만 반환
     async querySubscribesByServiceId(userId: string, serviceId: string) {
         return await this.createQueryBuilder("subscribe")
-            .select(["subscribe", "subscribe.user", "subscribeItems.amount", "product",  "payment.id", "payment.amount", "payment.paymentDate", "payment.paymentComplete", "payment.rewardComplete", "payment.paymentFailure", "payment.failureReason", "payment.createdAt", "payment.updatedAt"])
+            .select([
+                "subscribe", 
+                "subscribe.user",
+                "subscribeItems.amount", 
+                "product", 
+                "payment.id", 
+                "payment.amount", 
+                "payment.paymentDate", 
+                "payment.paymentComplete", 
+                "payment.rewardComplete", 
+                "payment.paymentFailure", 
+                "payment.failureReason", 
+                "payment.paidCardVendor",
+                "payment.paidCardNumber",
+                "payment.createdAt", 
+                "payment.updatedAt"])
             .where(`subscribe.user = "${userId}"`)
             .innerJoin("subscribe.user", "user")
             .innerJoin("subscribe.subscribeItems", "subscribeItems")

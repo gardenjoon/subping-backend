@@ -30,6 +30,12 @@ export class Payment {
     
     @Column({ type: "text", nullable: true })
     failureReason: String;
+    
+    @Column({ type: "text", nullable: true })
+    paidCardVendor: String;
+    
+    @Column({ type: "text", nullable: true })
+    paidCardNumber: String;
 
     @CreateDateColumn({ nullable: false })
     createdAt: Date;
