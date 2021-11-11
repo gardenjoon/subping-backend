@@ -1,7 +1,14 @@
+import { IncomingWebhook } from "@slack/webhook";
 import Iamport from "iamport";
 import * as moment from "moment-timezone";
 import SubpingRDB, { Entity, Repository } from "subpingrdb";
 import { Payment } from "subpingrdb/dist/src/entity/Payment";
+
+type Response = {
+    success: boolean;
+    totalPrice: number;
+    error: string;
+}
 
 class SubpingPayment {
     iamport = Iamport({
@@ -46,24 +53,34 @@ class SubpingPayment {
     }
 
     async pay(payment: Payment) {
+        const webhook = new IncomingWebhook("https://hooks.slack.com/services/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");
+
+        const response: Response = {
+            success: false,
+            totalPrice: 0,
+            error: ""
+        };
+
         try {
             const today = moment.tz("Asia/Seoul").format("YYYY-MM-DD");
             let totalPrice = 0;
-    
+
             const subpingRDB = new SubpingRDB();
             const connection = await subpingRDB.getConnection("dev");
             const paymentRepository = connection.getCustomRepository(Repository.Payment);
             const queryRunner = connection.createQueryRunner();
-    
+
             const targetPayment = await paymentRepository.queryPayment(payment);
 
             const subscribe = targetPayment.subscribe;
             const subscribeItems = subscribe.subscribeItems;
-    
+
             subscribeItems.map(item => {
                 totalPrice += (item.amount * item.product.price);
             })
-    
+
+            response.totalPrice = totalPrice;
+
             try {
                 const paymentResult = await this.iamport.subscribe.again({
                     name: "섭핑 정기결제",
@@ -71,89 +88,128 @@ class SubpingPayment {
                     merchant_uid: targetPayment.id,
                     amount: totalPrice
                 });
-    
-                const { imp_uid, status, fail_reason } = paymentResult;
-    
+
+                const { imp_uid, status, fail_reason, receipt_url, card_number, card_name } = paymentResult;
+
                 if (status === "paid") {
                     await queryRunner.startTransaction();
-    
+
                     try {
-                        await queryRunner.manager.update(Entity.Payment, { id: targetPayment.id }, { paymentComplete: true, amount: totalPrice, iamportUid: imp_uid });
+                        await queryRunner.manager.update(Entity.Payment, { id: targetPayment.id }, {
+                            paymentComplete: true,
+                            amount: totalPrice,
+                            iamportUid: imp_uid,
+                            paidCardNumber: card_number,
+                            paidCardVendor: card_name
+                        });
                         const nextPaymentDate = SubpingPayment.calcNextPaymentDate(subscribe.period, today);
-    
+
                         const nextPayment = new Entity.Payment;
                         nextPayment.amount = 0;
                         nextPayment.paymentDate = new Date(nextPaymentDate);
                         nextPayment.paymentComplete = false;
                         nextPayment.rewardComplete = false;
                         nextPayment.subscribe = targetPayment.subscribe;
-    
+
                         await queryRunner.manager.save(nextPayment);
                         await queryRunner.commitTransaction();
 
                         //로그 코드 정렬 금지
                         console.log(
-`[SubpingPayment] 결제 성공
-price: ${totalPrice}
-nextPaymentDate: ${nextPaymentDate}
-userCard: ${subscribe.userCard.id}
-subscribeId: ${subscribe.id}
-paymentId: ${targetPayment.id}
-imp_uid: ${imp_uid}
-status: ${status}`);
-                    } catch (e) {
+                            `[SubpingPayment] 결제 성공\nprice: ${totalPrice}\nnextPaymentDate: ${nextPaymentDate}\nuserCard: ${subscribe.userCard.id}\nsubscribeId: ${subscribe.id}\npaymentId: ${targetPayment.id}\nimp_uid: ${imp_uid}\nstatus: ${status}`);
+
+                        response.success = true;
+                        return response;
+
+                    }
+                    
+                    catch (e) {
                         console.log(`[SubpingPayment] DB Error: ${e.message}`)
                         await queryRunner.rollbackTransaction()
-                    } finally {
+
+                        await webhook.send({
+                            text:
+                                `[결제 실패 알림]\n사유 : DB 에러\n에러 : ${e}`
+                        }).catch(_ => { });
+
+                        console.log(`[SubpingPayment] 결제취소 요청`)
+                        const cancelResult = await this.iamport.payment.cancel({
+                            imp_uid: imp_uid,
+                            checksum: totalPrice
+                        });
+                        console.log(`[SubpingPayment] 결제취소 결과 : ${cancelResult}`)
+
+                        response.success = false;
+                        response.error = e;
+                    } 
+                    
+                    finally {
                         await queryRunner.release();
+                        return response;
                     }
-                } else if(status == "failed") {
+                }
+                
+                else if (status == "failed") {
                     await paymentRepository.update({
                         id: payment.id,
                     }, {
                         failureReason: fail_reason,
-                        paymentFailure: true
+                        paymentFailure: true,
+                        paidCardNumber: card_number,
+                        paidCardVendor: card_name
                     });
-                                    //로그 코드 정렬 금지
-                console.log(
-                    `[SubpingPayment] 결제 실패
-price: ${totalPrice}
-userCard: ${subscribe.userCard.id}
-subscribeId: ${subscribe.id}
-paymentId: ${targetPayment.id}
-error: ${fail_reason}`);
+                    //로그 코드 정렬 금지
+                    console.log(
+                        `[SubpingPayment] 결제 실패\nprice: ${totalPrice}\nuserCard: ${subscribe.userCard.id}\nsubscribeId: ${subscribe.id}\npaymentId: ${targetPayment.id}\nerror: ${fail_reason}`);
+
+                    await webhook.send({
+                        text:
+                            `[결제 실패 알림]\n사유 : 사용자 카드 결제상태 에러\n에러 : ${fail_reason}`
+                    }).catch(_ => { });
+
+                    response.success = false;
+                    response.error = fail_reason;
+                    return response;
                 }
             }
             catch (e) {
                 //로그 코드 정렬 금지
                 console.log(
-`[SubpingPayment] 결제 실패
-price: ${totalPrice}
-userCard: ${subscribe.userCard.id}
-subscribeId: ${subscribe.id}
-paymentId: ${targetPayment.id}
-error: ${e.message}`);
-                
+                    `[SubpingPayment] 결제 실패\nprice: ${totalPrice}\nuserCard: ${subscribe.userCard.id}\nsubscribeId: ${subscribe.id}\npaymentId: ${targetPayment.id}\nerror: ${e.message}`);
+
+                await webhook.send({
+                    text:
+                        `[결제 실패 알림]\n사유 : 아임포트 에러\n에러 : ${e}`
+                }).catch(_ => { });
+
                 await paymentRepository.update({
                     id: payment.id
                 }, {
                     failureReason: e.message,
-                    paymentFailure: true
+                    paymentFailure: true,
+                    paidCardVendor: subscribe.userCard.cardVendor,
+                    paidCardNumber: "****"
                 });
 
-                throw new Error("SubpingPaymentPayError");
+                response.success = false;
+                response.error = "아임포트 에러";
+                return response;
             }
         }
-        catch(e) {
+        catch (e) {
             //로그 코드 정렬 금지
             console.log(
-`[SubpingPayment] 결제 실패
-paymentId: ${payment.id}
-error: ${e.message}`);
-            throw new Error("SubpingPaymentPayError");
+                `[SubpingPayment] 결제 실패\npaymentId: ${payment.id}\nerror: ${e.message}`);
 
+            await webhook.send({
+                text:
+                    `[결제 실패 알림]\n사유 : 로직 에러\n에러 : ${e}`
+            }).catch(_ => { });
+
+            response.success = false;
+            response.error = e;
+            return response;
         }
-        
     }
 }
 
