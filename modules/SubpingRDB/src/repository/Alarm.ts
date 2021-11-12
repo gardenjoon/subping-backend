@@ -1,5 +1,6 @@
 import { EntityRepository, Repository } from "typeorm";
 import { Alarm } from "../entity/Alarm";
+import { User } from "../entity/User";
 
 @EntityRepository(Alarm)
 export class AlarmRepository extends Repository<Alarm> {
@@ -10,7 +11,9 @@ export class AlarmRepository extends Repository<Alarm> {
 
     // 알림 제거
     async deleteAlarm(userId: string): Promise<void> {
-        await this.delete({ user: userId });
+        const userModel = new User();
+        userModel.id = userId;
+        await this.delete({ user: userModel });
     }
 
     // 해당 유저의 모든알림 반환
@@ -26,8 +29,10 @@ export class AlarmRepository extends Repository<Alarm> {
 
     // 해당 유저의 읽지않은 알림 반환
     async queryUnreadAlarms(userId: string) {
+        const userModel = new User();
+        userModel.id = userId;
         return await this.find({
-            user: userId,
+            user: userModel,
             read: false
         });
     }

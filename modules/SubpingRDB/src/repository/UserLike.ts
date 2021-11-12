@@ -1,5 +1,7 @@
 import { EntityRepository, Repository } from "typeorm";
 import { UserLike } from "../entity/UserLike";
+import { Service } from "../entity/Service";
+import { User } from "../entity/User";
 
 @EntityRepository(UserLike)
 export class UserLikeRepository extends Repository<UserLike> {
@@ -10,9 +12,15 @@ export class UserLikeRepository extends Repository<UserLike> {
 
     // 해당 유저의 해당 서비스에 대한 좋아요 제거
     async deleteUserLike(userId: string, serviceId: string) {
+        const userModel = new User();
+        userModel.id = userId;
+
+        const serviceModel = new Service();
+        serviceModel.id = serviceId;
+        
         await this.delete({
-            user: userId,
-            service: serviceId
+            user: userModel,
+            service: serviceModel
         });
     }
 
