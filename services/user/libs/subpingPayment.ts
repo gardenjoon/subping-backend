@@ -3,6 +3,7 @@ import Iamport from "iamport";
 import * as moment from "moment-timezone";
 import SubpingRDB, { Entity, Repository } from "subpingrdb";
 import { Payment } from "subpingrdb/dist/src/entity/Payment";
+import { SubscribeItem } from "subpingrdb/dist/src/entity/SubscribeItem";
 
 type Response = {
     success: boolean;
@@ -64,20 +65,72 @@ class SubpingPayment {
         try {
             const today = moment.tz("Asia/Seoul").format("YYYY-MM-DD");
             let totalPrice = 0;
+            let reservedTotalPrice = 0;
 
             const subpingRDB = new SubpingRDB();
             const connection = await subpingRDB.getConnection("dev");
             const paymentRepository = connection.getCustomRepository(Repository.Payment);
+
             const queryRunner = connection.createQueryRunner();
 
             const targetPayment = await paymentRepository.queryPayment(payment);
 
             const subscribe = targetPayment.subscribe;
             const subscribeItems = subscribe.subscribeItems;
+            const reservecdItems: SubscribeItem[] = [];
 
             subscribeItems.map(item => {
-                totalPrice += (item.amount * item.product.price);
+                if(item.reserved) {
+                    reservecdItems.push(item);
+                    reservedTotalPrice += (item.amount * item.product.price);
+                } else {
+                    totalPrice += (item.amount * item.product.price);
+                }
             })
+            
+            if(reservecdItems.length != 0) {
+                totalPrice = reservedTotalPrice;
+                
+                const queryRunner = connection.createQueryRunner();
+
+                try {
+                    await queryRunner.startTransaction();
+
+                    await queryRunner.manager.delete(Entity.SubscribeItem, {
+                        subscribe: subscribe.id,
+                        reserved: false
+                    });
+                    
+                    for(const item of reservecdItems) {
+                        await queryRunner.manager.update(Entity.SubscribeItem, {
+                            id: item.id
+                        }, {
+                            reserved: false
+                        });
+                    };
+
+                    await queryRunner.commitTransaction();
+                } catch(e) {
+                    console.log(
+                        `[SubpingPayment] 예약 결제 실패\n구독 id : "${subscribe.id}"`);
+                    
+                    await webhook.send({
+                        text:
+                            `[결제 실패 알림]\n사유 : 예약된 구독 에러\n에러 : ${e}`
+                    }).catch(_ => { });
+
+                    await queryRunner.rollbackTransaction();
+                    await queryRunner.release()
+
+                    response.success = false;
+                    response.error = e;
+                    response.totalPrice = totalPrice;
+
+                    return response
+                } finally { 
+                    await queryRunner.release()
+                }
+            } 
 
             response.totalPrice = totalPrice;
 
@@ -155,8 +208,8 @@ class SubpingPayment {
                     }, {
                         failureReason: fail_reason,
                         paymentFailure: true,
-                        paidCardNumber: card_number,
-                        paidCardVendor: card_name
+                        paidCardNumber: null,
+                        paidCardVendor: targetPayment.subscribe.userCard.cardVendor
                     });
                     //로그 코드 정렬 금지
                     console.log(
@@ -188,7 +241,7 @@ class SubpingPayment {
                     failureReason: e.message,
                     paymentFailure: true,
                     paidCardVendor: subscribe.userCard.cardVendor,
-                    paidCardNumber: "****"
+                    paidCardNumber: null,
                 });
 
                 response.success = false;

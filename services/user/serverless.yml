@@ -104,7 +104,13 @@ functions:
           
   updateSubscribe:
     handler: ./handler/subscribe/updateSubscribe.handler
-  
+    events:
+      - http:
+          path: updateSubscribe
+          method: post
+          cors: true
+          authorizer: aws_iam
+
   cronSubscribe:
     handler: ./handler/subscribe/cronSubscribe.handler
     events:
