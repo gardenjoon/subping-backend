@@ -5,7 +5,7 @@ import { Payment } from "../entity/Payment";
 export class PaymentRepository extends Repository<Payment> {
     async queryPaymentListOfDate(targetDate: string) {
         return await this.createQueryBuilder("payment")
-            .where("payment.paymentComplete = False")
+            .where("payment.paymentComplete = False and payment.paymentFailure = NULL")
             .andWhere(`payment.paymentDate = "${targetDate}"`)
             .getMany()
     }

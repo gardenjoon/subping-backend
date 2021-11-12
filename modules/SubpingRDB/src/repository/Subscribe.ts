@@ -26,7 +26,22 @@ export class SubscribeRepository extends Repository<Subscribe> {
         service?: boolean;
     }) {
         let query = this.createQueryBuilder("subscribe")
-            .select(["subscribe", "subscribe.user", "subscribeItems.amount", "product"])
+            .select([
+                "subscribe", 
+                "subscribe.user",
+                "subscribeItems.amount",
+                "product", 
+                "payment.id", 
+                "payment.amount", 
+                "payment.paymentDate", 
+                "payment.paymentComplete", 
+                "payment.rewardComplete", 
+                "payment.paymentFailure", 
+                "payment.failureReason", 
+                "payment.paidCardVendor",
+                "payment.paidCardNumber",
+                "payment.createdAt", 
+                "payment.updatedAt"])
             .where(`subscribe.user = "${userId}"`)
             .innerJoin("subscribe.user", "user")
             .innerJoin("subscribe.subscribeItems", "subscribeItems")
@@ -35,15 +50,15 @@ export class SubscribeRepository extends Repository<Subscribe> {
         if (options) {
             if (options.payment) {
                 if (options.payment.endDate && options.payment.startDate) {
-                    query = query.innerJoinAndSelect('subscribe.payments', "payment", 
-                    `payment.paymentDate <= "${options.payment.endDate.toISOString()}"
+                    query = query.innerJoin('subscribe.payments', "payment",
+                        `payment.paymentDate <= "${options.payment.endDate.toISOString()}"
                     AND payment.paymentDate >= "${options.payment.startDate.toISOString()}"`);
                 } else {
-                    throw new Error("[SubpingRDB] payment가 정의되었지만 startDate, endDate가 옳바르지 않습니다.")
+                    query = query.innerJoin('subscribe.payments', "payment");
                 }
             }
 
-            if(options.service) {
+            if (options.service) {
                 query = query.innerJoinAndSelect("product.service", "service");
             }
         }
@@ -54,11 +69,27 @@ export class SubscribeRepository extends Repository<Subscribe> {
     // 해당 서비스에 대한 구독만 반환
     async querySubscribesByServiceId(userId: string, serviceId: string) {
         return await this.createQueryBuilder("subscribe")
-            .select(["subscribe", "subscribe.user", "subscribeItems.amount", "product"])
+            .select([
+                "subscribe", 
+                "subscribe.user",
+                "subscribeItems.amount", 
+                "product", 
+                "payment.id", 
+                "payment.amount", 
+                "payment.paymentDate", 
+                "payment.paymentComplete", 
+                "payment.rewardComplete", 
+                "payment.paymentFailure", 
+                "payment.failureReason", 
+                "payment.paidCardVendor",
+                "payment.paidCardNumber",
+                "payment.createdAt", 
+                "payment.updatedAt"])
             .where(`subscribe.user = "${userId}"`)
             .innerJoin("subscribe.user", "user")
             .innerJoin("subscribe.subscribeItems", "subscribeItems")
             .innerJoin("subscribeItems.product", "product", `product.serviceId = "${serviceId}"`)
+            .innerJoin('subscribe.payments', "payment")
             .getOne();
     }
 }

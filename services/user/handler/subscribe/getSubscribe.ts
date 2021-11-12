@@ -26,7 +26,12 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
 
         else {
             response = await subscribeRepository.querySubscribes(userId, {
-                service: true
+                service: true,
+                // 모든 기간 쿼리
+                payment: {
+                    startDate: null,
+                    endDate: null
+                }
             });
         }
         

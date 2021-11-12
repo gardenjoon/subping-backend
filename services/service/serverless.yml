@@ -98,9 +98,6 @@ functions:
   makeService:
     handler: ./handler/service/makeService.handler
 
-  makeServiceCategory:
-    handler: ./handler/service/makeServiceCategory.handler
-
   makeProduct:
     handler: ./handler/product/makeProduct.handler
 
@@ -130,7 +127,7 @@ functions:
           method: post
           cors: true
           authorizer: aws_iam
-
+ 
   getReviews:
     handler: ./handler/review/getReviews.handler
     events:
