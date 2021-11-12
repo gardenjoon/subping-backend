@@ -24,19 +24,10 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
             }
         })
 
-        if (recentReviews.length === 0) {
-            return failure({
-                success: false,
-                message: "NoReviewsException"
-            })
-        }
-
-        else {
-            return success({
-                success: true,
-                message: recentReviews
-            })
-        }
+        return success({
+            success: true,
+            message: recentReviews
+        })
     }
 
     catch (e) {

@@ -4,8 +4,8 @@ import { Review } from "../entity/Review";
 @EntityRepository(Review)
 export class ReviewRepository extends Repository<Review> {
     // 리뷰 생성
-    async createReview(reviewModel: Review): Promise<void> {
-        await this.save(reviewModel);
+    async createReview(reviewModel: Review) {
+        return await this.save(reviewModel);
     }
 
     // 리뷰 제거
@@ -59,9 +59,11 @@ export class ReviewRepository extends Repository<Review> {
 
         let reviews = this.createQueryBuilder("review")
             .select("review.*")
-            .addSelect("user.nickName", "nickName")
             .addSelect("GROUP_CONCAT(DISTINCT reviewImage.imageUrl)", "reviewImage")
+            .innerJoin("review.service", "service")
+            .addSelect("service.name", "serviceName")
             .innerJoin("review.user", "user")
+            .addSelect("user.nickName", "nickName")
             .leftJoin("review.images", "reviewImage")
             .orderBy("review.updatedAt", "DESC")
             .groupBy("review.id")
@@ -70,7 +72,7 @@ export class ReviewRepository extends Repository<Review> {
             reviews = reviews.andWhere(`review.service = "${serviceId}"`);
         }
 
-        if (userId){
+        if (!serviceId && userId){
             reviews = reviews.andWhere(`review.user = "${userId}"`);
         }
 
@@ -92,7 +94,10 @@ export class ReviewRepository extends Repository<Review> {
         result.map(result => {
             if (result.reviewImage){
                 result.reviewImage = (result.reviewImage.includes(',')) ? result.reviewImage.split(',') : result.reviewImage.split();
-            };
+            }
+            if (result.product) {
+                result.product = (result.product.includes(',')) ? result.product.split(',') : result.product.split();
+            }
         });
 
         return result

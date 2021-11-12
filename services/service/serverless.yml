@@ -159,10 +159,10 @@ functions:
     handler: ./handler/review/getRecentReviews.handler
     events:
       - http:
-        path: getRecentReviews
-        method: post
-        cors: true
-        authorizer: aws_iam
+          path: getRecentReviews
+          method: post
+          cors: true
+          authorizer: aws_iam
 
   backup:
     handler: ./handler/backup/backup.handler

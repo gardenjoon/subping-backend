@@ -8,7 +8,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const body = JSON.parse(event.body || "");
         const userId = event.headers.id;
 
-        const { serviceId } = body;
+        const serviceId = body.serviceId || null;
         const take = body.take || 100;
         const skip = body.skip || 1;
         const currentTime = new Date().toISOString();
@@ -27,19 +27,10 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
             }
         });
 
-        if (reviews.length === 0) {
-            return failure({
-                success: false,
-                message: "NoReviewsException"
-            })
-        }
-
-        else {
-            return success({
-                success: true,
-                message: reviews
-            });
-        }
+        return success({
+            success: true,
+            message: reviews
+        });
     }
     catch (e) {
         console.log(e);

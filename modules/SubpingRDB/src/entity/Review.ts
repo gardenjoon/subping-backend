@@ -31,4 +31,7 @@ export class Review {
     @OneToMany(type => ReviewImage, reviewImage => reviewImage.review, 
         { cascade: true })
     images: ReviewImage[];
+
+    @Column({ type: "text"})
+    product: string;
 }
