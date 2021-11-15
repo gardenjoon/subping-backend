@@ -11,10 +11,8 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         const body = JSON.parse(event.body || "");
 
         const { subscribeId, serviceId, subscribeProducts, period, card, address, deliveryMemo, cancelProductChange } = body;
-        // const serviceId = "35f6a231-4832-49dc-be76-c8241ebb8135";
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
-        const subscribeRepository = connection.getCustomRepository(Repository.Subscribe);
         const productRepository = connection.getCustomRepository(Repository.Product);
         const userCardRepository = connection.getCustomRepository(Repository.UserCard);
         const userAddressRepository = connection.getCustomRepository(Repository.UserAddress);

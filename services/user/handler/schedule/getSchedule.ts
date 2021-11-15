@@ -41,7 +41,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         });
 
         for (const subscribe of subscribes) {
-            const { payments, expiredDate, reSubscribeDate, period, subscribeItems } = subscribe;
+            const { payments, expiredDate, period, subscribeItems } = subscribe;
             const productName = [];
             const reservedProductName = [];
 
@@ -122,26 +122,6 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
                             response[paymentMonth][paymentString].push(schedule)
                             : response[paymentMonth][paymentString] = [schedule]
                     }
-                }
-            }
-
-            if (reSubscribeDate) {
-                const reSubscribeMoment = moment(reSubscribeDate);
-                const reSubscribeMonth = reSubscribeMoment.format("MM");
-                const reSubscribeString = reSubscribeMoment.format("YYYY-MM-DD");
-
-                const schedule = {
-                    "serviceId": subscribeItems[0].product.serviceId,
-                    "serviceName": subscribeItems[0].product.service.name,
-                    "productName": productName,
-                    "serviceLogoUrl": subscribeItems[0].product.service.serviceLogoUrl,
-                    "status": "구독 재시작 예정"
-                }
-
-                if (reSubscribeMonth === currentMonth || reSubscribeMonth === nextMonth) {
-                    response[reSubscribeMonth][reSubscribeString] ? 
-                        response[reSubscribeMonth][reSubscribeString].push(schedule)
-                        : response[reSubscribeMonth][reSubscribeString] = [schedule]
                 }
             }
 

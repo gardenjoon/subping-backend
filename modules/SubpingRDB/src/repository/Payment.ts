@@ -19,4 +19,11 @@ export class PaymentRepository extends Repository<Payment> {
             .where(`payment.id = "${payment.id}"`)
             .getOne()
     }
+
+    async queryLastPaidPayment(subscribeId: string, userId: string) {
+        return await this.createQueryBuilder("payment")
+            .where(`payment.subscribe = "${subscribeId}" AND `)
+            .orderBy('payment.paymentDate', "DESC")
+            .getOne()
+    }
 }
