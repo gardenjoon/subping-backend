@@ -8,7 +8,9 @@
     "coverage": "jest --coverage"
   },
   "dependencies": {
+    "@slack/webhook": "^6.0.0",
     "aws-sdk": "^2.800.0",
+    "iamport": "^0.3.4",
     "moment-timezone": "^0.5.33",
     "node-jsencrypt": "^1.0.0",
     "source-map-support": "^0.5.19",

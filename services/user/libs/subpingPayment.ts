@@ -3,6 +3,7 @@ import Iamport from "iamport";
 import * as moment from "moment-timezone";
 import SubpingRDB, { Entity, Repository } from "subpingrdb";
 import { Payment } from "subpingrdb/dist/src/entity/Payment";
+import { SubscribeItem } from "subpingrdb/dist/src/entity/SubscribeItem";
 
 type Response = {
     success: boolean;
@@ -62,22 +63,96 @@ class SubpingPayment {
         };
 
         try {
-            const today = moment.tz("Asia/Seoul").format("YYYY-MM-DD");
+            // const today = moment.tz("Asia/Seoul").format("YYYY-MM-DD");
+            const today = "2022-03-15"
             let totalPrice = 0;
+            let reservedTotalPrice = 0;
 
             const subpingRDB = new SubpingRDB();
             const connection = await subpingRDB.getConnection("dev");
+            const subscribeRepository = connection.getCustomRepository(Repository.Subscribe);
             const paymentRepository = connection.getCustomRepository(Repository.Payment);
+
             const queryRunner = connection.createQueryRunner();
-
             const targetPayment = await paymentRepository.queryPayment(payment);
-
             const subscribe = targetPayment.subscribe;
+
+            if(subscribe.reSubscribeDate != null) {
+                const reSubscribeDateString = moment(subscribe.reSubscribeDate).format("YYYY-MM-DD");
+
+                if(reSubscribeDateString == today) {
+                    await subscribeRepository.update({
+                        id: subscribe.id
+                    }, {
+                        reSubscribeDate: null
+                    })
+                } else {
+                    await paymentRepository.update({
+                        id: targetPayment.id
+                    }, {
+                        paymentDate: reSubscribeDateString
+                    })
+                    
+                    response.success = false;
+                    response.totalPrice = 0;
+                    response.error = "잘못된 일시정지 해제일";
+                    
+                    return response;
+                }
+            }
+
             const subscribeItems = subscribe.subscribeItems;
+            const reservedItems: SubscribeItem[] = [];
 
             subscribeItems.map(item => {
-                totalPrice += (item.amount * item.product.price);
+                if(item.reserved) {
+                    reservedItems.push(item);
+                    reservedTotalPrice += (item.amount * item.product.price);
+                } else {
+                    totalPrice += (item.amount * item.product.price);
+                }
             })
+            
+            if(reservedItems.length != 0) {
+                totalPrice = reservedTotalPrice;
+                
+                const queryRunner = connection.createQueryRunner();
+
+                try {
+                    await queryRunner.startTransaction();
+
+                    await queryRunner.manager.delete(Entity.SubscribeItem, {
+                        reserved: false
+                    });
+                    
+                    await queryRunner.manager.update(Entity.SubscribeItem, {
+                        subscribe: subscribe.id,
+                    }, {
+                        reserved: false
+                    });
+
+                    await queryRunner.commitTransaction();
+                } catch(e) {
+                    console.log(
+                        `[SubpingPayment] 예약 결제 실패\n구독 id : "${subscribe.id}"`);
+                    
+                    await webhook.send({
+                        text:
+                            `[결제 실패 알림]\n사유 : 예약된 구독 에러\n에러 : ${e}`
+                    }).catch(_ => { });
+
+                    await queryRunner.rollbackTransaction();
+                    await queryRunner.release()
+
+                    response.success = false;
+                    response.error = e;
+                    response.totalPrice = totalPrice;
+
+                    return response
+                } finally { 
+                    await queryRunner.release()
+                }
+            } 
 
             response.totalPrice = totalPrice;
 
@@ -114,13 +189,11 @@ class SubpingPayment {
                         await queryRunner.manager.save(nextPayment);
                         await queryRunner.commitTransaction();
 
-                        //로그 코드 정렬 금지
                         console.log(
                             `[SubpingPayment] 결제 성공\nprice: ${totalPrice}\nnextPaymentDate: ${nextPaymentDate}\nuserCard: ${subscribe.userCard.id}\nsubscribeId: ${subscribe.id}\npaymentId: ${targetPayment.id}\nimp_uid: ${imp_uid}\nstatus: ${status}`);
 
                         response.success = true;
                         return response;
-
                     }
                     
                     catch (e) {
@@ -155,10 +228,9 @@ class SubpingPayment {
                     }, {
                         failureReason: fail_reason,
                         paymentFailure: true,
-                        paidCardNumber: card_number,
-                        paidCardVendor: card_name
+                        paidCardNumber: null,
+                        paidCardVendor: targetPayment.subscribe.userCard.cardVendor
                     });
-                    //로그 코드 정렬 금지
                     console.log(
                         `[SubpingPayment] 결제 실패\nprice: ${totalPrice}\nuserCard: ${subscribe.userCard.id}\nsubscribeId: ${subscribe.id}\npaymentId: ${targetPayment.id}\nerror: ${fail_reason}`);
 
@@ -173,7 +245,6 @@ class SubpingPayment {
                 }
             }
             catch (e) {
-                //로그 코드 정렬 금지
                 console.log(
                     `[SubpingPayment] 결제 실패\nprice: ${totalPrice}\nuserCard: ${subscribe.userCard.id}\nsubscribeId: ${subscribe.id}\npaymentId: ${targetPayment.id}\nerror: ${e.message}`);
 
@@ -188,7 +259,7 @@ class SubpingPayment {
                     failureReason: e.message,
                     paymentFailure: true,
                     paidCardVendor: subscribe.userCard.cardVendor,
-                    paidCardNumber: "****"
+                    paidCardNumber: null,
                 });
 
                 response.success = false;
@@ -197,7 +268,6 @@ class SubpingPayment {
             }
         }
         catch (e) {
-            //로그 코드 정렬 금지
             console.log(
                 `[SubpingPayment] 결제 실패\npaymentId: ${payment.id}\nerror: ${e.message}`);
 

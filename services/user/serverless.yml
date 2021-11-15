@@ -104,12 +104,36 @@ functions:
           
   updateSubscribe:
     handler: ./handler/subscribe/updateSubscribe.handler
-  
+    events:
+      - http:
+          path: updateSubscribe
+          method: post
+          cors: true
+          authorizer: aws_iam
+
   cronSubscribe:
     handler: ./handler/subscribe/cronSubscribe.handler
     events:
       - schedule: cron(0 1 * * ? *)
   
+  cancelSubscribe:
+    handler: ./handler/subscribe/cancelSubscribe.handler
+    events:
+      - http:
+          path: cancelSubscribe
+          method: post
+          cors: true
+          authorizer: aws_iam
+  
+  pauseSubscribe:
+    handler: ./handler/subscribe/pauseSubscribe.handler
+    events:
+      - http:
+          path: pauseSubscribe
+          method: post
+          cors: true
+          authorizer: aws_iam
+
   duplicateNickName:
     handler: ./handler/nickname/duplicateNickName.handler
     events:

@@ -7,16 +7,19 @@ export class SubscribeItem {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @ManyToOne(type => Subscribe, subscribe => subscribe.subscribeItems, 
-        { onDelete: "CASCADE", onUpdate:  "CASCADE" })
+    @ManyToOne(type => Subscribe, subscribe => subscribe.subscribeItems,
+        { onDelete: "CASCADE", onUpdate: "CASCADE" })
     subscribe: Subscribe;
 
-    @ManyToOne(type => Product, product => product.subscribeItems, 
-        { onDelete: "CASCADE", onUpdate:  "CASCADE" })
+    @ManyToOne(type => Product, product => product.subscribeItems,
+        { onDelete: "CASCADE", onUpdate: "CASCADE" })
     product: Product;
 
     @Column({ nullable: false })
     amount: number;
+
+    @Column({ nullable: false, default: false })
+    reserved: boolean;
 
     @CreateDateColumn({ nullable: false })
     createdAt: Date;

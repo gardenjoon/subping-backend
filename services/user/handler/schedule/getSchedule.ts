@@ -41,40 +41,48 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         });
 
         for (const subscribe of subscribes) {
-            const { payments, expiredDate, reSubscribeDate, period, subscribeItems } = subscribe;
+            const { payments, expiredDate, period, subscribeItems } = subscribe;
             const productName = [];
+            const reservedProductName = [];
+
             let totalPrice = 0;
+            let reservedPrice = 0;
             
             subscribeItems.forEach(item => {
-                productName.push(item.product.name);
-                totalPrice += item.product.price * item.amount;
+                if(item.reserved) {
+                    reservedPrice += item.product.price * item.amount;
+                    reservedProductName.push(item.product.name);
+                } else {
+                    totalPrice += item.product.price * item.amount;
+                    productName.push(item.product.name);
+                }
             })
 
             for (const payment of payments) {
-                const { paymentDate, paymentComplete, paymentFailure } = payment;
+                const { paymentDate, paymentComplete, paymentFailure, amount } = payment;
                 
                 const paymentMoment = moment(paymentDate);
                 const paymentMonth = paymentMoment.format("MM");
                 const paymentString = paymentMoment.format("YYYY-MM-DD");
 
-                const schedule = {
-                    "serviceId": subscribeItems[0].product.serviceId,
-                    "serviceName": subscribeItems[0].product.service.name,
-                    "productName": productName,
-                    "totalPrice": totalPrice,
-                    "serviceLogoUrl": subscribeItems[0].product.service.serviceLogoUrl,
-                    "status": paymentFailure ? "결제 실패" : paymentComplete ? "결제 완료" : "결제 예정"
-                }
-
-                if (paymentMonth === currentMonth || paymentMonth === nextMonth) {
-                    response[paymentMonth][paymentString] ? 
-                        response[paymentMonth][paymentString].push(schedule)
-                        : response[paymentMonth][paymentString] = [schedule]
-                }
-
                 // payment는 항상 다음 결제 예정일과 이전 결제일이 남아있음, 따라서 다음 결제일일 경우 항상 payment의 마지막 요소이고
                 // 캘린더는 2달치를 나타내기 때문에, 나머지 빈 간격을 매꾸어 줘야함.
                 if(!paymentFailure && !paymentComplete) {
+                    const schedule = {
+                        "serviceId": subscribeItems[0].product.serviceId,
+                        "serviceName": subscribeItems[0].product.service.name,
+                        "productName": reservedProductName.length != 0 ? reservedProductName :productName,
+                        "totalPrice": reservedProductName.length != 0 ? reservedPrice : totalPrice,
+                        "serviceLogoUrl": subscribeItems[0].product.service.serviceLogoUrl,
+                        "status": "결제 예정"
+                    }
+    
+                    if (paymentMonth === currentMonth || paymentMonth === nextMonth) {
+                        response[paymentMonth][paymentString] ? 
+                            response[paymentMonth][paymentString].push(schedule)
+                            : response[paymentMonth][paymentString] = [schedule]
+                    }
+
                     let estimatedPaymentString = SubpingPayment.calcNextPaymentDate(period, paymentString);
                     let estimatedPaymentMoment = moment(estimatedPaymentString);
                     let estimatedPaymentMonth = estimatedPaymentMoment.format("MM");
@@ -83,8 +91,8 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
                         const schedule = {
                             "serviceId": subscribeItems[0].product.serviceId,
                             "serviceName": subscribeItems[0].product.service.name,
-                            "productName": productName,
-                            "totalPrice": totalPrice,
+                            "productName": reservedProductName.length != 0 ? reservedProductName :productName,
+                            "totalPrice": reservedProductName.length != 0 ? reservedPrice : totalPrice,
                             "serviceLogoUrl": subscribeItems[0].product.service.serviceLogoUrl,
                             "status": "결제 예정"
                         }
@@ -99,26 +107,21 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
                         estimatedPaymentMoment = moment(estimatedPaymentString);
                         estimatedPaymentMonth = estimatedPaymentMoment.format("MM");
                     } 
-                }
-            }
-
-            if (reSubscribeDate) {
-                const reSubscribeMoment = moment(reSubscribeDate);
-                const reSubscribeMonth = reSubscribeMoment.format("MM");
-                const reSubscribeString = reSubscribeMoment.format("YYYY-MM-DD");
-
-                const schedule = {
-                    "serviceId": subscribeItems[0].product.serviceId,
-                    "serviceName": subscribeItems[0].product.service.name,
-                    "productName": productName,
-                    "serviceLogoUrl": subscribeItems[0].product.service.serviceLogoUrl,
-                    "status": "구독 재시작 예정"
-                }
-
-                if (reSubscribeMonth === currentMonth || reSubscribeMonth === nextMonth) {
-                    response[reSubscribeMonth][reSubscribeString] ? 
-                        response[reSubscribeMonth][reSubscribeString].push(schedule)
-                        : response[reSubscribeMonth][reSubscribeString] = [schedule]
+                } else {
+                    const schedule = {
+                        "serviceId": subscribeItems[0].product.serviceId,
+                        "serviceName": subscribeItems[0].product.service.name,
+                        "productName": productName,
+                        "totalPrice": amount,
+                        "serviceLogoUrl": subscribeItems[0].product.service.serviceLogoUrl,
+                        "status": paymentFailure ? "결제 실패" : "결제 완료"
+                    }
+    
+                    if (paymentMonth === currentMonth || paymentMonth === nextMonth) {
+                        response[paymentMonth][paymentString] ? 
+                            response[paymentMonth][paymentString].push(schedule)
+                            : response[paymentMonth][paymentString] = [schedule]
+                    }
                 }
             }
 
