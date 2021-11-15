@@ -1,16 +1,16 @@
 import SubpingRDB, { Entity } from "subpingrdb";
-import  * as moment from "moment-timezone";
+import moment from "moment-timezone";
 
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import { success, failure } from "../../libs/response-lib";
 
 const makeHour = (hour: Number) => {
-    let standardHour: string;
-    return standardHour = 
-            (3 <= hour && hour < 9) ? "03:00"
-        :   (9 <= hour && hour < 15) ? "09:00"
-        :   (15 <= hour && hour < 21) ? "15:00"
-        :   "21:00"
+    let standardHour: string = 
+        (3 <= hour && hour < 9) ? "03:00"
+    :   (9 <= hour && hour < 15) ? "09:00"
+    :   (15 <= hour && hour < 21) ? "15:00"
+    :   "21:00";
+    return standardHour
 }
 export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
@@ -51,32 +51,32 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
             await queryRunner.manager.save(serviceModel);
 
             serviceEventModel.service = serviceModel;
-
+            
             await queryRunner.manager.save(serviceEventModel);
-
+            
             for(const category of categories) {
                 const categoryModel = new Entity.Category();
                 categoryModel.name = category
                 serviceCategoryModel.service = serviceModel;
                 serviceCategoryModel.category = categoryModel;
-
+                
                 await queryRunner.manager.save(serviceCategoryModel);
             }
-
+            
             for(const tag of tags) {
                 serviceTagModel.service = serviceModel;
                 serviceTagModel.tag = tag;
-
+                
                 await queryRunner.manager.save(serviceTagModel);
             }
-
+            
             for (const period of periods) {
                 servicePeriodModel.service = serviceModel;
                 servicePeriodModel.period = period;
-
+                
                 await queryRunner.manager.save(servicePeriodModel)
             }
-
+            
             await queryRunner.commitTransaction();
         }
 

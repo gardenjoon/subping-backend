@@ -18,10 +18,13 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         
         const userModel = new Entity.User();
         userModel.id = userId;
+
+        const serviceModel = new Entity.Service();
+        serviceModel.id = serviceId
         
         const userLikeModel = new Entity.UserLike();
         userLikeModel.user = userModel;
-        userLikeModel.service = serviceId;
+        userLikeModel.service = serviceModel;
 
         // 만약 토글이 true이고 존재하는 좋아요가 없으면, 생성
         if(toggle && !existUserLike) {

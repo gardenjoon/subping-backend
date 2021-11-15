@@ -1,4 +1,4 @@
-import SubpingRDB, { Repository, Entity } from "subpingrdb";
+import SubpingRDB, { Repository } from "subpingrdb";
 
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import { success, failure } from "../../libs/response-lib";

@@ -7,7 +7,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
     try {
         const userId = event.headers.id;
         const body = JSON.parse(event.body || "");
-        
+
         const { userName, userPhoneNumber, postCode, address, detailedAddress, isDefault } = body;
 
         if (!(userName && postCode && address && detailedAddress && isDefault != null && userPhoneNumber)) {
@@ -60,6 +60,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
             }
 
             await addressRepository.createUserAddress(newAddress);
+            await queryRunner.commitTransaction();
         }
 
         catch (e) {

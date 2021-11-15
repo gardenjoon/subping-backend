@@ -13,7 +13,7 @@ export class ServiceEvent {
     date: string;
 
     @PrimaryColumn({ length: 20 })
-    time: RankTime;
+    time: RankTime | string;
 
     @Column({ nullable: false, default: 0 })
     subscribe: Number;
