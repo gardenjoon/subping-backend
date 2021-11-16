@@ -1,4 +1,5 @@
-import { Entity, CreateDateColumn, UpdateDateColumn, ManyToOne, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, CreateDateColumn, UpdateDateColumn, ManyToOne, PrimaryGeneratedColumn, Column, OneToOne } from "typeorm";
+import { Reward } from "./Reward";
 import { Subscribe } from "./Subscribe";
 
 @Entity()
@@ -22,8 +23,9 @@ export class Payment {
     @Column({ nullable: false, default: false })
     paymentComplete: Boolean;
 
-    @Column({ nullable: false, default: false })
-    rewardComplete: Boolean;
+    @OneToOne(type => Reward, reward => reward.payment,
+        { nullable: false, cascade: true })
+    reward: Reward;
 
     @Column({ nullable: false, default: false })
     paymentFailure: Boolean;

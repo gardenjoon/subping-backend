@@ -1,4 +1,5 @@
 import { Entity, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, PrimaryGeneratedColumn, OneToMany, RelationId } from "typeorm";
+import { RewardItem } from "./RewardItem";
 import { Service } from "./Service";
 import { SubscribeItem } from "./SubscribeItem";
 
@@ -38,4 +39,8 @@ export class Product {
     @OneToMany(type => SubscribeItem, subscribeItem => subscribeItem.product, 
         { cascade: true })
     subscribeItems: SubscribeItem[];
+
+    @OneToMany(type => RewardItem, rewardItem => rewardItem.product, 
+        { cascade: true })
+    rewardItems: RewardItem[];
 }
