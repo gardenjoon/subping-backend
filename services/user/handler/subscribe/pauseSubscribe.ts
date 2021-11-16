@@ -26,8 +26,7 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
 
         if (subscribe) {
             if (cancelPause) {
-                // const today = moment().tz("Asia/Seoul").format("YYYY-MM-DD")
-                const today = "2022-01-20";
+                const today = moment().tz("Asia/Seoul").format("YYYY-MM-DD")
                 const reservedPayment = subscribe.payments[0];
                 const lastPaidPayment = subscribe.payments[1];
                 const originalReservedPaymentDate = SubpingPayment.calcNextPaymentDate(subscribe.period, lastPaidPayment.paymentDate.toString());
