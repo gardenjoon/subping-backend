@@ -1,6 +1,6 @@
-import { Service } from "../entity/Service";
 import { EntityRepository, Repository } from "typeorm";
 import { ServiceEvent } from "../entity/ServiceEvent";
+import { Service } from "../entity/Service";
 
 @EntityRepository(ServiceEvent)
 export class ServiceEventRepository extends Repository<ServiceEvent> {

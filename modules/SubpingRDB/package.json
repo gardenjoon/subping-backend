@@ -6,14 +6,14 @@
    "devDependencies": {
       "@types/node": "^8.0.29",
       "ts-node": "3.3.0",
-      "typescript": "3.3.3333"
+      "typescript": "^4.4.4"
    },
    "dependencies": {
       "aws-sdk": "^2.948.0",
       "moment-timezone": "^0.5.33",
       "mysql": "^2.14.1",
       "reflect-metadata": "^0.1.10",
-      "typeorm": "0.2.34",
+      "typeorm": "^0.2.38",
       "typeorm-aurora-data-api-driver": "^2.2.0"
    },
    "scripts": {
