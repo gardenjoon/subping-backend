@@ -1,4 +1,5 @@
-import { Entity, CreateDateColumn, UpdateDateColumn, ManyToOne, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, CreateDateColumn, UpdateDateColumn, ManyToOne, PrimaryGeneratedColumn, Column, OneToOne } from "typeorm";
+import { Reward } from "./Reward";
 import { Subscribe } from "./Subscribe";
 
 @Entity()
@@ -12,6 +13,9 @@ export class Payment {
     @ManyToOne(type => Subscribe, subscribe => subscribe.payments, 
         { onDelete: "CASCADE", onUpdate:  "CASCADE" })
     subscribe: Subscribe;
+    
+    @OneToOne(type => Reward, reward => reward.payment)
+    reward: Reward;
 
     @Column({ nullable: false })
     amount: number;

@@ -35,6 +35,8 @@ import { ReviewImageRepository } from "./repository/ReviewImage";
 import { UserAddressRepository } from "./repository/UserAddress";
 import { UserCardRepository } from "./repository/UserCard";
 import { PaymentRepository } from "./repository/Payment";
+import { Reward } from "./entity/Reward";
+import { RewardItem } from "./entity/RewardItem";
 
 process.env.TZ = "UTC";
 
@@ -49,6 +51,8 @@ export const Entity = {
     Category: Category,
     Product: Product,
     Review: Review,
+    Reward: Reward,
+    RewardItem: RewardItem,
     ReviewImage: ReviewImage,
     Seller: Seller,
     Service: Service,

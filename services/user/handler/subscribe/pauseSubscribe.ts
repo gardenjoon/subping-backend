@@ -25,115 +25,117 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
         }))[0];
 
         if (subscribe) {
-            if (cancelPause) {
-                const today = moment().tz("Asia/Seoul").format("YYYY-MM-DD")
-                const reservedPayment = subscribe.payments[0];
-                const lastPaidPayment = subscribe.payments[1];
-                const originalReservedPaymentDate = SubpingPayment.calcNextPaymentDate(subscribe.period, lastPaidPayment.paymentDate.toString());
+            if (subscribe.userId == userId) {
+                if (cancelPause) {
+                    const today = moment().tz("Asia/Seoul").format("YYYY-MM-DD")
+                    const reservedPayment = subscribe.payments[0];
+                    const lastPaidPayment = subscribe.payments[1];
+                    const originalReservedPaymentDate = SubpingPayment.calcNextPaymentDate(subscribe.period, lastPaidPayment.paymentDate.toString());
 
-                const queryRunner = connection.createQueryRunner();
+                    const queryRunner = connection.createQueryRunner();
 
-                // 취소일이 원래 갱신되어야 하는 날짜보다 이를 때
-                if (originalReservedPaymentDate > today) {
-                    await queryRunner.startTransaction();
+                    // 취소일이 원래 갱신되어야 하는 날짜보다 이를 때
+                    if (originalReservedPaymentDate > today) {
+                        await queryRunner.startTransaction();
 
-                    try {
-                        await queryRunner.manager.update(Entity.Subscribe, {
-                            id: subscribe.id
-                        }, {
-                            reSubscribeDate: null
-                        });
+                        try {
+                            await queryRunner.manager.update(Entity.Subscribe, {
+                                id: subscribe.id
+                            }, {
+                                reSubscribeDate: null
+                            });
 
-                        await queryRunner.manager.update(Entity.Payment, {
-                            id: reservedPayment.id
-                        }, {
-                            paymentDate: originalReservedPaymentDate
-                        });
+                            await queryRunner.manager.update(Entity.Payment, {
+                                id: reservedPayment.id
+                            }, {
+                                paymentDate: originalReservedPaymentDate
+                            });
 
-                        await queryRunner.commitTransaction();
-                    }
-
-                    catch (e) {
-                        await queryRunner.rollbackTransaction();
-                        await queryRunner.release();
-
-                        return failure({
-                            success: false,
-                            message: "DBException"
-                        })
-                    }
-
-                    finally {
-                        await queryRunner.release();
-                    }
-                }
-
-                // 취소일이 원래 갱신되어야 하는 날짜보다 늦을 때 -> 바로 갱신
-                else {
-                    await queryRunner.startTransaction();
-
-                    try {
-                        await queryRunner.manager.update(Entity.Subscribe, {
-                            id: subscribe.id
-                        }, {
-                            reSubscribeDate: null
-                        });
-
-                        await queryRunner.manager.update(Entity.Payment, {
-                            id: reservedPayment.id
-                        }, {
-                            paymentDate: today
-                        });
-                        await queryRunner.commitTransaction();
-                    }
-
-                    catch (e) {
-                        await queryRunner.rollbackTransaction();
-                        await queryRunner.release();
-
-                        return failure({
-                            success: false,
-                            message: "DBException"
-                        })
-                    }
-
-                    finally {
-                        await queryRunner.release();
-                    }
-
-                    try {
-                        // 결제를 진행합니다.
-                        const subpingPayment = new SubpingPayment();
-                        const result = await subpingPayment.pay(reservedPayment);
-
-                        if (!result.success) {
-                            throw new Error(`PaymentException`);
+                            await queryRunner.commitTransaction();
                         }
-                    } catch (e) {
-                        await subscribeRepository.delete({ id: subscribe.id });
 
-                        console.log(`[makeSubscribe] 구독 요청 실패 - 결제 오류`);
+                        catch (e) {
+                            await queryRunner.rollbackTransaction();
+                            await queryRunner.release();
 
+                            return failure({
+                                success: false,
+                                message: "DBException"
+                            })
+                        }
+
+                        finally {
+                            await queryRunner.release();
+                        }
+                    }
+
+                    // 취소일이 원래 갱신되어야 하는 날짜보다 늦을 때 -> 바로 갱신
+                    else {
+                        await queryRunner.startTransaction();
+
+                        try {
+                            await queryRunner.manager.update(Entity.Subscribe, {
+                                id: subscribe.id
+                            }, {
+                                reSubscribeDate: null
+                            });
+
+                            await queryRunner.manager.update(Entity.Payment, {
+                                id: reservedPayment.id
+                            }, {
+                                paymentDate: today
+                            });
+                            await queryRunner.commitTransaction();
+                        }
+
+                        catch (e) {
+                            await queryRunner.rollbackTransaction();
+                            await queryRunner.release();
+
+                            return failure({
+                                success: false,
+                                message: "DBException"
+                            })
+                        }
+
+                        finally {
+                            await queryRunner.release();
+                        }
+
+                        try {
+                            // 결제를 진행합니다.
+                            const subpingPayment = new SubpingPayment();
+                            const result = await subpingPayment.pay(reservedPayment);
+
+                            if (!result.success) {
+                                throw new Error(`PaymentException`);
+                            }
+                        } catch (e) {
+                            await subscribeRepository.delete({ id: subscribe.id });
+
+                            console.log(`[makeSubscribe] 구독 요청 실패 - 결제 오류`);
+
+                            return failure({
+                                success: false,
+                                message: "PaymentException"
+                            })
+                        }
+                    }
+
+                    return success({
+                        success: true,
+                        message: "done"
+                    });
+                } 
+                
+                else {
+                    if (subscribe.reSubscribeDate != null) {
                         return failure({
                             success: false,
-                            message: "PaymentException"
+                            message: "AlreadyPausedException"
                         })
                     }
-                }
 
-                return success({
-                    success: true,
-                    message: "done"
-                });
-            } else {
-                if (subscribe.reSubscribeDate != null) {
-                    return failure({
-                        success: false,
-                        message: "AlreadyPausedException"
-                    })
-                }
-
-                if (subscribe.userId == userId) {
                     // 만약 마지막 payment가 예약된 것이 아니면 재구독에 실패한 케이스
                     const isReservedPayment = (!subscribe.payments[0].paymentFailure && !subscribe.payments[0].paymentComplete)
 
@@ -193,15 +195,14 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
                         message: "done"
                     });
                 }
-
-                else {
-                    return failure({
-                        success: false,
-                        message: "WrongAccessException"
-                    });
-                }
+            } 
+            
+            else {
+                return failure({
+                    success: false,
+                    message: "WrongAccessException"
+                });
             }
-
         }
 
         else {

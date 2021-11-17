@@ -45,7 +45,6 @@ export class SubscribeRepository extends Repository<Subscribe> {
                     "payment.amount", 
                     "payment.paymentDate", 
                     "payment.paymentComplete", 
-                    "payment.rewardComplete", 
                     "payment.paymentFailure", 
                     "payment.failureReason", 
                     "payment.paidCardVendor",
@@ -62,6 +61,7 @@ export class SubscribeRepository extends Repository<Subscribe> {
                     query = query.innerJoin('subscribe.payments', "payment");
                 }
 
+                query = query.leftJoinAndSelect('payment.reward', 'reward');
                 query = query.orderBy('payment.paymentDate', 'DESC')
             }
 
@@ -90,7 +90,6 @@ export class SubscribeRepository extends Repository<Subscribe> {
                 "payment.amount", 
                 "payment.paymentDate", 
                 "payment.paymentComplete", 
-                "payment.rewardComplete", 
                 "payment.paymentFailure", 
                 "payment.failureReason", 
                 "payment.paidCardVendor",

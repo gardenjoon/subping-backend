@@ -120,7 +120,6 @@ export const handler: APIGatewayProxyHandler = async (event, _context) => {
             payment.amount = 0;
             payment.paymentDate = subscribeDate;
             payment.paymentComplete = false;
-            payment.rewardComplete = false;
             payment.paymentFailure = false;
             payment.subscribe = subscribe;
             

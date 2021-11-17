@@ -63,8 +63,7 @@ class SubpingPayment {
         };
 
         try {
-            // const today = moment.tz("Asia/Seoul").format("YYYY-MM-DD");
-            const today = "2022-03-15"
+            const today = moment.tz("Asia/Seoul").format("YYYY-MM-DD");
             let totalPrice = 0;
             let reservedTotalPrice = 0;
 
@@ -179,20 +178,37 @@ class SubpingPayment {
                         });
                         const nextPaymentDate = SubpingPayment.calcNextPaymentDate(subscribe.period, today);
 
-                        const nextPayment = new Entity.Payment;
+                        const nextPayment = new Entity.Payment();
                         nextPayment.amount = 0;
                         nextPayment.paymentDate = new Date(nextPaymentDate);
                         nextPayment.paymentComplete = false;
-                        nextPayment.rewardComplete = false;
                         nextPayment.subscribe = targetPayment.subscribe;
 
                         await queryRunner.manager.save(nextPayment);
+
+                        const reward = new Entity.Reward();
+                        reward.payment = targetPayment,
+                        reward.startDate = today,
+                        reward.endDate = moment(SubpingPayment.calcNextPaymentDate(subscribe.period, today)).subtract(1, "day").format("YYYY-MM-DD");
+                            
+                        await queryRunner.manager.save(reward);
+
+                        for(const items of subscribe.subscribeItems) {
+                            const rewardItem = new Entity.RewardItem();
+                            rewardItem.product = items.product;
+                            rewardItem.amount = items.amount;
+                            rewardItem.reward = reward;
+                            
+                            await queryRunner.manager.save(rewardItem);
+                        }
+                        
                         await queryRunner.commitTransaction();
 
                         console.log(
                             `[SubpingPayment] 결제 성공\nprice: ${totalPrice}\nnextPaymentDate: ${nextPaymentDate}\nuserCard: ${subscribe.userCard.id}\nsubscribeId: ${subscribe.id}\npaymentId: ${targetPayment.id}\nimp_uid: ${imp_uid}\nstatus: ${status}`);
 
                         response.success = true;
+
                         return response;
                     }
                     
