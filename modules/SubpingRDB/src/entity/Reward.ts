@@ -1,4 +1,4 @@
-import { Entity, Column, CreateDateColumn, UpdateDateColumn, OneToMany, PrimaryGeneratedColumn, OneToOne } from "typeorm";
+import { Entity, Column, CreateDateColumn, UpdateDateColumn, OneToMany, PrimaryGeneratedColumn, OneToOne, JoinColumn } from "typeorm";
 import { Payment } from "./Payment";
 import { RewardItem } from "./RewardItem";
 
@@ -7,8 +7,9 @@ export class Reward {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @OneToOne(type => Payment, payment => payment.reward,
+    @OneToOne(type => Payment, payment => payment.id,
         { onDelete: "CASCADE", onUpdate:  "CASCADE" })
+    @JoinColumn()
     payment: Payment;
 
     @Column({ nullable: false })

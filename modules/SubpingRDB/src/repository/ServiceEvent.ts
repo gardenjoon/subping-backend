@@ -1,3 +1,4 @@
+import { Service } from "../entity/Service";
 import { EntityRepository, Repository } from "typeorm";
 import { ServiceEvent } from "../entity/ServiceEvent";
 
@@ -10,7 +11,9 @@ export class ServiceEventRepository extends Repository<ServiceEvent> {
 
     // 서비스Id로 서비스이벤트 제거
     async deleteServiceEvent(serviceId: string): Promise<void> {
-        await this.delete({ service : serviceId });
+        const serviceModel = new Service();
+        serviceModel.id = serviceId;
+        await this.delete({ service : serviceModel });
     }
 
     // 모든 서비스이벤트 반환

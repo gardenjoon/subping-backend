@@ -1,4 +1,4 @@
-import { Entity, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, PrimaryGeneratedColumn, OneToOne } from "typeorm";
+import { Entity, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Product } from "./Product";
 import { Reward } from "./Reward";
 
@@ -7,7 +7,7 @@ export class RewardItem {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @OneToOne(type => Product, product => product.rewardItems,
+    @ManyToOne(type => Product, product => product.rewardItems,
         { onDelete: "CASCADE", onUpdate: "CASCADE" })
     product: Product;
 
