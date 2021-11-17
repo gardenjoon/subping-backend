@@ -76,6 +76,29 @@ class SubpingPayment {
             const targetPayment = await paymentRepository.queryPayment(payment);
             const subscribe = targetPayment.subscribe;
 
+            if(subscribe.expiredDate != null) {
+                const expireDateString = moment(subscribe.expiredDate).format("YYYY-MM-DD");
+
+                if(expireDateString == today) {
+                    await subscribeRepository.delete({
+                        id: subscribe.id
+                    });
+
+                    response.success = true;
+                    response.totalPrice = 0;
+                    
+                    return response;
+                } 
+                
+                else {
+                    response.success = false;
+                    response.totalPrice = 0;
+                    response.error = "잘못된 해지일";
+                    
+                    return response;
+                }
+            }
+            
             if(subscribe.reSubscribeDate != null) {
                 const reSubscribeDateString = moment(subscribe.reSubscribeDate).format("YYYY-MM-DD");
 
@@ -85,7 +108,9 @@ class SubpingPayment {
                     }, {
                         reSubscribeDate: null
                     })
-                } else {
+                } 
+                
+                else {
                     await paymentRepository.update({
                         id: targetPayment.id
                     }, {
