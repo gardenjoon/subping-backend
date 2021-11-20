@@ -1,0 +1,15 @@
+{
+  "name": "subping-serverless",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/Joiple-co/subping-serverless.git",
+  "author": "W1nU <jsw9808@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "modules/*",
+      "services/*"
+    ]
+  }
+}

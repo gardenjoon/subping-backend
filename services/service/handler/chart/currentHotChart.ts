@@ -1,5 +1,5 @@
 import SubpingRDB, { Repository } from "subpingrdb";
-import SubpingDDB from "../../libs/subpingddb";
+import SubpingDDB from "subpingddb";
 
 import * as moment from "moment-timezone";
 

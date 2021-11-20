@@ -3,12 +3,14 @@ service: user
 plugins:
   - serverless-webpack
   - serverless-offline
+  - serverless-plugin-monorepo
 
 custom:
   stage: ${opt:stage, self:provider.stage}
   webpack:
     webpackConfig: ./webpack.config.js
     includeModules: true
+    packager: yarn
 
 provider:
   name: aws

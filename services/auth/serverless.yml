@@ -23,21 +23,14 @@ service: auth
 plugins:
   - serverless-webpack
   - serverless-offline
-  
+  - serverless-plugin-monorepo
+
 custom:
   stage: ${opt:stage, self:provider.stage}
   webpack:
     webpackConfig: ./webpack.config.js
-    includeModules:
-      forceExclude:
-        - aws-sdk
-    packager: 'npm'
-
-  serverless-layers:
-    dependenciesPath: ./package.json
-    layersDeploymentBucket: subping-dev-layer-deployment
-    compatibleRuntimes: ["nodejs12.x"]
-    packageManager: npm
+    packager: yarn
+    includeModules: true
 
 provider:
   name: aws

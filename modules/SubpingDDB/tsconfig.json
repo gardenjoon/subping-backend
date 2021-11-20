@@ -4,7 +4,9 @@
     "target": "ES2015",
     "strict": true,
     "outDir": "dist",
-    "sourceMap": true
+    "sourceMap": true,
+    "noEmitHelpers": true,
+    "importHelpers": true
   },
   "typeRoots": [
     "node_modules/@types"

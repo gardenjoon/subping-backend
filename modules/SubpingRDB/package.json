@@ -2,7 +2,9 @@
    "name": "subpingrdb",
    "version": "0.0.1",
    "description": "Awesome project developed with TypeORM.",
+   "private": true,
    "main": "dist/src/index.js",
+   "types": "dist/src/index.d.ts",
    "devDependencies": {
       "@types/node": "^8.0.29",
       "ts-node": "3.3.0",

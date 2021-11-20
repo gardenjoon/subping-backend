@@ -8,9 +8,6 @@
     "sourceMap": true,
     "target": "es2017",
     "outDir": "lib",
-    "paths": {
-      "subpingrdb": ["../../modules/SubpingRDB"]
-    }
   },
   "include": ["./**/*.ts"],
   "exclude": [

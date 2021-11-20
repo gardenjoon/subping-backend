@@ -1,6 +1,6 @@
 import SubpingRDB, { Repository, Entity } from "subpingrdb";
-import SubpingDDB from "../../libs/SubpingDDB";
-import HotChartTimeModel from "../../libs/subpingddb/model/subpingTable/hotChartTime";
+import SubpingDDB from "subpingddb";
+import HotChartTimeModel from "subpingddb/model/subpingTable/hotChartTime";
 import * as moment from "moment-timezone";
 
 const makeHour = (hour: Number) => {
