@@ -1,18 +1,18 @@
 import SubpingRDB, { Entity } from "subpingrdb";
-import  * as moment from "moment-timezone";
+import moment from "moment-timezone";
 
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import { success, failure } from "../../libs/response-lib";
 
 const makeHour = (hour: Number) => {
-    let standardHour: string;
-    return standardHour = 
+    let standardHour:string = 
             (3 <= hour && hour < 9) ? "03:00"
         :   (9 <= hour && hour < 15) ? "09:00"
         :   (15 <= hour && hour < 21) ? "15:00"
-        :   "21:00"
+        :   "21:00";
+    return standardHour 
 }
-export const handler: APIGatewayProxyHandler = async (event, _context) => {
+export const handler:APIGatewayProxyHandler = async (event, _context) => {
     try {
         const body = JSON.parse(event.body || "");
 
