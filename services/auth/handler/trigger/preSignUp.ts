@@ -4,7 +4,7 @@ import SubpingRDB, { Entity, Repository } from "subpingrdb";
 
 // preSignUp 핸들러는, 회원가입에 사용되는 트리거입니다.
 // 본 트리거에서 CI 값 검증 및 기타 필요한 작업을 수행합니다. 
-export const handler = async (event, context, callback) => {
+export const handler = async (event: any, _: any, callback: any) => {
     try {
         const subpingRDB = new SubpingRDB();
         const connection = await subpingRDB.getConnection("dev");
@@ -21,7 +21,7 @@ export const handler = async (event, context, callback) => {
         userModel.phoneNumber = event.request.validationData['phone_number'];
         userModel.ci = event.request.validationData.ci;
 
-        await userRepository.saveUser(userModel);
+        await userRepository.save(userModel);
 
         // 회원가임 Confirm 자동 처리
         event.response.autoConfirmUser = true;
@@ -29,6 +29,10 @@ export const handler = async (event, context, callback) => {
         
         callback(null, event);
     } catch (e) {
-        
+        // 회원가임 Confirm 자동 처리
+        event.response.autoConfirmUser = false;
+        event.response.autoVerifyEmail = false;
+
+        callback(null, event);
     }
 };
